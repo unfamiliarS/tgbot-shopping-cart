@@ -7,7 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class PostgreSQLConnection {
+final public class PostgreSQLConnection {
 
     private Connection connection;
 
@@ -18,10 +18,6 @@ public class PostgreSQLConnection {
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
         }
-    }
-
-    public Connection getConnection() {
-        return connection;
     }
 
     public void closeConnection() {
@@ -61,6 +57,51 @@ public class PostgreSQLConnection {
             return false;
         }
     }
+
+    // Метод для обновления выбранной корзины для пользователя
+    public boolean updateSelectedCartForUser(long userId, long cartId) {
+        String query = "UPDATE \"Users\" SET selected_cart = ? WHERE user_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, cartId);
+            statement.setLong(2, userId);
+            int affectedRows = statement.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // Метод для получения id выбранной корзины для пользователя
+    public long getSelectedCartForUser(long userId) {
+        String query = "SELECT selected_cart FROM \"Users\" WHERE user_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, userId);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getLong("selected_cart");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    // Метод для получения названия корзины по id
+    public String getCartByID(long cartID) {
+        String query = "SELECT cart_name FROM \"Shoping_Carts\" WHERE cart_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, cartID);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getString("cart_name");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 
     // Метод для получения корзин пользователя
     public ResultSet getUserCarts(long userId) {

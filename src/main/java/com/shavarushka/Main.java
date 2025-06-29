@@ -2,11 +2,14 @@ package com.shavarushka;
 
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
 
-public class Main {
+final public class Main {
+    
+    private static final String botToken = System.getenv("SHOPPING_CART_BOT_TOKEN");
+    private static final ShopingCartBot bot = new ShopingCartBot(botToken);
+
     public static void main(String[] args) {
-        String botToken = System.getenv("SHOPPING_CART_BOT_TOKEN");
         try (var botsApplication = new TelegramBotsLongPollingApplication()) {
-            botsApplication.registerBot(botToken, new ShopingCartBot(botToken));
+            botsApplication.registerBot(botToken, bot);
             System.out.println("SharedShoppingCartBot successfully started");
             // Ensure this prcess wait forever
             Thread.currentThread().join();
