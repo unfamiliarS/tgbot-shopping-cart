@@ -27,16 +27,13 @@ public class ShopingCartBot implements LongPollingSingleThreadUpdateConsumer {
 
     @Override
     public void consume(Update update) {
-        
         SendMessage messageToSend = null;
-        
         if (update.hasMessage() && update.getMessage().hasText()) {
             // set default variable
             String updateMessage = update.getMessage().getText();
             long chatID = update.getMessage().getChatId();
             User user = update.getMessage().getFrom();
             long userID = user.getId();            
-            System.out.println(updateMessage);
             
             // this is a command handler block
             messageToSend = switch(updateMessage.strip()) {
@@ -104,14 +101,7 @@ public class ShopingCartBot implements LongPollingSingleThreadUpdateConsumer {
                         .build();
                 // ...
             } else if (queryMessage.startsWith("/selectCart_")) {
-                String cartID = queryMessage.substring("/selectCart_".length(), queryMessage.lastIndexOf("from_"));
-                String userID = queryMessage.substring(queryMessage.lastIndexOf("_")+1);
-                if (DBConnection.updateSelectedCartForUser(Long.parseLong(userID), Long.parseLong(cartID))) {
-                    messageToSend = SendMessage.builder()
-                        .chatId(chatID)
-                        .text("Добро пожаловать в " + DBConnection.getCartByID(Long.parseLong(cartID)))
-                        .build();
-                }
+                selectCartCallbackhandler(queryMessage, chatID);
             }
         }
         try {
@@ -180,6 +170,23 @@ public class ShopingCartBot implements LongPollingSingleThreadUpdateConsumer {
         }
     }
     // end of startCommandHandler methods set
+
+    // start of selectCartCallbackhandler methods set
+    private SendMessage selectCartCallbackhandler(String queryMessage, long chatID) {
+        String cartID = queryMessage.substring("/selectCart_".length(), queryMessage.lastIndexOf("from_"));
+        String userID = queryMessage.substring(queryMessage.lastIndexOf("_")+1);
+        if (DBConnection.updateSelectedCartForUser(Long.parseLong(userID), Long.parseLong(cartID))) {
+            return SendMessage.builder()
+                .chatId(chatID)
+                .text("Добро пожаловать в " + DBConnection.getCartByID(Long.parseLong(cartID)))
+                .build();
+        }
+        return SendMessage.builder()
+                .chatId(String.valueOf(chatID))
+                .text("Произошла ошибка при обновлении выбранной корзины.")
+                .build();
+    }
+    // end of selectCartCallbackhandler methods set
 
 
     private String getUsersCarts(ResultSet resultFromQuery) throws SQLException {
