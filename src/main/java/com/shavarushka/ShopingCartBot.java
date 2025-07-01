@@ -28,10 +28,11 @@ public class ShopingCartBot implements LongPollingSingleThreadUpdateConsumer {
     @Override
     public void consume(Update update) {
         SendMessage messageToSend = null;
+        long chatID = update.getMessage().getChatId();
+
         if (update.hasMessage() && update.getMessage().hasText()) {
             // set default variable
             String updateMessage = update.getMessage().getText();
-            long chatID = update.getMessage().getChatId();
             User user = update.getMessage().getFrom();
             long userID = user.getId();            
             
@@ -92,7 +93,6 @@ public class ShopingCartBot implements LongPollingSingleThreadUpdateConsumer {
         } else if (update.hasCallbackQuery()) {
             // set default variable
             String queryMessage = update.getCallbackQuery().getData();
-            long chatID = update.getCallbackQuery().getMessage().getChatId();
 
             if (queryMessage.equals("/createShoppingCart")) {
                 messageToSend = SendMessage.builder()
@@ -103,6 +103,11 @@ public class ShopingCartBot implements LongPollingSingleThreadUpdateConsumer {
             } else if (queryMessage.startsWith("/selectCart_")) {
                 selectCartCallbackhandler(queryMessage, chatID);
             }
+        } else {
+            messageToSend = SendMessage.builder()
+                .chatId(chatID)
+                .text("Неверная команда")
+                .build();
         }
         try {
             telegramClient.execute(messageToSend);
