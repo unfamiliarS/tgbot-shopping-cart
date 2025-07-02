@@ -1,33 +1,43 @@
 package com.shavarushka;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
-import com.shavarushka.commands.CreateCartCommand;
-import com.shavarushka.commands.HelpCommand;
-import com.shavarushka.commands.StartCommand;
+import com.shavarushka.commands.callbackhandler.CancelCreatingNewCartCallback;
+import com.shavarushka.commands.commandhandler.CancelCommand;
+import com.shavarushka.commands.commandhandler.CreateCartCommand;
+import com.shavarushka.commands.commandhandler.HelpCommand;
+import com.shavarushka.commands.commandhandler.StartCommand;
+import com.shavarushka.commands.intr.BotState;
 import com.shavarushka.commands.intr.CallbackCommand;
 import com.shavarushka.commands.intr.TextCommand;
 
 public class CommandManager {
     private final List<TextCommand> textCommands = new ArrayList<>();
     private final List<CallbackCommand> callbackCommands = new ArrayList<>();
-    private PostgreSQLConnection DBConnection;
+    private final Map<Long, BotState> userStates = new HashMap<>();
+    // private PostgreSQLConnection DBConnection;
 
     public CommandManager(TelegramClient telegramClient) {
-        DBConnection = new PostgreSQLConnection(System.getenv("DB_URL"),
-                                                System.getenv("DB_USER"), 
-                                                System.getenv("DB_PASSWORD"));
+        // DBConnection = new PostgreSQLConnection(System.getenv("DB_URL"),
+        //                                         System.getenv("DB_USER"), 
+        //                                         System.getenv("DB_PASSWORD"));
+        // register commands
         registerCommand(new StartCommand(telegramClient));
         registerCommand(new HelpCommand(telegramClient, textCommands));
-        registerCommand(new CreateCartCommand(telegramClient));
-        // ...
+        registerCommand(new CancelCommand(telegramClient, userStates));
+        var createCartCommand = new CreateCartCommand(telegramClient, userStates);
+        registerCommand(createCartCommand);
+        registerCommand(createCartCommand.new NameInputHandler(telegramClient));
+
+        // register callbacks
+        registerCommand(new CancelCreatingNewCartCallback(telegramClient, userStates));
     }
 
     public void registerCommand(TextCommand command) {
@@ -55,8 +65,6 @@ public class CommandManager {
                 return;
             }
         }
-
-        // Обработка неизвестной команды
     }
     
     private void processCallbackCommand(Update update) throws TelegramApiException {
@@ -66,9 +74,5 @@ public class CommandManager {
                 return;
             }
         }
-    }
-    
-    private void processUnknownUpdate(Update update) {
-        // Логирование неподдерживаемых типов сообщений
     }
 }

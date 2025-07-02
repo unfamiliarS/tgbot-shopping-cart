@@ -10,4 +10,25 @@ public interface BotCommand {
     void sendMessage(Long chatId, String text) throws TelegramApiException;
     void sendMessage(Long chatId, ReplyKeyboard text) throws TelegramApiException;
 
+    static String escapeMarkdownV2(String text) {
+        return text.replace("_", "\\_")
+                .replace("*", "\\*")
+                .replace("[", "\\[")
+                .replace("]", "\\]")
+                .replace("(", "\\(")
+                .replace(")", "\\)")
+                .replace("~", "\\~")
+                .replace("`", "\\`")
+                .replace(">", "\\>")
+                .replace("#", "\\#")
+                .replace("+", "\\+")
+                .replace("-", "\\-")
+                .replace("=", "\\=")
+                .replace("|", "\\|")
+                .replace("{", "\\{")
+                .replace("}", "\\}")
+                .replace(".", "\\.")
+                .replace("!", "\\!");
+    }
+
 }

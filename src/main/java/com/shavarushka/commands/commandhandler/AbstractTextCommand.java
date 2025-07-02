@@ -1,23 +1,25 @@
-package com.shavarushka.commands;
+package com.shavarushka.commands.commandhandler;
 
+import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
-import com.shavarushka.commands.intr.CallbackCommand;
+import com.shavarushka.commands.intr.TextCommand;
 
-public abstract class AbstractCallbackCommand implements CallbackCommand {
+public abstract class AbstractTextCommand implements TextCommand {
     protected final TelegramClient telegramClient;
     
-    public AbstractCallbackCommand(TelegramClient telegramClient) {
+    public AbstractTextCommand(TelegramClient telegramClient) {
         this.telegramClient = telegramClient;
     }
-    
+
     public void sendMessage(Long chatId, String text) throws TelegramApiException {
         telegramClient.execute(SendMessage.builder()
                                     .chatId(chatId)
                                     .text(text)
+                                    .parseMode(ParseMode.MARKDOWNV2)
                                     .build());
     }
 
@@ -27,4 +29,14 @@ public abstract class AbstractCallbackCommand implements CallbackCommand {
                                     .replyMarkup(keyboard)
                                     .build());
     }
+
+    public void sendMessage(Long chatId, String text, ReplyKeyboard keyboard) throws TelegramApiException {
+        telegramClient.execute(SendMessage.builder()
+                                    .chatId(chatId)
+                                    .text(text)
+                                    .parseMode(ParseMode.MARKDOWNV2)
+                                    .replyMarkup(keyboard)
+                                    .build());
+    }
+
 }

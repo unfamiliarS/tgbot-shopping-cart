@@ -8,6 +8,6 @@ public interface CallbackCommand extends BotCommand {
     @Override
     default boolean shouldProcess(Update update) {
         return update.hasCallbackQuery() &&
-               update.getCallbackQuery().getData().startsWith(getCallbackPattern());
+               update.getCallbackQuery().getData().startsWith(getCallbackPattern().strip());
     }
 }

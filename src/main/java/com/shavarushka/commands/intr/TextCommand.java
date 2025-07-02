@@ -10,6 +10,6 @@ public interface TextCommand extends BotCommand {
     default boolean shouldProcess(Update update) {
         return update.hasMessage() && 
                update.getMessage().hasText() &&
-               update.getMessage().getText().matches(getCommand());
+               update.getMessage().getText().matches(getCommand().strip());
     }
 }
