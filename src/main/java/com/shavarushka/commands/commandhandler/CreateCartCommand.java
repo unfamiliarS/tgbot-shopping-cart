@@ -8,14 +8,12 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import com.shavarushka.KeyboardsFabrics;
+import com.shavarushka.commands.intr.BotCommand;
 import com.shavarushka.commands.intr.BotState;
 
 public class CreateCartCommand extends AbstractTextCommand {
-    Map<Long, BotState> userStates;
-
     public CreateCartCommand(TelegramClient telegramClient, Map<Long, BotState> userStates) {
-        super(telegramClient);
-        this.userStates = userStates;
+        super(telegramClient, userStates);
     }
 
     @Override
@@ -25,7 +23,11 @@ public class CreateCartCommand extends AbstractTextCommand {
 
     @Override
     public String getDescription() {
-        return "Создание новой корзины";
+        return """
+            Создание новой корзины.
+                    - Используйте только буквы, цифры и -_.,!()
+                    - Длина от 3 до 30 символов
+            """;
     }
 
     @Override
@@ -38,8 +40,8 @@ public class CreateCartCommand extends AbstractTextCommand {
     }
 
     public class NameInputHandler extends AbstractTextCommand {
-        public NameInputHandler(TelegramClient telegramClient) {
-            super(telegramClient);
+        public NameInputHandler(TelegramClient telegramClient, Map<Long, BotState> userStates) {
+            super(telegramClient, userStates);
         }
 
         @Override
@@ -63,13 +65,35 @@ public class CreateCartCommand extends AbstractTextCommand {
         public void execute(Update update) throws TelegramApiException {
             long chatId = update.getMessage().getChatId();
             String cartName = update.getMessage().getText();
-            String message = "Вы точно уверены\\, что хотите создать *" + cartName + "*\\?";
+            String message;
+            if (!isCorrectCartName(cartName)) {
+                message = BotCommand.escapeMarkdownV2("Некорректное название для корзины. Попробуй ещё раз.");
+                sendMessage(chatId, message,
+                    KeyboardsFabrics.createInlineKeyboard(
+                        Map.of(BotCommand.escapeMarkdownV2("Отменить создание"),
+                        "/cancelcreatingnewcart"),
+                        1));
+                return;
+            }
+            message = "Вы точно уверены\\, что хотите создать *" + cartName + "*\\?";
             ReplyKeyboard confirmationKeyboard = KeyboardsFabrics.createInlineKeyboard(
-                                            Map.of("✅ Подтвердить", "/confirmcartcreation",
+                                            Map.of("✅ Подтвердить", "/confirmcartcreation_" + cartName,
                                                    "❌ Отменить", "/cancelcreatingnewcart"),
                                                    2);
-            sendMessage(chatId, message, confirmationKeyboard);
             userStates.put(chatId, BotState.CONFIRMING_CART_CREATION);
+            sendMessage(chatId, message, confirmationKeyboard);
+        }
+
+        private boolean isCorrectCartName(String cartName) {
+            String allowedCharsRegex = "^[a-zA-Zа-яА-ЯёЁ0-9\\s\\-_,.!()]+$";
+                    // not null test
+            return cartName != null && 
+                    // not empty test
+                   !cartName.trim().isEmpty() &&
+                    // length test
+                   (cartName.length() >= 3 && cartName.length() <= 43) &&
+                    // test for allowed chars
+                    cartName.matches(allowedCharsRegex);           
         }
     }
 }

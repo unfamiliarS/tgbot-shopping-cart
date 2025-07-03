@@ -9,14 +9,15 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 import com.shavarushka.commands.intr.BotCommand;
 import com.shavarushka.commands.intr.BotState;
 
-public class CancelCreatingNewCartCallback extends AbstractCallbackCommand {
-    public CancelCreatingNewCartCallback(TelegramClient telegramClient, Map<Long, BotState> userStates) {
+public class ConfirmCartCreationCallback extends AbstractCallbackCommand {
+
+    public ConfirmCartCreationCallback(TelegramClient telegramClient, Map<Long, BotState> userStates) {
         super(telegramClient, userStates);
     }
-    
+
     @Override
     public String getCallbackPattern() {
-        return "/cancelcreatingnewcart";
+        return "/confirmcartcreation_"; // + cartName
     }
 
     @Override
@@ -25,14 +26,14 @@ public class CancelCreatingNewCartCallback extends AbstractCallbackCommand {
         return update.hasCallbackQuery() &&
                update.getCallbackQuery().getData().startsWith(getCallbackPattern().strip()) &&
                userStates.containsKey(chatId) &&
-               (userStates.get(chatId).equals(BotState.WAITING_FOR_CART_NAME) ||
-               userStates.get(chatId).equals(BotState.CONFIRMING_CART_CREATION));
+               userStates.get(chatId).equals(BotState.CONFIRMING_CART_CREATION);
     }
 
     @Override
     public void execute(Update update) throws TelegramApiException {
         long chatId = update.getCallbackQuery().getMessage().getChatId();
-        String message = BotCommand.escapeMarkdownV2("Отменяю создание корзины...");
+        String cartName = update.getCallbackQuery().getData().substring(getCallbackPattern().length());
+        String message = BotCommand.escapeMarkdownV2("Успешно! Добро пожаловать в ") + "*" + cartName + "*";
         userStates.remove(chatId);
         sendMessage(chatId, message);
     }

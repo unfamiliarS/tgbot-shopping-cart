@@ -10,11 +10,8 @@ import com.shavarushka.commands.intr.BotCommand;
 import com.shavarushka.commands.intr.BotState;
 
 public class CancelCommand extends AbstractTextCommand {
-    private final Map<Long, BotState> userStates;
-
     public CancelCommand(TelegramClient telegramClient, Map<Long, BotState> userStates) {
-        super(telegramClient);
-        this.userStates = userStates;
+        super(telegramClient, userStates);
     }
 
     @Override

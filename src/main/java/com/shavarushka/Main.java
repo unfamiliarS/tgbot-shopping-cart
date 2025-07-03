@@ -3,7 +3,6 @@ package com.shavarushka;
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
 
 final public class Main {
-    
     private static final String botToken = System.getenv("SHOPPING_CART_BOT_TOKEN");
     private static final Bot bot = new Bot(botToken);
 

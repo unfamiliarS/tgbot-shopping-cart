@@ -10,6 +10,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import com.shavarushka.commands.callbackhandler.CancelCreatingNewCartCallback;
+import com.shavarushka.commands.callbackhandler.ConfirmCartCreationCallback;
 import com.shavarushka.commands.commandhandler.CancelCommand;
 import com.shavarushka.commands.commandhandler.CreateCartCommand;
 import com.shavarushka.commands.commandhandler.HelpCommand;
@@ -29,15 +30,15 @@ public class CommandManager {
         //                                         System.getenv("DB_USER"), 
         //                                         System.getenv("DB_PASSWORD"));
         // register commands
-        registerCommand(new StartCommand(telegramClient));
-        registerCommand(new HelpCommand(telegramClient, textCommands));
+        registerCommand(new StartCommand(telegramClient, userStates));
+        registerCommand(new HelpCommand(telegramClient, userStates, textCommands));
         registerCommand(new CancelCommand(telegramClient, userStates));
         var createCartCommand = new CreateCartCommand(telegramClient, userStates);
         registerCommand(createCartCommand);
-        registerCommand(createCartCommand.new NameInputHandler(telegramClient));
-
+        registerCommand(createCartCommand.new NameInputHandler(telegramClient, userStates));
         // register callbacks
         registerCommand(new CancelCreatingNewCartCallback(telegramClient, userStates));
+        registerCommand(new ConfirmCartCreationCallback(telegramClient, userStates));
     }
 
     public void registerCommand(TextCommand command) {

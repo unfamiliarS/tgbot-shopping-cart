@@ -19,12 +19,11 @@ public class KeyboardsFabrics {
         InlineKeyboardRow currentRow = new InlineKeyboardRow();
         
         for (Map.Entry<String, String> entry : buttons.entrySet()) {
-            currentRow.add(
-                InlineKeyboardButton
-                    .builder()
-                    .text(entry.getKey())
-                    .callbackData(entry.getValue())
-                    .build()
+            currentRow.add(InlineKeyboardButton
+                            .builder()
+                            .text(entry.getKey())
+                            .callbackData(entry.getValue())
+                            .build()
             );
             
             if (currentRow.size() >= buttonsPerRow) {
