@@ -8,7 +8,7 @@ public interface BotCommand {
     void execute(Update update) throws TelegramApiException;
     boolean shouldProcess(Update update);
     void sendMessage(Long chatId, String text) throws TelegramApiException;
-    void sendMessage(Long chatId, ReplyKeyboard text) throws TelegramApiException;
+    void sendMessage(Long chatId, String text, ReplyKeyboard keyboard) throws TelegramApiException;
 
     static String escapeMarkdownV2(String text) {
         return text.replace("_", "\\_")

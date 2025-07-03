@@ -14,6 +14,7 @@ import com.shavarushka.commands.callbackhandler.ConfirmCartCreationCallback;
 import com.shavarushka.commands.commandhandler.CancelCommand;
 import com.shavarushka.commands.commandhandler.CreateCartCommand;
 import com.shavarushka.commands.commandhandler.HelpCommand;
+import com.shavarushka.commands.commandhandler.MyCartCommand;
 import com.shavarushka.commands.commandhandler.StartCommand;
 import com.shavarushka.commands.intr.BotState;
 import com.shavarushka.commands.intr.CallbackCommand;
@@ -39,6 +40,7 @@ public class CommandManager {
         // register callbacks
         registerCommand(new CancelCreatingNewCartCallback(telegramClient, userStates));
         registerCommand(new ConfirmCartCreationCallback(telegramClient, userStates));
+        registerCommand(new MyCartCommand(telegramClient, userStates));
     }
 
     public void registerCommand(TextCommand command) {

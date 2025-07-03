@@ -26,8 +26,7 @@ public class CreateCartCommand extends AbstractTextCommand {
         return """
             Создание новой корзины.
                     - Используйте только буквы, цифры и -_.,!()
-                    - Длина от 3 до 30 символов
-            """;
+                    - Длина от 3 до 30 символов""";
     }
 
     @Override

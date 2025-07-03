@@ -42,13 +42,6 @@ public abstract class AbstractTextCommand implements TextCommand {
                                     .build());
     }
 
-    public void sendMessage(Long chatId, ReplyKeyboard keyboard) throws TelegramApiException {
-        telegramClient.execute(SendMessage.builder()
-                                    .chatId(chatId)
-                                    .replyMarkup(keyboard)
-                                    .build());
-    }
-
     public void sendMessage(Long chatId, String text, ReplyKeyboard keyboard) throws TelegramApiException {
         telegramClient.execute(SendMessage.builder()
                                     .chatId(chatId)
