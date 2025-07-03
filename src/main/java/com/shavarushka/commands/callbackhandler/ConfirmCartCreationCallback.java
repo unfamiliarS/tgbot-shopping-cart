@@ -6,7 +6,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
-import com.shavarushka.commands.intr.BotCommand;
 import com.shavarushka.commands.intr.BotState;
 
 public class ConfirmCartCreationCallback extends AbstractCallbackCommand {
@@ -31,10 +30,11 @@ public class ConfirmCartCreationCallback extends AbstractCallbackCommand {
 
     @Override
     public void execute(Update update) throws TelegramApiException {
-        long chatId = update.getCallbackQuery().getMessage().getChatId();
+        Long chatId = update.getCallbackQuery().getMessage().getChatId();
+        Integer messageId = update.getCallbackQuery().getMessage().getMessageId();
         String cartName = update.getCallbackQuery().getData().substring(getCallbackPattern().length());
-        String message = BotCommand.escapeMarkdownV2("Успешно! Добро пожаловать в ") + "*" + cartName + "*";
+        String message = escapeMarkdownV2("Успешно! Добро пожаловать в ") + "*" + cartName + "*";
         userStates.remove(chatId);
-        sendMessage(chatId, message);
+        editMessage(chatId, messageId, message);
     }
 }

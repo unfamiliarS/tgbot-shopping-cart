@@ -8,7 +8,6 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import com.shavarushka.KeyboardsFabrics;
-import com.shavarushka.commands.intr.BotCommand;
 import com.shavarushka.commands.intr.BotState;
 
 public class CreateCartCommand extends AbstractTextCommand {
@@ -66,10 +65,10 @@ public class CreateCartCommand extends AbstractTextCommand {
             String cartName = update.getMessage().getText();
             String message;
             if (!isCorrectCartName(cartName)) {
-                message = BotCommand.escapeMarkdownV2("Некорректное название для корзины. Попробуй ещё раз.");
+                message = escapeMarkdownV2("Некорректное название для корзины. Попробуй ещё раз.");
                 sendMessage(chatId, message,
                     KeyboardsFabrics.createInlineKeyboard(
-                        Map.of(BotCommand.escapeMarkdownV2("Отменить создание"),
+                        Map.of(escapeMarkdownV2("Отменить создание"),
                         "/cancelcreatingnewcart"),
                         1));
                 return;

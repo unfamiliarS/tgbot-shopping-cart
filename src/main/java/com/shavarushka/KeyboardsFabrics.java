@@ -5,13 +5,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
 
 public class KeyboardsFabrics {
 
-    static public ReplyKeyboard createInlineKeyboard(Map<String, String> buttons, int buttonsPerRow) {
+    static public InlineKeyboardMarkup createInlineKeyboard(Map<String, String> buttons, int buttonsPerRow) {
         if (buttonsPerRow <= 0)
             throw new IndexOutOfBoundsException("Incorect buttons per row number");
 

@@ -37,10 +37,13 @@ public class CommandManager {
         var createCartCommand = new CreateCartCommand(telegramClient, userStates);
         registerCommand(createCartCommand);
         registerCommand(createCartCommand.new NameInputHandler(telegramClient, userStates));
+        var mycartCommand = new MyCartCommand(telegramClient, userStates);
+        registerCommand(mycartCommand);
+
         // register callbacks
         registerCommand(new CancelCreatingNewCartCallback(telegramClient, userStates));
         registerCommand(new ConfirmCartCreationCallback(telegramClient, userStates));
-        registerCommand(new MyCartCommand(telegramClient, userStates));
+        registerCommand(mycartCommand.new SetCartCallback(telegramClient, userStates));
     }
 
     public void registerCommand(TextCommand command) {

@@ -6,7 +6,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
-import com.shavarushka.commands.intr.BotCommand;
 import com.shavarushka.commands.intr.BotState;
 
 public class CancelCommand extends AbstractTextCommand {
@@ -29,7 +28,7 @@ public class CancelCommand extends AbstractTextCommand {
         long chatId = update.getMessage().getChatId();
         // clear bot state for chat
         userStates.remove(chatId);
-        String message = BotCommand.escapeMarkdownV2(getDescription());
+        String message = escapeMarkdownV2(getDescription());
         sendMessage(chatId, message);
     }
 

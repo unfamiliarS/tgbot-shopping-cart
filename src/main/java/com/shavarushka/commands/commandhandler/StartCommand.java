@@ -25,7 +25,7 @@ public class StartCommand extends AbstractTextCommand {
 
     @Override
     public void execute(Update update) throws TelegramApiException {
-        long chatId = update.getMessage().getChatId();
+        Long chatId = update.getMessage().getChatId();
         String userName = update.getMessage().getFrom().getFirstName();
         sendMessage(chatId, "Привет *" + userName + "*\\!");
     }

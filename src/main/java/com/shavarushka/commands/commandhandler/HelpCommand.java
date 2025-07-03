@@ -7,7 +7,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
-import com.shavarushka.commands.intr.BotCommand;
 import com.shavarushka.commands.intr.BotState;
 import com.shavarushka.commands.intr.TextCommand;
 
@@ -32,10 +31,10 @@ public class HelpCommand extends AbstractTextCommand {
     @Override
     public void execute(Update update) throws TelegramApiException {
         long chatId = update.getMessage().getChatId();
-        String message = BotCommand.escapeMarkdownV2("Мини-справка по командам бота:\n\n");
+        String message = escapeMarkdownV2("Мини-справка по командам бота:\n\n");
         for (TextCommand command : textCommands) {
             if (!command.getCommand().equals("") || !command.getDescription().equals(""))
-                message += BotCommand.escapeMarkdownV2("  " + command.getCommand() + " - " + command.getDescription() + "\n");
+                message += escapeMarkdownV2("  " + command.getCommand() + " - " + command.getDescription() + "\n");
         }
         sendMessage(chatId, message);
     }

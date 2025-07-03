@@ -6,7 +6,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
-import com.shavarushka.commands.intr.BotCommand;
 import com.shavarushka.commands.intr.BotState;
 
 public class CancelCreatingNewCartCallback extends AbstractCallbackCommand {
@@ -31,9 +30,10 @@ public class CancelCreatingNewCartCallback extends AbstractCallbackCommand {
 
     @Override
     public void execute(Update update) throws TelegramApiException {
-        long chatId = update.getCallbackQuery().getMessage().getChatId();
-        String message = BotCommand.escapeMarkdownV2("Отменяю создание корзины...");
+        Long chatId = update.getCallbackQuery().getMessage().getChatId();
+        Integer messageId = update.getCallbackQuery().getMessage().getMessageId();
+        String message = escapeMarkdownV2("Отменяю создание корзины...");
         userStates.remove(chatId);
-        sendMessage(chatId, message);
+        editMessage(chatId, messageId, message);
     }
 }
