@@ -46,11 +46,8 @@ public class MyCartCommand extends AbstractTextCommand {
         message = "Ваши корзины:";
         Map<String, String> buttons = new HashMap<>();
         for (String cart : cartNames) {
-            buttons.put(cart, "/setcart_" + cart);
-            if (cart.equals(selectedCart)) {
-                buttons.remove(selectedCart);
-                buttons.put("✅ " + cart, "/setcart_" + cart);
-            }
+            String cartName = cart.equals(selectedCart) ? "✅ " + cart : cart;
+            buttons.put(cartName, "/setcart_" + cart);
         }
         InlineKeyboardMarkup keyboard = KeyboardsFabrics.createInlineKeyboard(
                         buttons,
