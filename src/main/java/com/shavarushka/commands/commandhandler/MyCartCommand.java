@@ -10,7 +10,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
-import com.shavarushka.KeyboardsFabrics;
+import com.shavarushka.commands.KeyboardsFabrics;
 import com.shavarushka.commands.callbackhandler.AbstractCallbackCommand;
 import com.shavarushka.commands.intr.BotState;
 

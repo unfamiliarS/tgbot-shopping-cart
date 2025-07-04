@@ -7,13 +7,13 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
-public class Bot implements LongPollingSingleThreadUpdateConsumer {
+import com.shavarushka.commands.CommandManager;
 
-    private TelegramClient telegramClient;
+public class Bot implements LongPollingSingleThreadUpdateConsumer {
     private CommandManager commandManager;
 
     public Bot(String token) {
-        telegramClient = new OkHttpTelegramClient(token);
+        TelegramClient telegramClient = new OkHttpTelegramClient(token);
         commandManager = new CommandManager(telegramClient);
     }
 

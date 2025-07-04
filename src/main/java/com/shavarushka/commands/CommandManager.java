@@ -1,8 +1,6 @@
-package com.shavarushka;
+package com.shavarushka.commands;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.telegram.telegrambots.meta.api.objects.Update;

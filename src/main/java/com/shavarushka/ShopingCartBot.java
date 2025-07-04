@@ -13,6 +13,9 @@ import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
+import com.shavarushka.commands.KeyboardsFabrics;
+import com.shavarushka.database.PostgreSQLConnection;
+
 public class ShopingCartBot implements LongPollingSingleThreadUpdateConsumer {
 
     private TelegramClient telegramClient;

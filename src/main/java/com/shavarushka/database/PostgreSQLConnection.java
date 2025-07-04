@@ -1,4 +1,4 @@
-package com.shavarushka;
+package com.shavarushka.database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

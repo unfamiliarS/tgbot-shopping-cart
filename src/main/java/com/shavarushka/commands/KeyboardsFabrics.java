@@ -1,4 +1,4 @@
-package com.shavarushka;
+package com.shavarushka.commands;
 
 import java.util.ArrayList;
 import java.util.List;
