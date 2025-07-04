@@ -20,13 +20,12 @@ public abstract class AbstractTextCommand extends MessageSender implements TextC
     // should override if need to check BotState 
     @Override
     public boolean shouldProcess(Update update) {
-        if (update.hasMessage()) {
-            long chatId = update.getMessage().getChatId();
-            String message = update.getMessage().getText();
-            return update.getMessage().hasText() &&
-                   userStates.get(chatId) == null &&
-                   message.matches(getCommand().strip());
-        }
-        return false;
+        if (!update.hasMessage() || !update.getMessage().hasText())
+            return false;
+
+        long chatId = update.getMessage().getChatId();
+        String message = update.getMessage().getText();
+        return userStates.get(chatId) == null &&
+                message.matches(getCommand().strip());
     }
 }

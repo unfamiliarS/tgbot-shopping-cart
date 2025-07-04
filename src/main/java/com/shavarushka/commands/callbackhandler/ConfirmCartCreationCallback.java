@@ -21,9 +21,11 @@ public class ConfirmCartCreationCallback extends AbstractCallbackCommand {
 
     @Override
     public boolean shouldProcess(Update update) {
+        if (!update.hasCallbackQuery())
+            return false;
+
         long chatId = update.getCallbackQuery().getMessage().getChatId();
-        return update.hasCallbackQuery() &&
-               update.getCallbackQuery().getData().startsWith(getCallbackPattern().strip()) &&
+        return update.getCallbackQuery().getData().startsWith(getCallbackPattern().strip()) &&
                userStates.containsKey(chatId) &&
                userStates.get(chatId).equals(BotState.CONFIRMING_CART_CREATION);
     }

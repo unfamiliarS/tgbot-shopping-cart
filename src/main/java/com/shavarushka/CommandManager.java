@@ -16,13 +16,13 @@ import com.shavarushka.commands.commandhandler.CreateCartCommand;
 import com.shavarushka.commands.commandhandler.HelpCommand;
 import com.shavarushka.commands.commandhandler.MyCartCommand;
 import com.shavarushka.commands.commandhandler.StartCommand;
+import com.shavarushka.commands.intr.BotCommand;
 import com.shavarushka.commands.intr.BotState;
 import com.shavarushka.commands.intr.CallbackCommand;
 import com.shavarushka.commands.intr.TextCommand;
 
 public class CommandManager {
-    private final List<TextCommand> textCommands = new ArrayList<>();
-    private final List<CallbackCommand> callbackCommands = new ArrayList<>();
+    private final Map<String, BotCommand> commands = new HashMap<>();
     private final Map<Long, BotState> userStates = new HashMap<>();
     // private PostgreSQLConnection DBConnection;
 
@@ -32,7 +32,7 @@ public class CommandManager {
         //                                         System.getenv("DB_PASSWORD"));
         // register commands
         registerCommand(new StartCommand(telegramClient, userStates));
-        registerCommand(new HelpCommand(telegramClient, userStates, textCommands));
+        registerCommand(new HelpCommand(telegramClient, userStates, commands));
         registerCommand(new CancelCommand(telegramClient, userStates));
         var createCartCommand = new CreateCartCommand(telegramClient, userStates);
         registerCommand(createCartCommand);
@@ -47,34 +47,15 @@ public class CommandManager {
     }
 
     public void registerCommand(TextCommand command) {
-        textCommands.add(command);
+        commands.put(command.getCommand(), command);
     }
 
     public void registerCommand(CallbackCommand command) {
-        callbackCommands.add(command);
+        commands.put(command.getCallbackPattern(), command);
     }
 
     public void processUpdate(Update update) throws TelegramApiException {
-        if (update.hasMessage() && update.getMessage().hasText()) {
-            processTextCommand(update);
-        } else if (update.hasCallbackQuery()) {
-            processCallbackCommand(update);
-        } else {
-            return;
-        }
-    }
-
-    private void processTextCommand(Update update) throws TelegramApiException {
-        for (TextCommand command : textCommands) {
-            if (command.shouldProcess(update)) {
-                command.execute(update);
-                return;
-            }
-        }
-    }
-    
-    private void processCallbackCommand(Update update) throws TelegramApiException {
-        for (CallbackCommand command : callbackCommands) {
+        for (BotCommand command : commands.values()) {
             if (command.shouldProcess(update)) {
                 command.execute(update);
                 return;

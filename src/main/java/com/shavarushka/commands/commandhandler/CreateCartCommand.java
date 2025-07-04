@@ -54,6 +54,9 @@ public class CreateCartCommand extends AbstractTextCommand {
         
         @Override
         public boolean shouldProcess(Update update) {
+            if (!update.hasMessage() || !update.getMessage().hasText())
+                return false;
+
             long chatId = update.getMessage().getChatId();
             return userStates.containsKey(chatId) && 
                    userStates.get(chatId).equals(BotState.WAITING_FOR_CART_NAME);

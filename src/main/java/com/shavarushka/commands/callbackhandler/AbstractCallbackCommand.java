@@ -20,12 +20,12 @@ public abstract class AbstractCallbackCommand extends MessageSender implements C
     // should override if need to check BotState
     @Override
     public boolean shouldProcess(Update update) {
-        if (update.hasCallbackQuery()) {
-            long chatId = update.getCallbackQuery().getMessage().getChatId();
-            String callback = update.getCallbackQuery().getData();
-            return !userStates.containsKey(chatId) &&
-                   callback.startsWith(getCallbackPattern().strip());
-        }
-        return false;
+        if (!update.hasCallbackQuery())
+            return false;
+
+        long chatId = update.getCallbackQuery().getMessage().getChatId();
+        String callback = update.getCallbackQuery().getData();
+        return !userStates.containsKey(chatId) &&
+                callback.startsWith(getCallbackPattern().strip());
     }
 }

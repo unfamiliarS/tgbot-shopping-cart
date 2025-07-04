@@ -1,21 +1,20 @@
 package com.shavarushka.commands.commandhandler;
 
-import java.util.List;
 import java.util.Map;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
+import com.shavarushka.commands.intr.BotCommand;
 import com.shavarushka.commands.intr.BotState;
-import com.shavarushka.commands.intr.TextCommand;
 
 public class HelpCommand extends AbstractTextCommand {
-    private final List<TextCommand> textCommands;
+    private final Map<String, BotCommand> commands;
 
-    public HelpCommand(TelegramClient telegramClient, Map<Long, BotState> userStates, List<TextCommand> commands) {
+    public HelpCommand(TelegramClient telegramClient, Map<Long, BotState> userStates, Map<String, BotCommand> commands) {
         super(telegramClient, userStates);
-        textCommands = commands;
+        this.commands = commands;
     }
 
     @Override
@@ -32,9 +31,11 @@ public class HelpCommand extends AbstractTextCommand {
     public void execute(Update update) throws TelegramApiException {
         long chatId = update.getMessage().getChatId();
         String message = escapeMarkdownV2("Мини-справка по командам бота:\n\n");
-        for (TextCommand command : textCommands) {
-            if (!command.getCommand().equals("") || !command.getDescription().equals(""))
-                message += escapeMarkdownV2("  " + command.getCommand() + " - " + command.getDescription() + "\n");
+        for (BotCommand command : commands.values()) {
+            if (command instanceof AbstractTextCommand textCommand) {
+                if (!textCommand.getCommand().equals("") || !textCommand.getDescription().equals(""))
+                    message += escapeMarkdownV2("  " + textCommand.getCommand() + " - " + textCommand.getDescription() + "\n");
+            }
         }
         sendMessage(chatId, message);
     }
