@@ -1,4 +1,4 @@
-package com.shavarushka.commands.intr;
+package com.shavarushka.commands.interfaces;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;

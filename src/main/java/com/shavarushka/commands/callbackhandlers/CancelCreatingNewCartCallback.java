@@ -1,4 +1,4 @@
-package com.shavarushka.commands.callbackhandler;
+package com.shavarushka.commands.callbackhandlers;
 
 import java.util.Map;
 
@@ -6,7 +6,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
-import com.shavarushka.commands.intr.BotState;
+import com.shavarushka.commands.interfaces.BotState;
 
 public class CancelCreatingNewCartCallback extends AbstractCallbackCommand {
     public CancelCreatingNewCartCallback(TelegramClient telegramClient, Map<Long, BotState> userStates) {

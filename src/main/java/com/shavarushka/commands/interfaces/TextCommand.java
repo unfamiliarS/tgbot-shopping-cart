@@ -1,4 +1,4 @@
-package com.shavarushka.commands.intr;
+package com.shavarushka.commands.interfaces;
 
 public interface TextCommand extends BotCommand {
     String getCommand();

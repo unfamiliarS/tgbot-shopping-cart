@@ -1,4 +1,4 @@
-package com.shavarushka.commands.commandhandler;
+package com.shavarushka.commands.commandhandlers;
 
 import java.util.Map;
 
@@ -8,7 +8,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import com.shavarushka.commands.KeyboardsFabrics;
-import com.shavarushka.commands.intr.BotState;
+import com.shavarushka.commands.interfaces.BotState;
 
 public class CreateCartCommand extends AbstractTextCommand {
     public CreateCartCommand(TelegramClient telegramClient, Map<Long, BotState> userStates) {

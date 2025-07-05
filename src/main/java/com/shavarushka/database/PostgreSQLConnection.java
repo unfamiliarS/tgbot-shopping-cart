@@ -13,9 +13,8 @@ final public class PostgreSQLConnection {
 
     public PostgreSQLConnection(String url, String user, String password) {
         try {
-            Class.forName("org.postgresql.Driver");
             this.connection = DriverManager.getConnection(url, user, password);
-        } catch (ClassNotFoundException | SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }

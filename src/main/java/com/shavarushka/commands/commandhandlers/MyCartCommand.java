@@ -1,4 +1,4 @@
-package com.shavarushka.commands.commandhandler;
+package com.shavarushka.commands.commandhandlers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,8 +11,8 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import com.shavarushka.commands.KeyboardsFabrics;
-import com.shavarushka.commands.callbackhandler.AbstractCallbackCommand;
-import com.shavarushka.commands.intr.BotState;
+import com.shavarushka.commands.callbackhandlers.AbstractCallbackCommand;
+import com.shavarushka.commands.interfaces.BotState;
 
 public class MyCartCommand extends AbstractTextCommand {
     private List<String> cartNames = new ArrayList<>();

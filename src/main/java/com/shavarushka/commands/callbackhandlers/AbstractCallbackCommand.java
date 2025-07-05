@@ -1,13 +1,13 @@
-package com.shavarushka.commands.callbackhandler;
+package com.shavarushka.commands.callbackhandlers;
 
 import java.util.Map;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
-import com.shavarushka.commands.intr.BotState;
-import com.shavarushka.commands.intr.CallbackCommand;
-import com.shavarushka.commands.intr.MessageSender;
+import com.shavarushka.commands.interfaces.BotState;
+import com.shavarushka.commands.interfaces.CallbackCommand;
+import com.shavarushka.commands.interfaces.MessageSender;
 
 public abstract class AbstractCallbackCommand extends MessageSender implements CallbackCommand {
     protected final Map<Long, BotState> userStates;

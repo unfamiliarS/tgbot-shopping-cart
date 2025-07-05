@@ -1,13 +1,13 @@
-package com.shavarushka.commands.commandhandler;
+package com.shavarushka.commands.commandhandlers;
 
 import java.util.Map;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
-import com.shavarushka.commands.intr.BotState;
-import com.shavarushka.commands.intr.MessageSender;
-import com.shavarushka.commands.intr.TextCommand;
+import com.shavarushka.commands.interfaces.BotState;
+import com.shavarushka.commands.interfaces.MessageSender;
+import com.shavarushka.commands.interfaces.TextCommand;
 
 public abstract class AbstractTextCommand extends MessageSender implements TextCommand {
     protected final Map<Long, BotState> userStates;

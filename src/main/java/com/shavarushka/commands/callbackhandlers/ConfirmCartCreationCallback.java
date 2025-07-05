@@ -1,4 +1,4 @@
-package com.shavarushka.commands.callbackhandler;
+package com.shavarushka.commands.callbackhandlers;
 
 import java.util.Map;
 
@@ -6,7 +6,8 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
-import com.shavarushka.commands.intr.BotState;
+import com.shavarushka.commands.interfaces.BotState;
+import com.shavarushka.database.DatabaseOperations;
 
 public class ConfirmCartCreationCallback extends AbstractCallbackCommand {
 
@@ -35,6 +36,11 @@ public class ConfirmCartCreationCallback extends AbstractCallbackCommand {
         Long chatId = update.getCallbackQuery().getMessage().getChatId();
         Integer messageId = update.getCallbackQuery().getMessage().getMessageId();
         String cartName = update.getCallbackQuery().getData().substring(getCallbackPattern().length());
+
+        var dbConnection = new DatabaseOperations();
+        dbConnection.addShoppingCart(cartName);
+        // dbConnection.addUser(cartName, dbConnection.getShoppingCartById(chatId));
+        
         String message = escapeMarkdownV2("Успешно! Добро пожаловать в ") + "*" + cartName + "*";
         userStates.remove(chatId);
         editMessage(chatId, messageId, message);

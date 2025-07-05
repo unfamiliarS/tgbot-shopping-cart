@@ -7,17 +7,17 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
-import com.shavarushka.commands.callbackhandler.CancelCreatingNewCartCallback;
-import com.shavarushka.commands.callbackhandler.ConfirmCartCreationCallback;
-import com.shavarushka.commands.commandhandler.CancelCommand;
-import com.shavarushka.commands.commandhandler.CreateCartCommand;
-import com.shavarushka.commands.commandhandler.HelpCommand;
-import com.shavarushka.commands.commandhandler.MyCartCommand;
-import com.shavarushka.commands.commandhandler.StartCommand;
-import com.shavarushka.commands.intr.BotCommand;
-import com.shavarushka.commands.intr.BotState;
-import com.shavarushka.commands.intr.CallbackCommand;
-import com.shavarushka.commands.intr.TextCommand;
+import com.shavarushka.commands.callbackhandlers.CancelCreatingNewCartCallback;
+import com.shavarushka.commands.callbackhandlers.ConfirmCartCreationCallback;
+import com.shavarushka.commands.commandhandlers.CancelCommand;
+import com.shavarushka.commands.commandhandlers.CreateCartCommand;
+import com.shavarushka.commands.commandhandlers.HelpCommand;
+import com.shavarushka.commands.commandhandlers.MyCartCommand;
+import com.shavarushka.commands.commandhandlers.StartCommand;
+import com.shavarushka.commands.interfaces.BotCommand;
+import com.shavarushka.commands.interfaces.BotState;
+import com.shavarushka.commands.interfaces.CallbackCommand;
+import com.shavarushka.commands.interfaces.TextCommand;
 
 public class CommandManager {
     private final Map<String, BotCommand> commands = new HashMap<>();
