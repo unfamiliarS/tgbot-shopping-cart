@@ -4,6 +4,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 
 import com.shavarushka.database.entities.ShoppingCart;
@@ -13,35 +14,37 @@ import java.time.LocalDateTime;
 
 public class DatabaseOperations {
 
-    private final SessionFactory sessionFactory;
+    private SessionFactory sessionFactory;
 
     public DatabaseOperations() {
-        // Инициализация SessionFactory
-        sessionFactory = new MetadataSources(
+        StandardServiceRegistry registry = 
             new StandardServiceRegistryBuilder()
-                .configure()
-                .build()
-        ).buildMetadata().buildSessionFactory();
+                .build();
+        try {
+            sessionFactory = new MetadataSources(registry)
+                    .addAnnotatedClass(User.class)
+                    .addAnnotatedClass(ShoppingCart.class)
+                    .buildMetadata()
+                    .buildSessionFactory();
+        } catch (Exception e) {
+            // The registry would be destroyed by the SessionFactory, but we
+            // had trouble building the SessionFactory so destroy it manually.
+            StandardServiceRegistryBuilder.destroy(registry);
+        }
     }
 
-    // Метод для добавления новой корзины
     public void addShoppingCart(String cartName) {
-        Session session = sessionFactory.openSession();
-        Transaction transaction = null;
-        try {
-            transaction = session.beginTransaction();
+        try (var session = sessionFactory.openSession()) {
+            var transaction = session.beginTransaction();
             ShoppingCart cart = new ShoppingCart(cartName);
             session.persist(cart);
             transaction.commit();
         } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
             e.printStackTrace();
-        } finally {
-            session.close();
         }
     }
+
+
 
     // Метод для получения корзины по ID
     public ShoppingCart getShoppingCartById(Long cartId) {
