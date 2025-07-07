@@ -10,6 +10,7 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -31,8 +32,11 @@ public class ShoppingCart {
 
     public ShoppingCart() {}
 
-    public ShoppingCart(String cartName) {
+    public ShoppingCart(String cartName, User user) {
         this.cartName = cartName;
+        users = new HashSet<>();
+        users.add(user);
+        user.getCarts().add(this);
         this.creationTime = LocalDateTime.now();
     }
 
@@ -50,6 +54,19 @@ public class ShoppingCart {
 
     public void setCartName(String cartName) {
         this.cartName = cartName;
+    }
+
+    public void addUser(User user) {
+        users.add(user);
+        user.getCarts().add(this);
+    }
+
+    public Set<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(Set<User> users) {
+        this.users = users;
     }
 
     public LocalDateTime getCreationTime() {

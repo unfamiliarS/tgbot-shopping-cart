@@ -18,16 +18,15 @@ import com.shavarushka.commands.interfaces.BotCommand;
 import com.shavarushka.commands.interfaces.BotState;
 import com.shavarushka.commands.interfaces.CallbackCommand;
 import com.shavarushka.commands.interfaces.TextCommand;
+import com.shavarushka.database.DatabaseOperations;
 
 public class CommandManager {
     private final Map<String, BotCommand> commands = new HashMap<>();
     private final Map<Long, BotState> userStates = new HashMap<>();
-    // private PostgreSQLConnection DBConnection;
+    private DatabaseOperations connection;
 
     public CommandManager(TelegramClient telegramClient) {
-        // DBConnection = new PostgreSQLConnection(System.getenv("DB_URL"),
-        //                                         System.getenv("DB_USER"), 
-        //                                         System.getenv("DB_PASSWORD"));
+        connection = new DatabaseOperations();
         // register commands
         registerCommand(new StartCommand(telegramClient, userStates));
         registerCommand(new HelpCommand(telegramClient, userStates, commands));
@@ -40,7 +39,7 @@ public class CommandManager {
 
         // register callbacks
         registerCommand(new CancelCreatingNewCartCallback(telegramClient, userStates));
-        registerCommand(new ConfirmCartCreationCallback(telegramClient, userStates));
+        registerCommand(new ConfirmCartCreationCallback(telegramClient, userStates, connection));
         registerCommand(mycartCommand.new SetCartCallback(telegramClient, userStates));
     }
 

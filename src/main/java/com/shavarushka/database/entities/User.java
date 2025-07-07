@@ -3,6 +3,7 @@ package com.shavarushka.database.entities;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
@@ -21,17 +22,14 @@ public class User {
     @Column(name = "user_id")
     private Long userId;
 
-    @Column(name = "user_first_name", nullable = false)
-    private String firstName;
+    @Column(nullable = false)
+    private String username;
 
-    @Column(name = "user_last_name")
-    private String lastName;
-
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "selected_cart")
     private ShoppingCart selectedCart;
     
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(
         name = "users_shopping_carts",
         joinColumns = @JoinColumn(name = "user_id"),
@@ -44,20 +42,10 @@ public class User {
 
     public User() {}
 
-    public User(Long userId, String firstName, ShoppingCart selectedCart) {
-        this.firstName = firstName;
-        this.selectedCart = selectedCart;
-        this.carts = new HashSet<>();
-        this.carts.add(selectedCart);
-        this.registrationTime = LocalDateTime.now();
-    }
-
-    public User(String firstName, String lastName, ShoppingCart selectedCart) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.selectedCart = selectedCart;
-        this.carts = new HashSet<>();
-        this.carts.add(selectedCart);
+    public User(Long userId, String username) {
+        this.userId = userId;
+        this.username = username;
+        carts = new HashSet<>();
         this.registrationTime = LocalDateTime.now();
     }
 
@@ -69,20 +57,12 @@ public class User {
         this.userId = userId;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getUsername() {
+        return username;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public ShoppingCart getSelectedCart() {
@@ -91,6 +71,19 @@ public class User {
 
     public void setSelectedCart(ShoppingCart selectedCart) {
         this.selectedCart = selectedCart;
+    }
+
+    public void addCart(ShoppingCart cart) {
+        this.carts.add(cart);
+        cart.getUsers().add(this);
+    }
+
+    public Set<ShoppingCart> getCarts() {
+        return carts;
+    }
+
+    public void setCarts(Set<ShoppingCart> carts) {
+        this.carts = carts;
     }
 
     public LocalDateTime getRegistrationTime() {
