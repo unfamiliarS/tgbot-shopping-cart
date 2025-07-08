@@ -38,7 +38,7 @@ public class CommandManager {
         var createCartCommand = new CreateCartCommand(sender, userStates);
         registerCommand(createCartCommand);
         registerCommand(createCartCommand.new NameInputHandler(sender, userStates));
-        var mycartCommand = new MyCartCommand(sender, userStates);
+        var mycartCommand = new MyCartCommand(sender, userStates, connection);
         registerCommand(mycartCommand);
 
         // register callbacks

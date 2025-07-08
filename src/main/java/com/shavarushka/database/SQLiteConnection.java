@@ -6,6 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.shavarushka.database.entities.ShoppingCarts;
 import com.shavarushka.database.entities.Users;
@@ -38,7 +40,7 @@ final public class SQLiteConnection {
         }
     }
 
-    public ShoppingCarts getShoppingCartById(Long cartId) {
+    public ShoppingCarts getCartById(Long cartId) {
         String query = "SELECT cart_id, cart_name, creation_time FROM shopping_carts WHERE cart_id = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setLong(1, cartId);
@@ -71,7 +73,7 @@ final public class SQLiteConnection {
         }
     }
 
-    public boolean addShoppingCart(ShoppingCarts cart, Users associatedUser) {
+    public boolean addCart(ShoppingCarts cart, Users associatedUser) {
         String query = "INSERT INTO shopping_carts (cart_name) VALUES (?)";
         try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, cart.cartName());
@@ -82,7 +84,7 @@ final public class SQLiteConnection {
                     if (associatedUser.selectedCartId() == null) {
                         updateSelectedCartForUser(associatedUser, cartId);
                     }
-                    addUserToShoppingCart(associatedUser, cartId);
+                    addUserToCart(associatedUser, cartId);
                 } else {
                     throw new SQLException("Creating cart failed, no ID obtained.");
                 }
@@ -95,7 +97,7 @@ final public class SQLiteConnection {
     }
 
     // add relationship between user and cart to intermediate table
-    private boolean addUserToShoppingCart(Users user, Long cartId) {
+    private boolean addUserToCart(Users user, Long cartId) {
         String query = "INSERT INTO users_shopping_carts (user_id, cart_id) VALUES (?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setLong(1, user.userId());
@@ -119,6 +121,32 @@ final public class SQLiteConnection {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public Set<ShoppingCarts> getCartsAssignedToUser(Long userId) {
+        String query = "SELECT sc.cart_id, sc.cart_name, sc.creation_time " +
+                    "FROM shopping_carts sc " +
+                    "JOIN users_shopping_carts usc ON sc.cart_id = usc.cart_id " +
+                    "WHERE usc.user_id = ?";
+
+        Set<ShoppingCarts> carts = new HashSet<>();
+
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, userId);
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                ShoppingCarts cart = new ShoppingCarts(
+                    resultSet.getLong("cart_id"),
+                    resultSet.getString("cart_name"),
+                    resultSet.getTimestamp("creation_time")
+                );
+                carts.add(cart);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return carts;
     }
 
     public void closeConnection() {

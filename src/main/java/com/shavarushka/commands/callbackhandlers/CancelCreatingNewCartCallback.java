@@ -34,7 +34,7 @@ public class CancelCreatingNewCartCallback extends AbstractCallbackCommand {
     public void execute(Update update) throws TelegramApiException {
         Long chatId = update.getCallbackQuery().getMessage().getChatId();
         Integer messageId = update.getCallbackQuery().getMessage().getMessageId();
-        String message = MessageSender.escapeMarkdownV2("Отменяю создание корзины...");
+        String message = "❌ " + MessageSender.escapeMarkdownV2("Отменяю создание корзины...");
         userStates.remove(chatId);
         sender.editMessage(chatId, messageId, message);
     }

@@ -1,9 +1,8 @@
 package com.shavarushka.commands.commandhandlers;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -13,15 +12,15 @@ import com.shavarushka.commands.KeyboardsFabrics;
 import com.shavarushka.commands.callbackhandlers.AbstractCallbackCommand;
 import com.shavarushka.commands.interfaces.BotState;
 import com.shavarushka.commands.interfaces.MessageSender;
+import com.shavarushka.database.SQLiteConnection;
+import com.shavarushka.database.entities.ShoppingCarts;
 
 public class MyCartCommand extends AbstractTextCommand {
-    private List<String> cartNames = new ArrayList<>();
-    private String selectedCart;
+    private final SQLiteConnection connection;
 
-    public MyCartCommand(MessageSender sender, Map<Long, BotState> userStates) {
+    public MyCartCommand(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
         super(sender, userStates);
-        cartNames.addAll(List.of("Корзина Хорошика", "Корзина Поняшика", "Корзина Фуры"));
-        selectedCart = cartNames.getFirst();
+        this.connection = connection;
     }
 
     @Override
@@ -37,17 +36,22 @@ public class MyCartCommand extends AbstractTextCommand {
     @Override
     public void execute(Update update) throws TelegramApiException {
         Long chatId = update.getMessage().getChatId();
+        Long userId = update.getMessage().getFrom().getId();
         String message;
-        if (cartNames.isEmpty()) {
+        Set<ShoppingCarts> carts = connection.getCartsAssignedToUser(userId);
+        if (carts.isEmpty()) {
             message = MessageSender.escapeMarkdownV2("У вас нет ни одной корзины:( \n/createnewcart чтобы создать");
             sender.sendMessage(chatId, message);
             return;
         }
+        ShoppingCarts selectedCart = connection.getCartById(
+                                    connection.getUserById(userId).selectedCartId());
+
         message = "Ваши корзины:";
         Map<String, String> buttons = new HashMap<>();
-        for (String cart : cartNames) {
-            String cartName = cart.equals(selectedCart) ? "✅ " + cart : cart;
-            buttons.put(cartName, "/setcart_" + cart);
+        for (ShoppingCarts cart : carts) {
+            String cartName = cart.cartId().equals(selectedCart.cartId()) ? "✅ " + cart.cartName() : cart.cartName();
+            buttons.put(cartName, "/setcart_" + cart.cartId());
         }
         InlineKeyboardMarkup keyboard = KeyboardsFabrics.createInlineKeyboard(
                         buttons,
@@ -69,22 +73,23 @@ public class MyCartCommand extends AbstractTextCommand {
         @Override
         public void execute(Update update) throws TelegramApiException {
             Long chatId = update.getCallbackQuery().getMessage().getChatId();
+            Long userId = update.getCallbackQuery().getFrom().getId();
             Integer messageId = update.getCallbackQuery().getMessage().getMessageId();
-            selectedCart = update.getCallbackQuery().getData().substring(getCallbackPattern().length());
+            String newSelectedCartName = update.getCallbackQuery().getData().substring(getCallbackPattern().length());
+            Long newSelectedCartId = Long.parseLong(newSelectedCartName);
             String message;
-            if (cartNames.isEmpty()) {
+            Set<ShoppingCarts> carts = connection.getCartsAssignedToUser(userId);
+
+            if (carts.isEmpty()) {
                 message = MessageSender.escapeMarkdownV2("У вас нет ни одной корзины:( \n/createnewcart чтобы создать");
                 sender.sendMessage(chatId, message);
                 return;
             }
             message = "Ваши корзины:";
             Map<String, String> buttons = new HashMap<>();
-            for (String cart : cartNames) {
-                buttons.put(cart, "/setcart_" + cart);
-                if (cart.equals(selectedCart)) {
-                    buttons.remove(selectedCart);
-                    buttons.put("✅ " + cart, "/setcart_" + cart);
-                }
+            for (ShoppingCarts cart : carts) {
+                String cartName = cart.cartId().equals(newSelectedCartId) ? "✅ " + cart.cartName() : cart.cartName();
+                buttons.put(cartName, "/setcart_" + cart.cartId());
             }
             InlineKeyboardMarkup keyboard = KeyboardsFabrics.createInlineKeyboard(
                             buttons,

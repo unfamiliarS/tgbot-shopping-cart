@@ -12,7 +12,7 @@ import com.shavarushka.database.entities.ShoppingCarts;
 import com.shavarushka.database.entities.Users;
 
 public class ConfirmCartCreationCallback extends AbstractCallbackCommand {
-    SQLiteConnection connection;
+    private final SQLiteConnection connection;
 
     public ConfirmCartCreationCallback(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
         super(sender, userStates);
@@ -54,9 +54,9 @@ public class ConfirmCartCreationCallback extends AbstractCallbackCommand {
                             null); // db will figure it out itself
             connection.addUser(user);
         }
-        connection.addShoppingCart(cart, user);
+        connection.addCart(cart, user);
 
-        String message = MessageSender.escapeMarkdownV2("Успешно! Добро пожаловать в ") + "*" + cartName + "*";
+        String message = "✅ " + MessageSender.escapeMarkdownV2("Корзина ") + "*" + cartName + "*" + " создана";
         userStates.remove(chatId);
         sender.editMessage(chatId, messageId, message);
     }
