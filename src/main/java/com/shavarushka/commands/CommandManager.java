@@ -17,30 +17,34 @@ import com.shavarushka.commands.commandhandlers.StartCommand;
 import com.shavarushka.commands.interfaces.BotCommand;
 import com.shavarushka.commands.interfaces.BotState;
 import com.shavarushka.commands.interfaces.CallbackCommand;
+import com.shavarushka.commands.interfaces.MessageSender;
 import com.shavarushka.commands.interfaces.TextCommand;
-import com.shavarushka.database.DatabaseOperations;
+import com.shavarushka.database.SQLiteConnection;
 
 public class CommandManager {
     private final Map<String, BotCommand> commands = new HashMap<>();
     private final Map<Long, BotState> userStates = new HashMap<>();
-    private DatabaseOperations connection;
+    private final MessageSender sender;
+    private SQLiteConnection connection;
 
     public CommandManager(TelegramClient telegramClient) {
-        connection = new DatabaseOperations();
+        sender = new MessageSender(telegramClient);
+        connection = new SQLiteConnection(System.getenv("DB_URL"));
+
         // register commands
-        registerCommand(new StartCommand(telegramClient, userStates));
-        registerCommand(new HelpCommand(telegramClient, userStates, commands));
-        registerCommand(new CancelCommand(telegramClient, userStates));
-        var createCartCommand = new CreateCartCommand(telegramClient, userStates);
+        registerCommand(new StartCommand(sender, userStates));
+        registerCommand(new HelpCommand(sender, userStates, commands));
+        registerCommand(new CancelCommand(sender, userStates));
+        var createCartCommand = new CreateCartCommand(sender, userStates);
         registerCommand(createCartCommand);
-        registerCommand(createCartCommand.new NameInputHandler(telegramClient, userStates));
-        var mycartCommand = new MyCartCommand(telegramClient, userStates);
+        registerCommand(createCartCommand.new NameInputHandler(sender, userStates));
+        var mycartCommand = new MyCartCommand(sender, userStates);
         registerCommand(mycartCommand);
 
         // register callbacks
-        registerCommand(new CancelCreatingNewCartCallback(telegramClient, userStates));
-        registerCommand(new ConfirmCartCreationCallback(telegramClient, userStates, connection));
-        registerCommand(mycartCommand.new SetCartCallback(telegramClient, userStates));
+        registerCommand(new CancelCreatingNewCartCallback(sender, userStates));
+        registerCommand(new ConfirmCartCreationCallback(sender, userStates, connection));
+        registerCommand(mycartCommand.new SetCartCallback(sender, userStates));
     }
 
     public void registerCommand(TextCommand command) {

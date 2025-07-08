@@ -9,7 +9,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 public class MessageSender {
-    protected final TelegramClient telegramClient;
+    private final TelegramClient telegramClient;
     
     public MessageSender(TelegramClient telegramClient) {
         this.telegramClient = telegramClient; 
@@ -51,7 +51,7 @@ public class MessageSender {
                                     .build());
     }
 
-    protected String escapeMarkdownV2(String text) {
+    static public String escapeMarkdownV2(String text) {
         return text.replace("_", "\\_")
                 .replace("*", "\\*")
                 .replace("[", "\\[")

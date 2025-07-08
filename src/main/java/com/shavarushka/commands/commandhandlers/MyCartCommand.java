@@ -8,18 +8,18 @@ import java.util.Map;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import com.shavarushka.commands.KeyboardsFabrics;
 import com.shavarushka.commands.callbackhandlers.AbstractCallbackCommand;
 import com.shavarushka.commands.interfaces.BotState;
+import com.shavarushka.commands.interfaces.MessageSender;
 
 public class MyCartCommand extends AbstractTextCommand {
     private List<String> cartNames = new ArrayList<>();
     private String selectedCart;
 
-    public MyCartCommand(TelegramClient telegramClient, Map<Long, BotState> userStates) {
-        super(telegramClient, userStates);
+    public MyCartCommand(MessageSender sender, Map<Long, BotState> userStates) {
+        super(sender, userStates);
         cartNames.addAll(List.of("Корзина Хорошика", "Корзина Поняшика", "Корзина Фуры"));
         selectedCart = cartNames.getFirst();
     }
@@ -39,8 +39,8 @@ public class MyCartCommand extends AbstractTextCommand {
         Long chatId = update.getMessage().getChatId();
         String message;
         if (cartNames.isEmpty()) {
-            message = escapeMarkdownV2("У вас нет ни одной корзины:( \n/createnewcart чтобы создать");
-            sendMessage(chatId, message);
+            message = MessageSender.escapeMarkdownV2("У вас нет ни одной корзины:( \n/createnewcart чтобы создать");
+            sender.sendMessage(chatId, message);
             return;
         }
         message = "Ваши корзины:";
@@ -52,13 +52,13 @@ public class MyCartCommand extends AbstractTextCommand {
         InlineKeyboardMarkup keyboard = KeyboardsFabrics.createInlineKeyboard(
                         buttons,
                         1);
-        sendMessage(chatId, message, keyboard);
+        sender.sendMessage(chatId, message, keyboard);
     }
 
     public class SetCartCallback extends AbstractCallbackCommand {
 
-        public SetCartCallback(TelegramClient telegramClient, Map<Long, BotState> userStates) {
-            super(telegramClient, userStates);
+        public SetCartCallback(MessageSender sender, Map<Long, BotState> userStates) {
+            super(sender, userStates);
         }
 
         @Override
@@ -73,8 +73,8 @@ public class MyCartCommand extends AbstractTextCommand {
             selectedCart = update.getCallbackQuery().getData().substring(getCallbackPattern().length());
             String message;
             if (cartNames.isEmpty()) {
-                message = escapeMarkdownV2("У вас нет ни одной корзины:( \n/createnewcart чтобы создать");
-                sendMessage(chatId, message);
+                message = MessageSender.escapeMarkdownV2("У вас нет ни одной корзины:( \n/createnewcart чтобы создать");
+                sender.sendMessage(chatId, message);
                 return;
             }
             message = "Ваши корзины:";
@@ -89,7 +89,7 @@ public class MyCartCommand extends AbstractTextCommand {
             InlineKeyboardMarkup keyboard = KeyboardsFabrics.createInlineKeyboard(
                             buttons,
                             1);
-            editMessage(chatId, messageId, message, keyboard);
+            sender.editMessage(chatId, messageId, message, keyboard);
         }
     }
 }

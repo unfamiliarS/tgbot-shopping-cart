@@ -3,17 +3,17 @@ package com.shavarushka.commands.callbackhandlers;
 import java.util.Map;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import com.shavarushka.commands.interfaces.BotState;
 import com.shavarushka.commands.interfaces.CallbackCommand;
 import com.shavarushka.commands.interfaces.MessageSender;
 
-public abstract class AbstractCallbackCommand extends MessageSender implements CallbackCommand {
+public abstract class AbstractCallbackCommand implements CallbackCommand {
     protected final Map<Long, BotState> userStates;
+    protected final MessageSender sender;
     
-    public AbstractCallbackCommand(TelegramClient telegramClient, Map<Long, BotState> userStates) {
-        super(telegramClient);
+    public AbstractCallbackCommand(MessageSender sender, Map<Long, BotState> userStates) {
+        this.sender = sender;        
         this.userStates = userStates;
     }
     

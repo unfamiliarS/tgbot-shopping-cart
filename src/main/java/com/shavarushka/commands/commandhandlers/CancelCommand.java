@@ -4,13 +4,13 @@ import java.util.Map;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import com.shavarushka.commands.interfaces.BotState;
+import com.shavarushka.commands.interfaces.MessageSender;
 
 public class CancelCommand extends AbstractTextCommand {
-    public CancelCommand(TelegramClient telegramClient, Map<Long, BotState> userStates) {
-        super(telegramClient, userStates);
+    public CancelCommand(MessageSender sender, Map<Long, BotState> userStates) {
+        super(sender, userStates);
     }
 
     @Override
@@ -28,8 +28,8 @@ public class CancelCommand extends AbstractTextCommand {
         long chatId = update.getMessage().getChatId();
         // clear bot state for chat
         userStates.remove(chatId);
-        String message = escapeMarkdownV2(getDescription());
-        sendMessage(chatId, message);
+        String message = MessageSender.escapeMarkdownV2(getDescription());
+        sender.sendMessage(chatId, message);
     }
 
 }

@@ -2,21 +2,20 @@ package com.shavarushka.commands.callbackhandlers;
 
 import java.util.Map;
 
-import org.hibernate.Session;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import com.shavarushka.commands.interfaces.BotState;
-import com.shavarushka.database.DatabaseOperations;
-import com.shavarushka.database.entities.ShoppingCart;
-import com.shavarushka.database.entities.User;
+import com.shavarushka.commands.interfaces.MessageSender;
+import com.shavarushka.database.SQLiteConnection;
+import com.shavarushka.database.entities.ShoppingCarts;
+import com.shavarushka.database.entities.Users;
 
 public class ConfirmCartCreationCallback extends AbstractCallbackCommand {
-    DatabaseOperations connection;
+    SQLiteConnection connection;
 
-    public ConfirmCartCreationCallback(TelegramClient telegramClient, Map<Long, BotState> userStates, DatabaseOperations connection) {
-        super(telegramClient, userStates);
+    public ConfirmCartCreationCallback(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
+        super(sender, userStates);
         this.connection = connection;
     }
 
@@ -42,48 +41,23 @@ public class ConfirmCartCreationCallback extends AbstractCallbackCommand {
         Integer messageId = update.getCallbackQuery().getMessage().getMessageId();
         String cartName = update.getCallbackQuery().getData().substring(getCallbackPattern().length());
 
-        // boolean isNewUser = false;
-        // User user = connection.getUserById(chatId);
-        // // adding new user if needed
-        // if (user == null) {
-        //     user = new User(update.getCallbackQuery().getFrom().getId(),
-        //                         update.getCallbackQuery().getFrom().getUserName());
-        //     isNewUser = true;
-        // }
-        // // create shopping cart
-        // ShoppingCart cart = new ShoppingCart(cartName, user);
-        // // setting this cart for new user
-        // if (isNewUser) {
-        //     user.setSelectedCart(cart);
-        //     connection.addUser(user);
-        // }
-        
-        // connection.addShoppingCart(cart);
+        // create shopping cart
+        ShoppingCarts cart = new ShoppingCarts(null, cartName, null);
 
-        try (Session session = connection.getSessionFactory().openSession()) {
-            var transaction = session.beginTransaction();
-
-            boolean isNewUser = false;
-            User user = session.find(User.class, update.getCallbackQuery().getFrom().getId());
-            // adding new user if needed
-            if (user == null) {
-                user = new User(update.getCallbackQuery().getFrom().getId(),
-                                    update.getCallbackQuery().getFrom().getUserName());
-                isNewUser = true;
-            }
-            // create shopping cart
-            ShoppingCart cart = new ShoppingCart(cartName, user);
-            if (isNewUser) {
-                user.setSelectedCart(cart);
-                session.persist(user);
-            }
-            session.persist(cart);
-
-            transaction.commit();
+        Users user = connection.getUserById(update.getCallbackQuery().getFrom().getId());
+        // register new user if needed
+        // ps: I put the logic for adding a new user here, but I might regret it later...        
+        if (user == null) {
+            user = new Users(update.getCallbackQuery().getFrom().getId(),
+                            update.getCallbackQuery().getFrom().getUserName(),
+                            null, // adding later
+                            null); // db will figure it out itself
+            connection.addUser(user);
         }
+        connection.addShoppingCart(cart, user);
 
-        String message = escapeMarkdownV2("Успешно! Добро пожаловать в ") + "*" + cartName + "*";
+        String message = MessageSender.escapeMarkdownV2("Успешно! Добро пожаловать в ") + "*" + cartName + "*";
         userStates.remove(chatId);
-        editMessage(chatId, messageId, message);
+        sender.editMessage(chatId, messageId, message);
     }
 }

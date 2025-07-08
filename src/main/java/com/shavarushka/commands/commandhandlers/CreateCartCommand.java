@@ -5,14 +5,14 @@ import java.util.Map;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import com.shavarushka.commands.KeyboardsFabrics;
 import com.shavarushka.commands.interfaces.BotState;
+import com.shavarushka.commands.interfaces.MessageSender;
 
 public class CreateCartCommand extends AbstractTextCommand {
-    public CreateCartCommand(TelegramClient telegramClient, Map<Long, BotState> userStates) {
-        super(telegramClient, userStates);
+    public CreateCartCommand(MessageSender sender, Map<Long, BotState> userStates) {
+        super(sender, userStates);
     }
 
     @Override
@@ -31,15 +31,15 @@ public class CreateCartCommand extends AbstractTextCommand {
     @Override
     public void execute(Update update) throws TelegramApiException {
         long chatId = update.getMessage().getChatId();
-        sendMessage(chatId, 
+        sender.sendMessage(chatId, 
                 "Введите название корзины",
                 KeyboardsFabrics.createInlineKeyboard(Map.of("Отменить создание", "/cancelcreatingnewcart"), 1));
         userStates.put(chatId, BotState.WAITING_FOR_CART_NAME);
     }
 
     public class NameInputHandler extends AbstractTextCommand {
-        public NameInputHandler(TelegramClient telegramClient, Map<Long, BotState> userStates) {
-            super(telegramClient, userStates);
+        public NameInputHandler(MessageSender sender, Map<Long, BotState> userStates) {
+            super(sender, userStates);
         }
 
         @Override
@@ -68,10 +68,10 @@ public class CreateCartCommand extends AbstractTextCommand {
             String cartName = update.getMessage().getText();
             String message;
             if (!isCorrectCartName(cartName)) {
-                message = escapeMarkdownV2("Некорректное название для корзины. Попробуй ещё раз.");
-                sendMessage(chatId, message,
+                message = MessageSender.escapeMarkdownV2("Некорректное название для корзины. Попробуй ещё раз.");
+                sender.sendMessage(chatId, message,
                     KeyboardsFabrics.createInlineKeyboard(
-                        Map.of(escapeMarkdownV2("Отменить создание"),
+                        Map.of(MessageSender.escapeMarkdownV2("Отменить создание"),
                         "/cancelcreatingnewcart"),
                         1));
                 return;
@@ -82,7 +82,7 @@ public class CreateCartCommand extends AbstractTextCommand {
                                                    "❌ Отменить", "/cancelcreatingnewcart"),
                                                    2);
             userStates.put(chatId, BotState.CONFIRMING_CART_CREATION);
-            sendMessage(chatId, message, confirmationKeyboard);
+            sender.sendMessage(chatId, message, confirmationKeyboard);
         }
 
         private boolean isCorrectCartName(String cartName) {

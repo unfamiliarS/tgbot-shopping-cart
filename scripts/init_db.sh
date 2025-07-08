@@ -1,16 +1,15 @@
 #!/bin/bash
 
-DB_FILE=../shopping_cart_bot.db
+# set echo
+set -x
 
+DB_FILE=../test.db
 rm -f "$DB_FILE"
 
-# 'dnf in sqlite -y' for sqlite3 command 
-sqlite3 "$DB_FILE" << EOF
-CREATE TABLE IF NOT EXISTS users (
-    user_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_first_name TEXT NOT NULL,
-    user_last_name TEXT,
-    selected_cart INTEGER DEFAULT -1 NOT NULL,
+sql_query="CREATE TABLE IF NOT EXISTS users (
+    user_id INTEGER PRIMARY KEY,
+    username TEXT NOT NULL,
+    selected_cart INTEGER,
     registration_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -26,7 +25,9 @@ CREATE TABLE IF NOT EXISTS users_shopping_carts (
     PRIMARY KEY (cart_id, user_id),
     FOREIGN KEY (cart_id) REFERENCES shopping_carts(cart_id) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE
-);
-EOF
+);"
 
-echo "Creating $(basename $DB_FILE) is done."
+# 'dnf in sqlite -y' for sqlite3 command
+sqlite3 "$DB_FILE" << EOF
+$sql_query
+EOF

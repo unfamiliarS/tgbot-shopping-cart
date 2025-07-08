@@ -3,17 +3,17 @@ package com.shavarushka.commands.commandhandlers;
 import java.util.Map;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import com.shavarushka.commands.interfaces.BotState;
 import com.shavarushka.commands.interfaces.MessageSender;
 import com.shavarushka.commands.interfaces.TextCommand;
 
-public abstract class AbstractTextCommand extends MessageSender implements TextCommand {
+public abstract class AbstractTextCommand implements TextCommand {
     protected final Map<Long, BotState> userStates;
+    protected final MessageSender sender;
 
-    public AbstractTextCommand(TelegramClient telegramClient, Map<Long, BotState> userStates) {
-        super(telegramClient);
+    public AbstractTextCommand(MessageSender sender, Map<Long, BotState> userStates) {
+        this.sender = sender;
         this.userStates = userStates;
     }
 

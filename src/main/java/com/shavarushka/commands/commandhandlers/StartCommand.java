@@ -4,13 +4,13 @@ import java.util.Map;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import com.shavarushka.commands.interfaces.BotState;
+import com.shavarushka.commands.interfaces.MessageSender;
 
 public class StartCommand extends AbstractTextCommand {
-    public StartCommand(TelegramClient telegramClient, Map<Long, BotState> userStates) {
-        super(telegramClient, userStates);
+    public StartCommand(MessageSender sender, Map<Long, BotState> userStates) {
+        super(sender, userStates);
     }
 
     @Override
@@ -27,6 +27,6 @@ public class StartCommand extends AbstractTextCommand {
     public void execute(Update update) throws TelegramApiException {
         Long chatId = update.getMessage().getChatId();
         String userName = update.getMessage().getFrom().getFirstName();
-        sendMessage(chatId, "Привет *" + userName + "*\\!");
+        sender.sendMessage(chatId, "Привет *" + userName + "*\\!");
     }
 }
