@@ -125,11 +125,11 @@ final public class SQLiteConnection {
     }
 
     // add relationship between user and cart to intermediate table
-    private boolean addUserToCart(Users user, Long cartId) {
-        String query = "INSERT INTO users_shopping_carts (user_id, cart_id) VALUES (?, ?)";
+    public boolean addUserToCart(Users user, Long cartId) {
+        String query = "INSERT OR IGNORE INTO users_shopping_carts (cart_id, user_id) VALUES (?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setLong(1, user.userId());
-            statement.setLong(2, cartId);
+            statement.setLong(1, cartId);
+            statement.setLong(2, user.userId());
             statement.executeUpdate();
             return true;
         } catch (SQLException e) {

@@ -10,6 +10,7 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 import com.shavarushka.commands.callbackhandlers.CancelCreatingNewCartCallback;
 import com.shavarushka.commands.callbackhandlers.CancelInvitingUserCallback;
 import com.shavarushka.commands.callbackhandlers.ConfirmCartCreationCallback;
+import com.shavarushka.commands.callbackhandlers.ConfirmInvitingCallback;
 import com.shavarushka.commands.commandhandlers.CancelCommand;
 import com.shavarushka.commands.commandhandlers.CreateCartCommand;
 import com.shavarushka.commands.commandhandlers.HelpCommand;
@@ -51,6 +52,7 @@ public class CommandManager {
         registerCommand(new ConfirmCartCreationCallback(sender, userStates, connection));
         registerCommand(mycartCommand.new SetCartCallback(sender, userStates));
         registerCommand(new CancelInvitingUserCallback(sender, userStates));
+        registerCommand(new ConfirmInvitingCallback(sender, userStates, connection));
     }
 
     public void registerCommand(TextCommand command) {
