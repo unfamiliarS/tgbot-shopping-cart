@@ -23,9 +23,9 @@ public abstract class AbstractTextCommand implements TextCommand {
         if (!update.hasMessage() || !update.getMessage().hasText())
             return false;
 
-        long chatId = update.getMessage().getChatId();
+        Long chatId = update.getMessage().getChatId();
         String message = update.getMessage().getText();
-        return userStates.get(chatId) == null &&
+        return !userStates.containsKey(chatId) &&
                 message.matches(getCommand().strip());
     }
 }

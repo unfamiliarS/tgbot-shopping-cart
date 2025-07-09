@@ -25,7 +25,7 @@ public class CancelCommand extends AbstractTextCommand {
 
     @Override
     public void execute(Update update) throws TelegramApiException {
-        long chatId = update.getMessage().getChatId();
+        Long chatId = update.getMessage().getChatId();
         // clear bot state for chat
         userStates.remove(chatId);
         String message = MessageSender.escapeMarkdownV2(getDescription());

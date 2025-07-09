@@ -30,7 +30,7 @@ public class CreateCartCommand extends AbstractTextCommand {
 
     @Override
     public void execute(Update update) throws TelegramApiException {
-        long chatId = update.getMessage().getChatId();
+        Long chatId = update.getMessage().getChatId();
         sender.sendMessage(chatId, 
                 "Введи название корзины:",
                 KeyboardsFabrics.createInlineKeyboard(Map.of("Отменить создание", "/cancelcreatingnewcart"), 1));
@@ -44,7 +44,7 @@ public class CreateCartCommand extends AbstractTextCommand {
 
         @Override
         public String getCommand() {
-            return "";
+            return "create_cartname";
         }
 
         @Override

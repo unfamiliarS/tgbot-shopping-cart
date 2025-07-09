@@ -29,11 +29,11 @@ public class HelpCommand extends AbstractTextCommand {
 
     @Override
     public void execute(Update update) throws TelegramApiException {
-        long chatId = update.getMessage().getChatId();
+        Long chatId = update.getMessage().getChatId();
         String message = MessageSender.escapeMarkdownV2("Мини-справка по командам бота:\n\n");
         for (BotCommand command : commands.values()) {
             if (command instanceof AbstractTextCommand textCommand) {
-                if (!textCommand.getCommand().equals("") || !textCommand.getDescription().equals(""))
+                if (textCommand.getCommand().startsWith("/") || !textCommand.getDescription().equals(""))
                     message += MessageSender.escapeMarkdownV2(
                                             "  " + 
                                             textCommand.getCommand() + 

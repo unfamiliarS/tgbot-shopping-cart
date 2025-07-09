@@ -23,7 +23,7 @@ public class CancelCreatingNewCartCallback extends AbstractCallbackCommand {
         if (!update.hasCallbackQuery())
             return false;
 
-        long chatId = update.getCallbackQuery().getMessage().getChatId();
+        Long chatId = update.getCallbackQuery().getMessage().getChatId();
         return update.getCallbackQuery().getData().startsWith(getCallbackPattern().strip()) &&
                userStates.containsKey(chatId) &&
                (userStates.get(chatId).equals(BotState.WAITING_FOR_CART_NAME) ||

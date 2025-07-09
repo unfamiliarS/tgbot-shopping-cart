@@ -29,7 +29,7 @@ public class ConfirmCartCreationCallback extends AbstractCallbackCommand {
         if (!update.hasCallbackQuery())
             return false;
 
-        long chatId = update.getCallbackQuery().getMessage().getChatId();
+        Long chatId = update.getCallbackQuery().getMessage().getChatId();
         return update.getCallbackQuery().getData().startsWith(getCallbackPattern().strip()) &&
                userStates.containsKey(chatId) &&
                userStates.get(chatId).equals(BotState.CONFIRMING_CART_CREATION);
@@ -43,8 +43,18 @@ public class ConfirmCartCreationCallback extends AbstractCallbackCommand {
 
         // create shopping cart
         ShoppingCarts cart = new ShoppingCarts(null, cartName, null);
-
+        
         Users user = connection.getUserById(update.getCallbackQuery().getFrom().getId());
+        // register new user if needed
+        if (user == null) {
+            user = new Users(update.getCallbackQuery().getFrom().getId(),
+                            chatId,
+                            update.getCallbackQuery().getFrom().getFirstName(),
+                            update.getCallbackQuery().getFrom().getUserName(),
+                            null, // adding later
+                            null); // db will figure it out itself
+            connection.addUser(user);
+        }
         connection.addCart(cart, user);
 
         String message = "✅ " + MessageSender.escapeMarkdownV2("Корзина ") + "*" + cartName + "*" + " создана";

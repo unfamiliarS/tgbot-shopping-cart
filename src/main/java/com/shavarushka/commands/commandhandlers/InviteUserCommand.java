@@ -9,6 +9,7 @@ import com.shavarushka.commands.KeyboardsFabrics;
 import com.shavarushka.commands.interfaces.BotState;
 import com.shavarushka.commands.interfaces.MessageSender;
 import com.shavarushka.database.SQLiteConnection;
+import com.shavarushka.database.entities.Users;
 
 public class InviteUserCommand extends AbstractTextCommand {
     private final SQLiteConnection connection;
@@ -55,7 +56,7 @@ public class InviteUserCommand extends AbstractTextCommand {
 
         @Override
         public String getCommand() {
-            return "";
+            return "invite_username";
         }
 
         @Override
@@ -69,13 +70,13 @@ public class InviteUserCommand extends AbstractTextCommand {
                 return false;
 
             Long chatId = update.getMessage().getChatId();
-            return userStates.containsKey(chatId) && 
+            return userStates.containsKey(chatId) &&
                    userStates.get(chatId).equals(BotState.WAITING_FOR_USERNAME_TO_INVITE);
         }
 
         @Override
         public void execute(Update update) throws TelegramApiException {
-            long chatId = update.getMessage().getChatId();
+            Long chatId = update.getMessage().getChatId();
             String usernameToInvite = update.getMessage().getText();
             String message;
             if (!isCorrectUsername(usernameToInvite)) {
@@ -86,9 +87,17 @@ public class InviteUserCommand extends AbstractTextCommand {
                         1));
                 return;
             }
-
+            
             // check if user exist
             // ...
+
+            Users user = connection.getUserByUsername(usernameToInvite.substring(1));
+            if (user == null) {
+                System.out.println("User for " + usernameToInvite + " is missing");
+                return;
+            }
+
+            sender.sendMessage(user.chatId(), "Привет от " + update.getMessage().getFrom().getUserName());
 
             message = "✅ Приглашение отправленно пользователю *" + usernameToInvite + "*";
             sender.sendMessage(chatId, message);

@@ -32,8 +32,6 @@ public class StartCommand extends AbstractTextCommand {
     public void execute(Update update) throws TelegramApiException {
         Long chatId = update.getMessage().getChatId();
         Long userId = update.getMessage().getFrom().getId();
-        System.out.println("chatId: " + chatId);
-        System.out.println("userId: " + userId);
         String firstname = update.getMessage().getFrom().getFirstName();
 
         Users user = connection.getUserById(userId);

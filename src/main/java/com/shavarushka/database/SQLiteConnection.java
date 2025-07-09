@@ -43,6 +43,27 @@ final public class SQLiteConnection {
         }
     }
 
+
+    public Users getUserByUsername(String username) {
+        String query = "SELECT user_id, chat_id, username, user_firstname, selected_cart, " + 
+            "registration_time FROM users WHERE username = ?";        
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, username);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next())
+                return new Users(resultSet.getLong("user_id"),
+                                resultSet.getLong("chat_id"),
+                                resultSet.getString("user_firstname"),
+                                resultSet.getString("username"), 
+                                resultSet.getLong("selected_cart"), 
+                                resultSet.getTimestamp("registration_time"));
+            return null;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public ShoppingCarts getCartById(Long cartId) {
         String query = "SELECT cart_id, cart_name, creation_time FROM shopping_carts WHERE cart_id = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
@@ -86,7 +107,9 @@ final public class SQLiteConnection {
             try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     Long cartId = generatedKeys.getLong(1);
-                    if (associatedUser.selectedCartId() == null) {
+                    // for some reason null replaced with zero
+                    if (associatedUser.selectedCartId() == null || 
+                        associatedUser.selectedCartId() == 0) {
                         updateSelectedCartForUser(associatedUser, cartId);
                     }
                     addUserToCart(associatedUser, cartId);

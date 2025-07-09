@@ -23,7 +23,7 @@ public abstract class AbstractCallbackCommand implements CallbackCommand {
         if (!update.hasCallbackQuery())
             return false;
 
-        long chatId = update.getCallbackQuery().getMessage().getChatId();
+        Long chatId = update.getCallbackQuery().getMessage().getChatId();
         String callback = update.getCallbackQuery().getData();
         return !userStates.containsKey(chatId) &&
                 callback.startsWith(getCallbackPattern().strip());
