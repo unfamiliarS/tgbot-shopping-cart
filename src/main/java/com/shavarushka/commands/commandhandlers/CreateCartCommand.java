@@ -32,7 +32,7 @@ public class CreateCartCommand extends AbstractTextCommand {
     public void execute(Update update) throws TelegramApiException {
         long chatId = update.getMessage().getChatId();
         sender.sendMessage(chatId, 
-                "Введите название корзины",
+                "Введи название корзины:",
                 KeyboardsFabrics.createInlineKeyboard(Map.of("Отменить создание", "/cancelcreatingnewcart"), 1));
         userStates.put(chatId, BotState.WAITING_FOR_CART_NAME);
     }
@@ -57,14 +57,14 @@ public class CreateCartCommand extends AbstractTextCommand {
             if (!update.hasMessage() || !update.getMessage().hasText())
                 return false;
 
-            long chatId = update.getMessage().getChatId();
-            return userStates.containsKey(chatId) && 
+            Long chatId = update.getMessage().getChatId();
+            return userStates.containsKey(chatId) &&
                    userStates.get(chatId).equals(BotState.WAITING_FOR_CART_NAME);
         }
 
         @Override
         public void execute(Update update) throws TelegramApiException {
-            long chatId = update.getMessage().getChatId();
+            Long chatId = update.getMessage().getChatId();
             String cartName = update.getMessage().getText();
             String message;
             if (!isCorrectCartName(cartName)) {

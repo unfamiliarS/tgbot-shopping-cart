@@ -24,12 +24,15 @@ final public class SQLiteConnection {
     }
 
     public Users getUserById(Long userId) {
-        String query = "SELECT user_id, username, selected_cart, registration_time FROM users WHERE user_id = ?";        
+        String query = "SELECT user_id, chat_id, username, user_firstname, selected_cart, " + 
+            "registration_time FROM users WHERE user_id = ?";        
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setLong(1, userId);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next())
                 return new Users(resultSet.getLong("user_id"),
+                                resultSet.getLong("chat_id"),
+                                resultSet.getString("user_firstname"),
                                 resultSet.getString("username"), 
                                 resultSet.getLong("selected_cart"), 
                                 resultSet.getTimestamp("registration_time"));
@@ -58,13 +61,15 @@ final public class SQLiteConnection {
 
     public boolean addUser(Users user) {
         String query = user.selectedCartId() == null ? 
-            "INSERT INTO users (user_id, username) VALUES (?, ?)" :
-            "INSERT INTO users (user_id, username, selected_cart) VALUES (?, ?, ?)";
+            "INSERT INTO users (user_id, chat_id, user_firstname, username) VALUES (?, ?, ?, ?)" :
+            "INSERT INTO users (user_id, chat_id, user_firstname, username, selected_cart) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setLong(1, user.userId());
-            statement.setString(2, user.username());
+            statement.setLong(2, user.chatId());
+            statement.setString(3, user.firstname());
+            statement.setString(4, user.username());
             if (user.selectedCartId() != null)
-                statement.setLong(3, user.selectedCartId());
+                statement.setLong(5, user.selectedCartId());
             statement.executeUpdate();
             return true;
         } catch (SQLException e) {

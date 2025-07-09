@@ -8,10 +8,12 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import com.shavarushka.commands.callbackhandlers.CancelCreatingNewCartCallback;
+import com.shavarushka.commands.callbackhandlers.CancelInvitingUserCallback;
 import com.shavarushka.commands.callbackhandlers.ConfirmCartCreationCallback;
 import com.shavarushka.commands.commandhandlers.CancelCommand;
 import com.shavarushka.commands.commandhandlers.CreateCartCommand;
 import com.shavarushka.commands.commandhandlers.HelpCommand;
+import com.shavarushka.commands.commandhandlers.InviteUserCommand;
 import com.shavarushka.commands.commandhandlers.MyCartCommand;
 import com.shavarushka.commands.commandhandlers.StartCommand;
 import com.shavarushka.commands.interfaces.BotCommand;
@@ -32,7 +34,7 @@ public class CommandManager {
         connection = new SQLiteConnection(System.getenv("DB_URL"));
 
         // register commands
-        registerCommand(new StartCommand(sender, userStates));
+        registerCommand(new StartCommand(sender, userStates, connection));
         registerCommand(new HelpCommand(sender, userStates, commands));
         registerCommand(new CancelCommand(sender, userStates));
         var createCartCommand = new CreateCartCommand(sender, userStates);
@@ -40,11 +42,15 @@ public class CommandManager {
         registerCommand(createCartCommand.new NameInputHandler(sender, userStates));
         var mycartCommand = new MyCartCommand(sender, userStates, connection);
         registerCommand(mycartCommand);
+        var inviteUserCommand = new InviteUserCommand(sender, userStates, connection);
+        registerCommand(inviteUserCommand);
+        registerCommand(inviteUserCommand.new UsernameInputHandler(sender, userStates));
 
         // register callbacks
         registerCommand(new CancelCreatingNewCartCallback(sender, userStates));
         registerCommand(new ConfirmCartCreationCallback(sender, userStates, connection));
         registerCommand(mycartCommand.new SetCartCallback(sender, userStates));
+        registerCommand(new CancelInvitingUserCallback(sender, userStates));
     }
 
     public void registerCommand(TextCommand command) {

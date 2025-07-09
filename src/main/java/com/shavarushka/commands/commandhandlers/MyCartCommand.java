@@ -38,12 +38,15 @@ public class MyCartCommand extends AbstractTextCommand {
         Long chatId = update.getMessage().getChatId();
         Long userId = update.getMessage().getFrom().getId();
         String message;
+        
+        // check if user's carts empty
         Set<ShoppingCarts> carts = connection.getCartsAssignedToUser(userId);
         if (carts.isEmpty()) {
             message = MessageSender.escapeMarkdownV2("У вас нет ни одной корзины:( \n/createnewcart чтобы создать");
             sender.sendMessage(chatId, message);
             return;
         }
+        
         ShoppingCarts selectedCart = connection.getCartById(
                                     connection.getUserById(userId).selectedCartId());
 

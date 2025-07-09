@@ -8,6 +8,8 @@ rm -f "$DB_FILE"
 
 sql_query="CREATE TABLE IF NOT EXISTS users (
     user_id INTEGER PRIMARY KEY,
+    chat_id INTEGER NOT NULL,
+    user_firstname TEXT NOT NULL,
     username TEXT NOT NULL,
     selected_cart INTEGER,
     registration_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP

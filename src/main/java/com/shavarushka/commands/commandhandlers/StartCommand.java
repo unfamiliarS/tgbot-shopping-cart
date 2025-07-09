@@ -7,10 +7,15 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.shavarushka.commands.interfaces.BotState;
 import com.shavarushka.commands.interfaces.MessageSender;
+import com.shavarushka.database.SQLiteConnection;
+import com.shavarushka.database.entities.Users;
 
 public class StartCommand extends AbstractTextCommand {
-    public StartCommand(MessageSender sender, Map<Long, BotState> userStates) {
+    private final SQLiteConnection connection;
+
+    public StartCommand(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
         super(sender, userStates);
+        this.connection = connection;
     }
 
     @Override
@@ -26,7 +31,27 @@ public class StartCommand extends AbstractTextCommand {
     @Override
     public void execute(Update update) throws TelegramApiException {
         Long chatId = update.getMessage().getChatId();
-        String userName = update.getMessage().getFrom().getFirstName();
-        sender.sendMessage(chatId, "Привет *" + userName + "*\\!");
+        Long userId = update.getMessage().getFrom().getId();
+        System.out.println("chatId: " + chatId);
+        System.out.println("userId: " + userId);
+        String firstname = update.getMessage().getFrom().getFirstName();
+
+        Users user = connection.getUserById(userId);
+        // register new user if needed
+        if (user == null) {
+            user = new Users(userId,
+                            chatId,
+                            firstname,
+                            update.getMessage().getFrom().getUserName(),
+                            null, // adding later
+                            null); // db will figure it out itself
+            connection.addUser(user);
+        }
+        // update chatId if needed
+        if (chatId != user.chatId()) {
+            // TODO: logic to update chatId
+        }
+
+        sender.sendMessage(chatId, "Привет *" + firstname + "*\\!");
     }
 }

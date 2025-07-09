@@ -45,15 +45,6 @@ public class ConfirmCartCreationCallback extends AbstractCallbackCommand {
         ShoppingCarts cart = new ShoppingCarts(null, cartName, null);
 
         Users user = connection.getUserById(update.getCallbackQuery().getFrom().getId());
-        // register new user if needed
-        // ps: I put the logic for adding a new user here, but I might regret it later...        
-        if (user == null) {
-            user = new Users(update.getCallbackQuery().getFrom().getId(),
-                            update.getCallbackQuery().getFrom().getUserName(),
-                            null, // adding later
-                            null); // db will figure it out itself
-            connection.addUser(user);
-        }
         connection.addCart(cart, user);
 
         String message = "✅ " + MessageSender.escapeMarkdownV2("Корзина ") + "*" + cartName + "*" + " создана";
