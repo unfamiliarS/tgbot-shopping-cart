@@ -27,6 +27,7 @@ import com.shavarushka.database.SQLiteConnection;
 public class CommandManager {
     private final Map<String, BotCommand> commands = new HashMap<>();
     private final Map<Long, BotState> userStates = new HashMap<>();
+    private final Map<Long, String> tempNewCartNames = new HashMap<>();
     private final MessageSender sender;
     private SQLiteConnection connection;
 
@@ -38,7 +39,7 @@ public class CommandManager {
         registerCommand(new StartCommand(sender, userStates, connection));
         registerCommand(new HelpCommand(sender, userStates, commands));
         registerCommand(new CancelCommand(sender, userStates));
-        var createCartCommand = new CreateCartCommand(sender, userStates);
+        var createCartCommand = new CreateCartCommand(sender, userStates, tempNewCartNames);
         registerCommand(createCartCommand);
         registerCommand(createCartCommand.new NameInputHandler(sender, userStates));
         var mycartCommand = new MyCartCommand(sender, userStates, connection);
@@ -49,7 +50,7 @@ public class CommandManager {
 
         // register callbacks
         registerCommand(new CancelCreatingNewCartCallback(sender, userStates));
-        registerCommand(new ConfirmCartCreationCallback(sender, userStates, connection));
+        registerCommand(new ConfirmCartCreationCallback(sender, userStates, connection, tempNewCartNames));
         registerCommand(mycartCommand.new SetCartCallback(sender, userStates));
         registerCommand(new CancelInvitingUserCallback(sender, userStates));
         registerCommand(new ConfirmInvitingCallback(sender, userStates, connection));

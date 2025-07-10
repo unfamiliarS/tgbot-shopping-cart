@@ -1,6 +1,7 @@
 package com.shavarushka.commands.callbackhandlers;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -33,9 +34,24 @@ public class ConfirmInvitingCallback extends AbstractCallbackCommand {
         connection.addUserToCart(user, cartId);
         connection.updateSelectedCartForUser(user.userId(), cartId);
 
+        notifyUsersForInviteConfirmation(update, cartId);
+
         String message = "✅ Приглашение принято\\. Добро пожаловать в " 
                         + MessageSender.escapeMarkdownV2(connection.getCartById(cartId).cartName()) + "\\!";
         sender.editMessage(chatId, messageId, message);
     }
 
+    private void notifyUsersForInviteConfirmation(Update update, Long cartId) throws TelegramApiException {
+        Set<Users> users;
+        if ((users = connection.getUsersAssignedToCart(cartId)).isEmpty())
+            return;
+        for (Users user : users) {
+            if (user.userId().equals(update.getCallbackQuery().getFrom().getId()))
+                continue;
+            String name = update.getCallbackQuery().getFrom().getUserName();
+            if (name.isEmpty() || name == null)
+                name = update.getCallbackQuery().getFrom().getFirstName();
+            sender.sendMessage(user.chatId(), "@" +  name + " вступил в корзину\\!");
+        }
+    }
 }

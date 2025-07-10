@@ -23,13 +23,21 @@ public class MessageSender {
                                     .build());
     }
 
-    public void sendMessage(Long chatId, String text, ReplyKeyboard keyboard) throws TelegramApiException {
-        telegramClient.execute(SendMessage.builder()
-                                    .chatId(chatId)
-                                    .text(text)
-                                    .parseMode(ParseMode.MARKDOWNV2)
-                                    .replyMarkup(keyboard)
-                                    .build());
+    public void sendMessage(Long chatId, String text, ReplyKeyboard keyboard, boolean withMarkdown) throws TelegramApiException {
+        if (withMarkdown) {
+            telegramClient.execute(SendMessage.builder()
+                                        .chatId(chatId)
+                                        .text(text)
+                                        .parseMode(ParseMode.MARKDOWNV2)
+                                        .replyMarkup(keyboard)
+                                        .build());
+        } else {
+            telegramClient.execute(SendMessage.builder()
+                            .chatId(chatId)
+                            .text(text)
+                            .replyMarkup(keyboard)
+                            .build());
+        }
     }
 
     public void editMessage(Long chatId, Integer messageId, String text) throws TelegramApiException {

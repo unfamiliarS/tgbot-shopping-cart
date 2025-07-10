@@ -177,6 +177,31 @@ final public class SQLiteConnection {
         return carts;
     }
 
+    public Set<Users> getUsersAssignedToCart(Long cartId) {
+        String query = "SELECT u.user_id, u.chat_id, u.user_firstname, u.username, u.selected_cart, u.registration_time " +
+                    "FROM users u " +
+                    "JOIN users_shopping_carts usc ON u.user_id = usc.user_id " +
+                    "WHERE usc.cart_id = ?";
+        Set<Users> users = new HashSet<>();
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, cartId);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                Users user = new Users(resultSet.getLong("user_id"),
+                                resultSet.getLong("chat_id"),
+                                resultSet.getString("user_firstname"),
+                                resultSet.getString("username"), 
+                                resultSet.getLong("selected_cart"), 
+                                resultSet.getTimestamp("registration_time"));
+                users.add(user);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return users;
+    }
+
     public void closeConnection() {
         if (connection != null) {
             try {

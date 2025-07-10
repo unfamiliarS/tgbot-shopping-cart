@@ -13,15 +13,18 @@ import com.shavarushka.database.entities.Users;
 
 public class ConfirmCartCreationCallback extends AbstractCallbackCommand {
     private final SQLiteConnection connection;
+    private final Map<Long, String> cartNames;
 
-    public ConfirmCartCreationCallback(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
+    public ConfirmCartCreationCallback(MessageSender sender, Map<Long, BotState> userStates,
+                                    SQLiteConnection connection, Map<Long, String> cartNames) {
         super(sender, userStates);
         this.connection = connection;
+        this.cartNames = cartNames;
     }
 
     @Override
     public String getCallbackPattern() {
-        return "/confirmcartcreation_"; // + cartName
+        return "/confirmcartcreation";
     }
 
     @Override
@@ -39,8 +42,8 @@ public class ConfirmCartCreationCallback extends AbstractCallbackCommand {
     public void execute(Update update) throws TelegramApiException {
         Long chatId = update.getCallbackQuery().getMessage().getChatId();
         Integer messageId = update.getCallbackQuery().getMessage().getMessageId();
-        String cartName = update.getCallbackQuery().getData().substring(getCallbackPattern().length());
-
+        String cartName = cartNames.get(chatId);
+        cartNames.remove(chatId);
         // create shopping cart
         ShoppingCarts cart = new ShoppingCarts(null, cartName, null);
         
@@ -57,7 +60,7 @@ public class ConfirmCartCreationCallback extends AbstractCallbackCommand {
         }
         connection.addCart(cart, user);
 
-        String message = "✅ " + MessageSender.escapeMarkdownV2("Корзина ") + "*" + cartName + "*" + " создана";
+        String message = "✅ " + MessageSender.escapeMarkdownV2("Корзина ") + "*" + MessageSender.escapeMarkdownV2(cartName) + "*" + " создана";
         userStates.remove(chatId);
         sender.editMessage(chatId, messageId, message);
     }

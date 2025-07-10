@@ -59,7 +59,7 @@ public class MyCartCommand extends AbstractTextCommand {
         InlineKeyboardMarkup keyboard = KeyboardsFabrics.createInlineKeyboard(
                         buttons,
                         1);
-        sender.sendMessage(chatId, message, keyboard);
+        sender.sendMessage(chatId, message, keyboard, false);
     }
 
     public class SetCartCallback extends AbstractCallbackCommand {

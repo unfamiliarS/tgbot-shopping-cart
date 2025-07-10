@@ -46,7 +46,7 @@ public class InviteUserCommand extends AbstractTextCommand {
 
         sender.sendMessage(chatId, 
                 MessageSender.escapeMarkdownV2("Введи @имя_пользователя, которого хочешь пригласить в свою корзину:"),
-                KeyboardsFabrics.createInlineKeyboard(Map.of("Отменить ввод", "/cancelinvitinguser"), 1));
+                KeyboardsFabrics.createInlineKeyboard(Map.of("Отменить ввод", "/cancelinvitinguser"), 1), true);
         userStates.put(chatId, BotState.WAITING_FOR_USERNAME_TO_INVITE);
     }
 
@@ -81,17 +81,17 @@ public class InviteUserCommand extends AbstractTextCommand {
             String usernameToInvite = update.getMessage().getText();
             String message;
             if (!isCorrectUsername(usernameToInvite)) {
-                message = MessageSender.escapeMarkdownV2("Некорректное имя пользователя, оно должно начинаться с @.\nПопробуй ещё раз.");
+                message = "Некорректное имя пользователя, оно должно начинаться с @.\nПопробуй ещё раз.";
                 sender.sendMessage(chatId, message,
                     KeyboardsFabrics.createInlineKeyboard(
                         Map.of("Отменить ввод", "/cancelinvitinguser"),
-                        1));
+                        1), false);
                 return;
             }
             
             inviteUser(update);
 
-            message = "✅ Приглашение отправленно пользователю *" + usernameToInvite + "*";
+            message = "✅ Приглашение отправленно пользователю " + usernameToInvite;
             sender.sendMessage(chatId, message);
             userStates.remove(chatId);
         }
@@ -115,12 +115,12 @@ public class InviteUserCommand extends AbstractTextCommand {
             // get current user
             user = connection.getUserById(currentUserId);
             String invitedCart = connection.getCartById(user.selectedCartId()).cartName();
-            String invitingMessage = "*" + update.getMessage().getFrom().getUserName() + "*" +
-                                    " приглашает в корзину " + "*" + invitedCart + "*";
+            String invitingMessage = "@" + MessageSender.escapeMarkdownV2(update.getMessage().getFrom().getUserName()) +
+                                    " приглашает в корзину *" + MessageSender.escapeMarkdownV2(invitedCart) + "*";
             InlineKeyboardMarkup keyboard = KeyboardsFabrics.createInlineKeyboard(
                                 Map.of("✅ Вступить", "/confirminviting_" + user.selectedCartId()
-                                    ), 1);    
-            sender.sendMessage(invitedChatId, invitingMessage, keyboard);
+                                    ), 1);
+            sender.sendMessage(invitedChatId, invitingMessage, keyboard, true);
         }
         
     }

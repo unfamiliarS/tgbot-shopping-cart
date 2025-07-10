@@ -11,8 +11,11 @@ import com.shavarushka.commands.interfaces.BotState;
 import com.shavarushka.commands.interfaces.MessageSender;
 
 public class CreateCartCommand extends AbstractTextCommand {
-    public CreateCartCommand(MessageSender sender, Map<Long, BotState> userStates) {
+    private final Map<Long, String> cartNames;
+
+    public CreateCartCommand(MessageSender sender, Map<Long, BotState> userStates, Map<Long, String> cartNames) {
         super(sender, userStates);
+        this.cartNames = cartNames;
     }
 
     @Override
@@ -33,7 +36,8 @@ public class CreateCartCommand extends AbstractTextCommand {
         Long chatId = update.getMessage().getChatId();
         sender.sendMessage(chatId, 
                 "Введи название корзины:",
-                KeyboardsFabrics.createInlineKeyboard(Map.of("Отменить создание", "/cancelcreatingnewcart"), 1));
+                KeyboardsFabrics.createInlineKeyboard(Map.of("Отменить создание", "/cancelcreatingnewcart"),
+                1), false);
         userStates.put(chatId, BotState.WAITING_FOR_CART_NAME);
     }
 
@@ -67,22 +71,24 @@ public class CreateCartCommand extends AbstractTextCommand {
             Long chatId = update.getMessage().getChatId();
             String cartName = update.getMessage().getText();
             String message;
+            
             if (!isCorrectCartName(cartName)) {
-                message = MessageSender.escapeMarkdownV2("Некорректное название для корзины. Попробуй ещё раз.");
+                message = "Некорректное название для корзины. Попробуй ещё раз.";
                 sender.sendMessage(chatId, message,
                     KeyboardsFabrics.createInlineKeyboard(
-                        Map.of(MessageSender.escapeMarkdownV2("Отменить создание"),
-                        "/cancelcreatingnewcart"),
-                        1));
+                        Map.of("Отменить создание", "/cancelcreatingnewcart"),
+                        1), false);
                 return;
             }
-            message = "Вы точно уверены\\, что хотите создать *" + cartName + "*\\?";
+
+            cartNames.put(chatId, cartName);
+            message = "Вы точно уверены\\, что хотите создать *" + MessageSender.escapeMarkdownV2(cartName) + "* \\?";
             ReplyKeyboard confirmationKeyboard = KeyboardsFabrics.createInlineKeyboard(
-                                            Map.of("✅ Подтвердить", "/confirmcartcreation_" + cartName,
+                                            Map.of("✅ Подтвердить", "/confirmcartcreation",
                                                    "❌ Отменить", "/cancelcreatingnewcart"),
                                                    2);
             userStates.put(chatId, BotState.CONFIRMING_CART_CREATION);
-            sender.sendMessage(chatId, message, confirmationKeyboard);
+            sender.sendMessage(chatId, message, confirmationKeyboard, true);
         }
 
         private boolean isCorrectCartName(String cartName) {
