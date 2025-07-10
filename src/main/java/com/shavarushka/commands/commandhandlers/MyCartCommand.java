@@ -78,8 +78,7 @@ public class MyCartCommand extends AbstractTextCommand {
             Long chatId = update.getCallbackQuery().getMessage().getChatId();
             Long userId = update.getCallbackQuery().getFrom().getId();
             Integer messageId = update.getCallbackQuery().getMessage().getMessageId();
-            String newSelectedCartName = update.getCallbackQuery().getData().substring(getCallbackPattern().length());
-            Long newSelectedCartId = Long.parseLong(newSelectedCartName);
+            Long newSelectedCartId = Long.parseLong(update.getCallbackQuery().getData().substring(getCallbackPattern().length()));
             String message;
             Set<ShoppingCarts> carts = connection.getCartsAssignedToUser(userId);
 
@@ -88,6 +87,9 @@ public class MyCartCommand extends AbstractTextCommand {
                 sender.sendMessage(chatId, message);
                 return;
             }
+
+            connection.updateSelectedCartForUser(userId, newSelectedCartId);
+
             message = "Ваши корзины:";
             Map<String, String> buttons = new HashMap<>();
             for (ShoppingCarts cart : carts) {

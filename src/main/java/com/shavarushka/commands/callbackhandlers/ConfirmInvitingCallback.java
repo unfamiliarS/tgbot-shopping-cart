@@ -31,7 +31,7 @@ public class ConfirmInvitingCallback extends AbstractCallbackCommand {
 
         Users user = connection.getUserById(update.getCallbackQuery().getFrom().getId());
         connection.addUserToCart(user, cartId);
-        connection.updateSelectedCartForUser(user, cartId);
+        connection.updateSelectedCartForUser(user.userId(), cartId);
 
         String message = "✅ Приглашение принято\\. Добро пожаловать в " 
                         + MessageSender.escapeMarkdownV2(connection.getCartById(cartId).cartName()) + "\\!";

@@ -121,7 +121,6 @@ public class InviteUserCommand extends AbstractTextCommand {
                                 Map.of("✅ Вступить", "/confirminviting_" + user.selectedCartId()
                                     ), 1);    
             sender.sendMessage(invitedChatId, invitingMessage, keyboard);
-            // "❌ Отменить", "/cancelinviting"
         }
         
     }

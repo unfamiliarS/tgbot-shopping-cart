@@ -110,7 +110,7 @@ final public class SQLiteConnection {
                     // for some reason null replaced with zero
                     if (associatedUser.selectedCartId() == null || 
                         associatedUser.selectedCartId() == 0) {
-                        updateSelectedCartForUser(associatedUser, cartId);
+                        updateSelectedCartForUser(associatedUser.userId(), cartId);
                     }
                     addUserToCart(associatedUser, cartId);
                 } else {
@@ -138,11 +138,11 @@ final public class SQLiteConnection {
         }
     }
 
-    public boolean updateSelectedCartForUser(Users user, Long cartId) {
+    public boolean updateSelectedCartForUser(Long userId, Long cartId) {
         String query = "UPDATE users SET selected_cart = ? WHERE user_id = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setLong(1, cartId);
-            statement.setLong(2, user.userId());
+            statement.setLong(2, userId);
             int affectedRows = statement.executeUpdate();
             return affectedRows > 0;
         } catch (SQLException e) {
