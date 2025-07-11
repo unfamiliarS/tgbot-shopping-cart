@@ -59,7 +59,6 @@ public class MyCartCommand extends AbstractTextCommand {
     }
 
     public class SetCartCallback extends AbstractCallbackCommand {
-
         public SetCartCallback(MessageSender sender, Map<Long, BotState> userStates) {
             super(sender, userStates);
         }

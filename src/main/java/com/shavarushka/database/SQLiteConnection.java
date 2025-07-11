@@ -17,11 +17,23 @@ final public class SQLiteConnection {
 
     public SQLiteConnection(String url) {
         try {
-            this.connection = DriverManager.getConnection(url);
+            connection = DriverManager.getConnection(url);
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
+
+    public void closeConnection() {
+        if (connection != null) {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    // Read---------------------------------------------------------------------------------------------------
 
     public Users getUserById(Long userId) {
         String query = "SELECT user_id, chat_id, username, user_firstname, selected_cart, " + 
@@ -79,73 +91,6 @@ final public class SQLiteConnection {
         }
     }
 
-    public boolean addUser(Users user) {
-        String query = user.selectedCartId() == null ? 
-            "INSERT INTO users (user_id, chat_id, user_firstname, username) VALUES (?, ?, ?, ?)" :
-            "INSERT INTO users (user_id, chat_id, user_firstname, username, selected_cart) VALUES (?, ?, ?, ?, ?)";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setLong(1, user.userId());
-            statement.setLong(2, user.chatId());
-            statement.setString(3, user.firstname());
-            statement.setString(4, user.username());
-            if (user.selectedCartId() != null)
-                statement.setLong(5, user.selectedCartId());
-            statement.executeUpdate();
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    public boolean addCart(ShoppingCarts cart, Users associatedUser) {
-        String query = "INSERT INTO shopping_carts (cart_name) VALUES (?)";
-        try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            statement.setString(1, cart.cartName());
-            statement.executeUpdate();
-            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    Long cartId = generatedKeys.getLong(1);
-                    updateSelectedCartForUser(associatedUser.userId(), cartId);
-                    addUserToCart(associatedUser.userId(), cartId);
-                } else {
-                    throw new SQLException("Creating cart failed, no ID obtained.");
-                }
-            }
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    // add relationship between user and cart to intermediate table
-    public boolean addUserToCart(Long userId, Long cartId) {
-        String query = "INSERT OR IGNORE INTO users_shopping_carts (cart_id, user_id) VALUES (?, ?)";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setLong(1, cartId);
-            statement.setLong(2, userId);
-            statement.executeUpdate();
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    public boolean updateSelectedCartForUser(Long userId, Long cartId) {
-        String query = "UPDATE OR IGNORE users SET selected_cart = ? WHERE user_id = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setLong(1, cartId);
-            statement.setLong(2, userId);
-            int affectedRows = statement.executeUpdate();
-            return affectedRows > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
     public Set<ShoppingCarts> getCartsAssignedToUser(Long userId) {
         String query = "SELECT sc.cart_id, sc.cart_name, sc.creation_time " +
                     "FROM shopping_carts sc " +
@@ -197,13 +142,101 @@ final public class SQLiteConnection {
         return users;
     }
 
-    public void closeConnection() {
-        if (connection != null) {
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
+    // Create---------------------------------------------------------------------------------------------------
+
+    public boolean addUser(Users user) {
+        String query = user.selectedCartId() == null ? 
+            "INSERT INTO users (user_id, chat_id, user_firstname, username) VALUES (?, ?, ?, ?)" :
+            "INSERT INTO users (user_id, chat_id, user_firstname, username, selected_cart) VALUES (?, ?, ?, ?, ?)";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, user.userId());
+            statement.setLong(2, user.chatId());
+            statement.setString(3, user.firstname());
+            statement.setString(4, user.username());
+            if (user.selectedCartId() != null)
+                statement.setLong(5, user.selectedCartId());
+            statement.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean addCart(ShoppingCarts cart, Users associatedUser) {
+        String query = "INSERT INTO shopping_carts (cart_name) VALUES (?)";
+        try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+            statement.setString(1, cart.cartName());
+            statement.executeUpdate();
+            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    Long cartId = generatedKeys.getLong(1);
+                    updateSelectedCartForUser(associatedUser.userId(), cartId);
+                    addUserToCartIntermediate(associatedUser.userId(), cartId);
+                } else {
+                    throw new SQLException("Creating cart failed, no ID obtained.");
+                }
             }
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // add relationship between user and cart to intermediate table
+    public boolean addUserToCartIntermediate(Long userId, Long cartId) {
+        String query = "INSERT OR IGNORE INTO users_shopping_carts (cart_id, user_id) VALUES (?, ?)";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, cartId);
+            statement.setLong(2, userId);
+            statement.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // Update---------------------------------------------------------------------------------------------------
+
+    public boolean updateSelectedCartForUser(Long userId, Long cartId) {
+        String query = "UPDATE OR IGNORE users SET selected_cart = ? WHERE user_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, cartId);
+            statement.setLong(2, userId);
+            int affectedRows = statement.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // Delete---------------------------------------------------------------------------------------------------
+
+    public boolean deleteCart(Long cartId) {
+        String query = "DELETE FROM shopping_carts WHERE cart_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, cartId);
+            int affectedRows = statement.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean deleteCartFromIntermediate(Long userId, Long cartId) {
+        String query = "DELETE FROM users_shopping_carts WHERE cart_id = ? AND user_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, cartId);
+            statement.setLong(2, userId);
+            int affectedRows = statement.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
         }
     }
 }

@@ -9,8 +9,8 @@ import com.shavarushka.commands.callbackhandlers.interfaces.AbstractCancelCallba
 import com.shavarushka.commands.interfaces.BotState;
 import com.shavarushka.commands.interfaces.MessageSender;
 
-public class CancelCreatingNewCartCallback extends AbstractCancelCallback {
-    public CancelCreatingNewCartCallback(MessageSender sender, Map<Long, BotState> userStates) {
+public class CancelCreatingCartCallback extends AbstractCancelCallback {
+    public CancelCreatingCartCallback(MessageSender sender, Map<Long, BotState> userStates) {
         super(sender, userStates);
     }
     

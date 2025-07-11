@@ -44,7 +44,7 @@ public class ConfirmInvitingCallback extends AbstractCallbackCommand {
             sender.editMessage(chatId, messageId, message, false);
         }
 
-        connection.addUserToCart(userId, cartId);
+        connection.addUserToCartIntermediate(userId, cartId);
         connection.updateSelectedCartForUser(userId, cartId);
 
         notifyUsersForInviteConfirmation(update, cartId);

@@ -9,14 +9,15 @@ import com.shavarushka.commands.callbackhandlers.interfaces.AbstractCancelCallba
 import com.shavarushka.commands.interfaces.BotState;
 import com.shavarushka.commands.interfaces.MessageSender;
 
-public class CancelInvitingUserCallback extends AbstractCancelCallback {
-    public CancelInvitingUserCallback(MessageSender sender, Map<Long, BotState> userStates) {
+public class CancelCartDeletion extends AbstractCancelCallback {
+
+    public CancelCartDeletion(MessageSender sender, Map<Long, BotState> userStates) {
         super(sender, userStates);
     }
-    
+
     @Override
     public String getCallbackPattern() {
-        return "/cancelinvitinguser";
+        return "/cancelcartdeletion";
     }
 
     @Override
@@ -27,12 +28,13 @@ public class CancelInvitingUserCallback extends AbstractCancelCallback {
         Long chatId = update.getCallbackQuery().getMessage().getChatId();
         return update.getCallbackQuery().getData().startsWith(getCallbackPattern().strip()) &&
                userStates.containsKey(chatId) &&
-               userStates.get(chatId).equals(BotState.WAITING_FOR_USERNAME_TO_INVITE);
+               userStates.get(chatId).equals(BotState.CONFIRMING_CART_DELETION);
     }
 
     @Override
     public void execute(Update update) throws TelegramApiException {
-        String message = "❌ Отменяю создание приглашения...";
+        String message = "❌ Отменяю удаление корзины...";
         processCanceling(update, message);
     }
+
 }

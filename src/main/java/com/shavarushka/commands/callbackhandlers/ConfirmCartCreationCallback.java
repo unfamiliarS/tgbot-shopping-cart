@@ -62,8 +62,8 @@ public class ConfirmCartCreationCallback extends AbstractCallbackCommand {
         }
         connection.addCart(cart, user);
 
-        String message = "✅ Корзина *" + MessageSender.escapeMarkdownV2(cartName) + "* создана";
         userStates.remove(chatId);
+        String message = "✅ Корзина *" + MessageSender.escapeMarkdownV2(cartName) + "* создана";
         sender.editMessage(chatId, messageId, message, true);
     }
 }

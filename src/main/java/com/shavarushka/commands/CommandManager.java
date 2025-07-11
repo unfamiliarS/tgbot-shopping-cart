@@ -7,11 +7,13 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
-import com.shavarushka.commands.callbackhandlers.CancelCreatingNewCartCallback;
+import com.shavarushka.commands.callbackhandlers.CancelCartDeletion;
+import com.shavarushka.commands.callbackhandlers.CancelCreatingCartCallback;
 import com.shavarushka.commands.callbackhandlers.CancelInvitingUserCallback;
 import com.shavarushka.commands.callbackhandlers.ConfirmCartCreationCallback;
+import com.shavarushka.commands.callbackhandlers.ConfirmCartDeletion;
 import com.shavarushka.commands.callbackhandlers.ConfirmInvitingCallback;
-import com.shavarushka.commands.commandhandlers.CancelCommand;
+import com.shavarushka.commands.callbackhandlers.DeleteCartCallback;
 import com.shavarushka.commands.commandhandlers.CreateCartCommand;
 import com.shavarushka.commands.commandhandlers.HelpCommand;
 import com.shavarushka.commands.commandhandlers.InviteUserCommand;
@@ -49,11 +51,14 @@ public class CommandManager {
         registerCommand(inviteUserCommand.new UsernameInputHandler(sender, userStates));
 
         // register callbacks
-        registerCommand(new CancelCreatingNewCartCallback(sender, userStates));
+        registerCommand(new CancelCreatingCartCallback(sender, userStates));
         registerCommand(new ConfirmCartCreationCallback(sender, userStates, connection, tempNewCartNames));
         registerCommand(mycartCommand.new SetCartCallback(sender, userStates));
         registerCommand(new CancelInvitingUserCallback(sender, userStates));
         registerCommand(new ConfirmInvitingCallback(sender, userStates, connection));
+        registerCommand(new DeleteCartCallback(sender, userStates, connection));
+        registerCommand(new CancelCartDeletion(sender, userStates));
+        registerCommand(new ConfirmCartDeletion(sender, userStates, connection));
     }
 
     public void registerCommand(TextCommand command) {
