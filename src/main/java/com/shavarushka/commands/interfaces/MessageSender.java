@@ -15,48 +15,52 @@ public class MessageSender {
         this.telegramClient = telegramClient; 
     }
 
-    public void sendMessage(Long chatId, String text) throws TelegramApiException {
-        telegramClient.execute(SendMessage.builder()
-                                    .chatId(chatId)
-                                    .text(text)
-                                    .parseMode(ParseMode.MARKDOWNV2)
-                                    .build());
+    public void sendMessage(Long chatId, String text, boolean withMarkdown) throws TelegramApiException {
+        var message = SendMessage.builder()
+                        .chatId(chatId)
+                        .text(text);
+        if (withMarkdown) {
+            message.parseMode(ParseMode.MARKDOWNV2);
+        }
+
+        telegramClient.execute(message.build());
     }
 
     public void sendMessage(Long chatId, String text, ReplyKeyboard keyboard, boolean withMarkdown) throws TelegramApiException {
+        var message = SendMessage.builder()
+                        .chatId(chatId)
+                        .text(text)
+                        .replyMarkup(keyboard);
         if (withMarkdown) {
-            telegramClient.execute(SendMessage.builder()
-                                        .chatId(chatId)
-                                        .text(text)
-                                        .parseMode(ParseMode.MARKDOWNV2)
-                                        .replyMarkup(keyboard)
-                                        .build());
-        } else {
-            telegramClient.execute(SendMessage.builder()
-                            .chatId(chatId)
-                            .text(text)
-                            .replyMarkup(keyboard)
-                            .build());
+            message.parseMode(ParseMode.MARKDOWNV2);
         }
+
+        telegramClient.execute(message.build());
     }
 
-    public void editMessage(Long chatId, Integer messageId, String text) throws TelegramApiException {
-        telegramClient.execute(EditMessageText.builder()
-                                    .chatId(chatId)
-                                    .messageId(messageId)
-                                    .text(text)
-                                    .parseMode(ParseMode.MARKDOWNV2)
-                                    .build());
+    public void editMessage(Long chatId, Integer messageId, String text, boolean withMarkdown) throws TelegramApiException {
+        var message = EditMessageText.builder()
+                .chatId(chatId)
+                .messageId(messageId)
+                .text(text);
+        if (withMarkdown) {
+            message.parseMode(ParseMode.MARKDOWNV2);
+        }
+
+        telegramClient.execute(message.build());
     }
 
-    public void editMessage(Long chatId, Integer messageId, String text, InlineKeyboardMarkup keyboard) throws TelegramApiException {
-        telegramClient.execute(EditMessageText.builder()
-                                    .chatId(chatId)
-                                    .messageId(messageId)
-                                    .text(text)
-                                    .parseMode(ParseMode.MARKDOWNV2)
-                                    .replyMarkup(keyboard) 
-                                    .build());
+    public void editMessage(Long chatId, Integer messageId, String text, InlineKeyboardMarkup keyboard, boolean withMarkdown) throws TelegramApiException {
+        var message = EditMessageText.builder()
+                .chatId(chatId)
+                .messageId(messageId)
+                .text(text)
+                .replyMarkup(keyboard);
+        if (withMarkdown) {
+            message.parseMode(ParseMode.MARKDOWNV2);
+        }
+
+        telegramClient.execute(message.build());
     }
 
     static public String escapeMarkdownV2(String text) {

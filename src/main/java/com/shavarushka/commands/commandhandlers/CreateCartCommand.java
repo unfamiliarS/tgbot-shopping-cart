@@ -3,12 +3,16 @@ package com.shavarushka.commands.commandhandlers;
 import java.util.Map;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.shavarushka.commands.KeyboardsFabrics;
+import com.shavarushka.commands.commandhandlers.interfaces.AbstractTextCommand;
 import com.shavarushka.commands.interfaces.BotState;
 import com.shavarushka.commands.interfaces.MessageSender;
+import com.vdurmont.emoji.EmojiManager;
+import com.vdurmont.emoji.EmojiParser;
 
 public class CreateCartCommand extends AbstractTextCommand {
     private final Map<Long, String> cartNames;
@@ -27,17 +31,18 @@ public class CreateCartCommand extends AbstractTextCommand {
     public String getDescription() {
         return """
             Создание новой корзины.
-                    - Используйте только буквы, цифры и -_.,!()
-                    - Длина от 3 до 30 символов""";
+                    - Используйте только буквы, цифры и -_.,!()""";
     }
 
     @Override
     public void execute(Update update) throws TelegramApiException {
         Long chatId = update.getMessage().getChatId();
-        sender.sendMessage(chatId, 
-                "Введи название корзины:",
-                KeyboardsFabrics.createInlineKeyboard(Map.of("Отменить создание", "/cancelcreatingnewcart"),
-                1), false);
+
+        String message = "Введи название корзины:";
+        InlineKeyboardMarkup keyboard = KeyboardsFabrics.createInlineKeyboard(
+            Map.of("Отменить создание", "/cancelcreatingnewcart"), 1
+        );
+        sender.sendMessage(chatId, message, keyboard, false);
         userStates.put(chatId, BotState.WAITING_FOR_CART_NAME);
     }
 
@@ -82,7 +87,7 @@ public class CreateCartCommand extends AbstractTextCommand {
             }
 
             cartNames.put(chatId, cartName);
-            message = "Вы точно уверены\\, что хотите создать *" + MessageSender.escapeMarkdownV2(cartName) + "* \\?";
+            message = "Вы точно уверены\\, что хотите создать *" + MessageSender.escapeMarkdownV2(cartName) + "*\\?";
             ReplyKeyboard confirmationKeyboard = KeyboardsFabrics.createInlineKeyboard(
                                             Map.of("✅ Подтвердить", "/confirmcartcreation",
                                                    "❌ Отменить", "/cancelcreatingnewcart"),
@@ -92,15 +97,36 @@ public class CreateCartCommand extends AbstractTextCommand {
         }
 
         private boolean isCorrectCartName(String cartName) {
+            // not null and not empty check
+            if (cartName == null || cartName.strip().isEmpty()) {
+                return false;
+            }
+            // length check
+            if (cartName.length() > 43) {
+                return false;
+            }
+
+            // check for allowed chars
+            if (isPureEmoji(cartName)) {
+                return true;
+            }
             String allowedCharsRegex = "^[a-zA-Zа-яА-ЯёЁ0-9\\s\\-_,.!()]+$";
-                    // not null test
-            return cartName != null && 
-                    // not empty test
-                   !cartName.trim().isEmpty() &&
-                    // length test
-                   (cartName.length() >= 3 && cartName.length() <= 43) &&
-                    // test for allowed chars
-                    cartName.matches(allowedCharsRegex);           
+            if (EmojiManager.containsEmoji(cartName)) {
+                String textWithoutEmoji = EmojiParser.removeAllEmojis(cartName);
+                if (textWithoutEmoji.matches(allowedCharsRegex)) {
+                    return true;
+                }
+            }
+            if (cartName.matches(allowedCharsRegex)) {
+                return true;
+            }
+
+            return false;
+        }
+
+        private boolean isPureEmoji(String str) {
+            String textWithoutEmoji = EmojiParser.removeAllEmojis(str);
+            return textWithoutEmoji.isEmpty();
         }
     }
 }

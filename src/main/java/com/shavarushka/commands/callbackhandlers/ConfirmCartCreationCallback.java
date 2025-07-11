@@ -5,6 +5,7 @@ import java.util.Map;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import com.shavarushka.commands.callbackhandlers.interfaces.AbstractCallbackCommand;
 import com.shavarushka.commands.interfaces.BotState;
 import com.shavarushka.commands.interfaces.MessageSender;
 import com.shavarushka.database.SQLiteConnection;
@@ -44,6 +45,7 @@ public class ConfirmCartCreationCallback extends AbstractCallbackCommand {
         Integer messageId = update.getCallbackQuery().getMessage().getMessageId();
         String cartName = cartNames.get(chatId);
         cartNames.remove(chatId);
+        
         // create shopping cart
         ShoppingCarts cart = new ShoppingCarts(null, cartName, null);
         
@@ -60,8 +62,8 @@ public class ConfirmCartCreationCallback extends AbstractCallbackCommand {
         }
         connection.addCart(cart, user);
 
-        String message = "✅ " + MessageSender.escapeMarkdownV2("Корзина ") + "*" + MessageSender.escapeMarkdownV2(cartName) + "*" + " создана";
+        String message = "✅ Корзина *" + MessageSender.escapeMarkdownV2(cartName) + "* создана";
         userStates.remove(chatId);
-        sender.editMessage(chatId, messageId, message);
+        sender.editMessage(chatId, messageId, message, true);
     }
 }

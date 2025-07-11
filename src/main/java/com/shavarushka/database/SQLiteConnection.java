@@ -107,12 +107,8 @@ final public class SQLiteConnection {
             try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     Long cartId = generatedKeys.getLong(1);
-                    // for some reason null replaced with zero
-                    if (associatedUser.selectedCartId() == null || 
-                        associatedUser.selectedCartId() == 0) {
-                        updateSelectedCartForUser(associatedUser.userId(), cartId);
-                    }
-                    addUserToCart(associatedUser, cartId);
+                    updateSelectedCartForUser(associatedUser.userId(), cartId);
+                    addUserToCart(associatedUser.userId(), cartId);
                 } else {
                     throw new SQLException("Creating cart failed, no ID obtained.");
                 }
@@ -125,11 +121,11 @@ final public class SQLiteConnection {
     }
 
     // add relationship between user and cart to intermediate table
-    public boolean addUserToCart(Users user, Long cartId) {
+    public boolean addUserToCart(Long userId, Long cartId) {
         String query = "INSERT OR IGNORE INTO users_shopping_carts (cart_id, user_id) VALUES (?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setLong(1, cartId);
-            statement.setLong(2, user.userId());
+            statement.setLong(2, userId);
             statement.executeUpdate();
             return true;
         } catch (SQLException e) {
@@ -139,7 +135,7 @@ final public class SQLiteConnection {
     }
 
     public boolean updateSelectedCartForUser(Long userId, Long cartId) {
-        String query = "UPDATE users SET selected_cart = ? WHERE user_id = ?";
+        String query = "UPDATE OR IGNORE users SET selected_cart = ? WHERE user_id = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setLong(1, cartId);
             statement.setLong(2, userId);

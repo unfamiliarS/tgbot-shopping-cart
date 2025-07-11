@@ -5,10 +5,11 @@ import java.util.Map;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import com.shavarushka.commands.commandhandlers.interfaces.AbstractCancelCommand;
 import com.shavarushka.commands.interfaces.BotState;
 import com.shavarushka.commands.interfaces.MessageSender;
 
-public class CancelCommand extends AbstractTextCommand {
+public class CancelCommand extends AbstractCancelCommand {
     public CancelCommand(MessageSender sender, Map<Long, BotState> userStates) {
         super(sender, userStates);
     }
@@ -28,8 +29,8 @@ public class CancelCommand extends AbstractTextCommand {
         Long chatId = update.getMessage().getChatId();
         // clear bot state for chat
         userStates.remove(chatId);
-        String message = MessageSender.escapeMarkdownV2(getDescription());
-        sender.sendMessage(chatId, message);
+        String message = getDescription();
+        sender.sendMessage(chatId, message, false);
     }
 
 }

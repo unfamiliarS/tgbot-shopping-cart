@@ -1,15 +1,18 @@
 package com.shavarushka.commands.commandhandlers;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.shavarushka.commands.KeyboardsFabrics;
+import com.shavarushka.commands.commandhandlers.interfaces.AbstractTextCommand;
 import com.shavarushka.commands.interfaces.BotState;
 import com.shavarushka.commands.interfaces.MessageSender;
 import com.shavarushka.database.SQLiteConnection;
+import com.shavarushka.database.entities.ShoppingCarts;
 import com.shavarushka.database.entities.Users;
 
 public class InviteUserCommand extends AbstractTextCommand {
@@ -38,15 +41,15 @@ public class InviteUserCommand extends AbstractTextCommand {
         
         // check if user's carts empty
         if (connection.getCartsAssignedToUser(userId).isEmpty()) {
-            message = MessageSender.escapeMarkdownV2(
-                "У тебя нет ни одной корзины:( \n/createnewcart чтобы создать");
-            sender.sendMessage(chatId, message);
+            message = "У тебя нет ни одной корзины😔 \n/createnewcart чтобы создать";
+            sender.sendMessage(chatId, message, false);
             return;
         }
 
         sender.sendMessage(chatId, 
-                MessageSender.escapeMarkdownV2("Введи @имя_пользователя, которого хочешь пригласить в свою корзину:"),
-                KeyboardsFabrics.createInlineKeyboard(Map.of("Отменить ввод", "/cancelinvitinguser"), 1), true);
+                "Введи @имя_пользователя, которого хочешь пригласить в свою корзину:",
+                KeyboardsFabrics.createInlineKeyboard(Map.of("Отменить ввод", "/cancelinvitinguser"), 
+                1), false);
         userStates.put(chatId, BotState.WAITING_FOR_USERNAME_TO_INVITE);
     }
 
@@ -78,8 +81,14 @@ public class InviteUserCommand extends AbstractTextCommand {
         @Override
         public void execute(Update update) throws TelegramApiException {
             Long chatId = update.getMessage().getChatId();
+            Long currentUserId = update.getMessage().getFrom().getId();
+            Long invitedCartId = connection.getUserById(currentUserId).selectedCartId();
             String usernameToInvite = update.getMessage().getText();
+            String currentUsername = update.getMessage().getFrom().getUserName().isEmpty() ?
+                                    update.getMessage().getFrom().getFirstName() :
+                                    update.getMessage().getFrom().getUserName();
             String message;
+
             if (!isCorrectUsername(usernameToInvite)) {
                 message = "Некорректное имя пользователя, оно должно начинаться с @.\nПопробуй ещё раз.";
                 sender.sendMessage(chatId, message,
@@ -88,11 +97,31 @@ public class InviteUserCommand extends AbstractTextCommand {
                         1), false);
                 return;
             }
+
+            if (isItMe(currentUsername, usernameToInvite.substring(1))) {
+                message = "Хулиганишь🙃";
+                sender.sendMessage(chatId, message, false);
+                userStates.remove(chatId);
+                return;
+            }
+
+            Users invitedUser = connection.getUserByUsername(usernameToInvite.substring(1));
+            if (invitedUser == null) {
+                System.out.println("User for " + usernameToInvite + " is missing");
+                return;
+            }
+
+            if (isUserAlreadyHaveThisCart(invitedUser.userId(), invitedCartId)) {
+                message = usernameToInvite + " уже состоит в этой корзине😋";
+                sender.sendMessage(chatId, message, false);
+                userStates.remove(chatId);
+                return;
+            }
             
-            inviteUser(update);
+            inviteUser(currentUsername, currentUserId, invitedUser.chatId(), invitedCartId);
 
             message = "✅ Приглашение отправленно пользователю " + usernameToInvite;
-            sender.sendMessage(chatId, message);
+            sender.sendMessage(chatId, message, false);
             userStates.remove(chatId);
         }
 
@@ -100,25 +129,26 @@ public class InviteUserCommand extends AbstractTextCommand {
             return username.startsWith("@");  
         }
 
-        private void inviteUser(Update update) throws TelegramApiException {
-            Long currentUserId = update.getMessage().getFrom().getId();
-            String usernameToInvite = update.getMessage().getText();
-            
-            // get invited user
-            Users user = connection.getUserByUsername(usernameToInvite.substring(1));
-            if (user == null) {
-                System.out.println("User for " + usernameToInvite + " is missing");
-                return;
-            }
-            Long invitedChatId = user.chatId();
+        private boolean isItMe(String myUsername, String usernameToInvite) {
+            return myUsername.equals(usernameToInvite);  
+        }
 
-            // get current user
-            user = connection.getUserById(currentUserId);
-            String invitedCart = connection.getCartById(user.selectedCartId()).cartName();
-            String invitingMessage = "@" + MessageSender.escapeMarkdownV2(update.getMessage().getFrom().getUserName()) +
+        private boolean isUserAlreadyHaveThisCart(Long userId, Long cartId) {
+            Set<ShoppingCarts> carts = connection.getCartsAssignedToUser(userId);
+            for (ShoppingCarts cart : carts) {
+                if (cart.cartId() == cartId) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private void inviteUser(String currentUsername, Long currentUserId, Long invitedChatId, Long invitedCartId) throws TelegramApiException {
+            String invitedCart = connection.getCartById(invitedCartId).cartName();
+            String invitingMessage = "@" + MessageSender.escapeMarkdownV2(currentUsername) +
                                     " приглашает в корзину *" + MessageSender.escapeMarkdownV2(invitedCart) + "*";
             InlineKeyboardMarkup keyboard = KeyboardsFabrics.createInlineKeyboard(
-                                Map.of("✅ Вступить", "/confirminviting_" + user.selectedCartId()
+                                Map.of("✅ Вступить", "/confirminviting_" + invitedCartId
                                     ), 1);
             sender.sendMessage(invitedChatId, invitingMessage, keyboard, true);
         }

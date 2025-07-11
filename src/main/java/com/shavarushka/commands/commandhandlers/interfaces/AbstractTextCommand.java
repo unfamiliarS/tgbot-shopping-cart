@@ -1,4 +1,4 @@
-package com.shavarushka.commands.commandhandlers;
+package com.shavarushka.commands.commandhandlers.interfaces;
 
 import java.util.Map;
 

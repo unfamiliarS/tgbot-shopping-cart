@@ -5,10 +5,11 @@ import java.util.Map;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import com.shavarushka.commands.callbackhandlers.interfaces.AbstractCancelCallback;
 import com.shavarushka.commands.interfaces.BotState;
 import com.shavarushka.commands.interfaces.MessageSender;
 
-public class CancelCreatingNewCartCallback extends AbstractCallbackCommand {
+public class CancelCreatingNewCartCallback extends AbstractCancelCallback {
     public CancelCreatingNewCartCallback(MessageSender sender, Map<Long, BotState> userStates) {
         super(sender, userStates);
     }
@@ -32,10 +33,7 @@ public class CancelCreatingNewCartCallback extends AbstractCallbackCommand {
 
     @Override
     public void execute(Update update) throws TelegramApiException {
-        Long chatId = update.getCallbackQuery().getMessage().getChatId();
-        Integer messageId = update.getCallbackQuery().getMessage().getMessageId();
-        String message = "❌ " + MessageSender.escapeMarkdownV2("Отменяю создание корзины...");
-        userStates.remove(chatId);
-        sender.editMessage(chatId, messageId, message);
+        String message = "❌ Отменяю создание корзины...";
+        processCanceling(update, message);
     }
 }

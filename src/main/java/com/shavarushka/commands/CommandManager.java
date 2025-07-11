@@ -38,7 +38,7 @@ public class CommandManager {
         // register commands
         registerCommand(new StartCommand(sender, userStates, connection));
         registerCommand(new HelpCommand(sender, userStates, commands));
-        registerCommand(new CancelCommand(sender, userStates));
+        // registerCommand(new CancelCommand(sender, userStates));
         var createCartCommand = new CreateCartCommand(sender, userStates, tempNewCartNames);
         registerCommand(createCartCommand);
         registerCommand(createCartCommand.new NameInputHandler(sender, userStates));

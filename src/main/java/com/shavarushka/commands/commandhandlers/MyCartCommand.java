@@ -9,7 +9,8 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.shavarushka.commands.KeyboardsFabrics;
-import com.shavarushka.commands.callbackhandlers.AbstractCallbackCommand;
+import com.shavarushka.commands.callbackhandlers.interfaces.AbstractCallbackCommand;
+import com.shavarushka.commands.commandhandlers.interfaces.AbstractTextCommand;
 import com.shavarushka.commands.interfaces.BotState;
 import com.shavarushka.commands.interfaces.MessageSender;
 import com.shavarushka.database.SQLiteConnection;
@@ -42,8 +43,8 @@ public class MyCartCommand extends AbstractTextCommand {
         // check if user's carts empty
         Set<ShoppingCarts> carts = connection.getCartsAssignedToUser(userId);
         if (carts.isEmpty()) {
-            message = MessageSender.escapeMarkdownV2("У вас нет ни одной корзины:( \n/createnewcart чтобы создать");
-            sender.sendMessage(chatId, message);
+            message = "У вас нет ни одной корзины:( \n/createnewcart чтобы создать";
+            sender.sendMessage(chatId, message, false);
             return;
         }
         
@@ -83,8 +84,8 @@ public class MyCartCommand extends AbstractTextCommand {
             Set<ShoppingCarts> carts = connection.getCartsAssignedToUser(userId);
 
             if (carts.isEmpty()) {
-                message = MessageSender.escapeMarkdownV2("У вас нет ни одной корзины:( \n/createnewcart чтобы создать");
-                sender.sendMessage(chatId, message);
+                message = "У вас нет ни одной корзины:( \n/createnewcart чтобы создать";
+                sender.sendMessage(chatId, message, false);
                 return;
             }
 
@@ -99,7 +100,7 @@ public class MyCartCommand extends AbstractTextCommand {
             InlineKeyboardMarkup keyboard = KeyboardsFabrics.createInlineKeyboard(
                             buttons,
                             1);
-            sender.editMessage(chatId, messageId, message, keyboard);
+            sender.editMessage(chatId, messageId, message, keyboard, false);
         }
     }
 }

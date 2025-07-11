@@ -5,10 +5,11 @@ import java.util.Map;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import com.shavarushka.commands.callbackhandlers.interfaces.AbstractCancelCallback;
 import com.shavarushka.commands.interfaces.BotState;
 import com.shavarushka.commands.interfaces.MessageSender;
 
-public class CancelInvitingUserCallback extends AbstractCallbackCommand {
+public class CancelInvitingUserCallback extends AbstractCancelCallback {
     public CancelInvitingUserCallback(MessageSender sender, Map<Long, BotState> userStates) {
         super(sender, userStates);
     }
@@ -31,11 +32,8 @@ public class CancelInvitingUserCallback extends AbstractCallbackCommand {
 
     @Override
     public void execute(Update update) throws TelegramApiException {
-        Long chatId = update.getCallbackQuery().getMessage().getChatId();
-        Integer messageId = update.getCallbackQuery().getMessage().getMessageId();
-        String message = "❌ " + MessageSender.escapeMarkdownV2("Отменяю создание приглашения...");
-        userStates.remove(chatId);
-        sender.editMessage(chatId, messageId, message);
+        String message = "❌ Отменяю создание приглашения...";
+        processCanceling(update, message);
     }
 
     
