@@ -1,6 +1,7 @@
 package com.shavarushka.commands.commandhandlers;
 
-import java.util.HashMap;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -40,8 +41,9 @@ public class MyCartCommand extends AbstractTextCommand {
         Long userId = update.getMessage().getFrom().getId();
         String message;
         
-        // check if user's carts empty
         Set<ShoppingCarts> carts = connection.getCartsAssignedToUser(userId);
+        
+        // check if user's carts empty
         if (carts.isEmpty()) {
             message = "У вас нет ни одной корзины:( \n/createnewcart чтобы создать";
             sender.sendMessage(chatId, message, false);
@@ -52,11 +54,15 @@ public class MyCartCommand extends AbstractTextCommand {
                                     connection.getUserById(userId).selectedCartId());
 
         message = "Ваши корзины:";
-        Map<String, String> buttons = new HashMap<>();
-        for (ShoppingCarts cart : carts) {
-            String cartName = cart.cartId().equals(selectedCart.cartId()) ? "✅ " + cart.cartName() : cart.cartName();
-            buttons.put(cartName, "/setcart_" + cart.cartId());
-        }
+        Map<String, String> buttons = new LinkedHashMap<>();
+        carts.stream()
+            .sorted(Comparator.comparing(ShoppingCarts::creationTime))
+            .forEach(cart -> {
+                String cartName = cart.cartId().equals(selectedCart.cartId()) 
+                    ? "✅ " + cart.cartName() 
+                    : cart.cartName();
+                buttons.put(cartName, "/setcart_" + cart.cartId());
+            });
         InlineKeyboardMarkup keyboard = KeyboardsFabrics.createInlineKeyboard(
                         buttons,
                         1);
@@ -90,13 +96,17 @@ public class MyCartCommand extends AbstractTextCommand {
             }
 
             connection.updateSelectedCartForUser(userId, newSelectedCartId);
-
+            
             message = "Ваши корзины:";
-            Map<String, String> buttons = new HashMap<>();
-            for (ShoppingCarts cart : carts) {
-                String cartName = cart.cartId().equals(newSelectedCartId) ? "✅ " + cart.cartName() : cart.cartName();
-                buttons.put(cartName, "/setcart_" + cart.cartId());
-            }
+            Map<String, String> buttons = new LinkedHashMap<>();
+            carts.stream()
+                .sorted(Comparator.comparing(ShoppingCarts::creationTime))
+                .forEach(cart -> {
+                    String cartName = cart.cartId().equals(newSelectedCartId) 
+                        ? "✅ " + cart.cartName() 
+                        : cart.cartName();
+                    buttons.put(cartName, "/setcart_" + cart.cartId());
+                });
             InlineKeyboardMarkup keyboard = KeyboardsFabrics.createInlineKeyboard(
                             buttons,
                             1);
