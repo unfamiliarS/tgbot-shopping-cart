@@ -9,7 +9,6 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
 
 public class KeyboardsFabrics {
-
     static public InlineKeyboardMarkup createInlineKeyboard(Map<String, String> buttons, int buttonsPerRow) {
         if (buttonsPerRow <= 0)
             throw new IndexOutOfBoundsException("Incorect buttons per row number");
@@ -20,8 +19,8 @@ public class KeyboardsFabrics {
         for (Map.Entry<String, String> entry : buttons.entrySet()) {
             currentRow.add(InlineKeyboardButton
                             .builder()
-                            .text(entry.getKey())
-                            .callbackData(entry.getValue())
+                            .text(entry.getValue())
+                            .callbackData(entry.getKey())
                             .build()
             );
             

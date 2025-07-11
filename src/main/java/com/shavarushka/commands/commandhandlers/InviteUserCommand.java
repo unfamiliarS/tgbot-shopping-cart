@@ -48,7 +48,7 @@ public class InviteUserCommand extends AbstractTextCommand {
 
         sender.sendMessage(chatId, 
                 "Введи @имя_пользователя, которого хочешь пригласить в свою корзину:",
-                KeyboardsFabrics.createInlineKeyboard(Map.of("Отменить ввод", "/cancelinvitinguser"), 
+                KeyboardsFabrics.createInlineKeyboard(Map.of("/cancelinvitinguser", "Отменить ввод"), 
                 1), false);
         userStates.put(chatId, BotState.WAITING_FOR_USERNAME_TO_INVITE);
     }
@@ -93,7 +93,7 @@ public class InviteUserCommand extends AbstractTextCommand {
                 message = "Некорректное имя пользователя, оно должно начинаться с @.\nПопробуй ещё раз.";
                 sender.sendMessage(chatId, message,
                     KeyboardsFabrics.createInlineKeyboard(
-                        Map.of("Отменить ввод", "/cancelinvitinguser"),
+                        Map.of("/cancelinvitinguser", "Отменить ввод"),
                         1), false);
                 return;
             }
@@ -148,7 +148,7 @@ public class InviteUserCommand extends AbstractTextCommand {
             String invitingMessage = "@" + MessageSender.escapeMarkdownV2(currentUsername) +
                                     " приглашает в корзину *" + MessageSender.escapeMarkdownV2(invitedCart) + "*";
             InlineKeyboardMarkup keyboard = KeyboardsFabrics.createInlineKeyboard(
-                                Map.of("✅ Вступить", "/confirminviting_" + invitedCartId
+                                Map.of("/confirminviting_" + invitedCartId, "✅ Вступить"
                                     ), 1);
             sender.sendMessage(invitedChatId, invitingMessage, keyboard, true);
         }

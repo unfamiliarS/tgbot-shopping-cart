@@ -40,7 +40,7 @@ public class CreateCartCommand extends AbstractTextCommand {
 
         String message = "Введи название корзины:";
         InlineKeyboardMarkup keyboard = KeyboardsFabrics.createInlineKeyboard(
-            Map.of("Отменить создание", "/cancelcreatingnewcart"), 1
+            Map.of("/cancelcreatingnewcart", "Отменить создание"), 1
         );
         sender.sendMessage(chatId, message, keyboard, false);
         userStates.put(chatId, BotState.WAITING_FOR_CART_NAME);
@@ -81,7 +81,7 @@ public class CreateCartCommand extends AbstractTextCommand {
                 message = "Некорректное название для корзины. Попробуй ещё раз.";
                 sender.sendMessage(chatId, message,
                     KeyboardsFabrics.createInlineKeyboard(
-                        Map.of("Отменить создание", "/cancelcreatingnewcart"),
+                        Map.of("/cancelcreatingnewcart", "Отменить создание"),
                         1), false);
                 return;
             }
@@ -89,8 +89,8 @@ public class CreateCartCommand extends AbstractTextCommand {
             cartNames.put(chatId, cartName);
             message = "Вы точно уверены\\, что хотите создать *" + MessageSender.escapeMarkdownV2(cartName) + "*\\?";
             ReplyKeyboard confirmationKeyboard = KeyboardsFabrics.createInlineKeyboard(
-                                            Map.of("✅ Подтвердить", "/confirmcartcreation",
-                                                   "❌ Отменить", "/cancelcreatingnewcart"),
+                                            Map.of("/confirmcartcreation", "✅ Подтвердить",
+                                                   "/cancelcreatingnewcart", "❌ Отменить"),
                                                    2);
             userStates.put(chatId, BotState.CONFIRMING_CART_CREATION);
             sender.sendMessage(chatId, message, confirmationKeyboard, true);

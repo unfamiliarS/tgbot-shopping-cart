@@ -43,7 +43,6 @@ final public class SQLiteConnection {
         }
     }
 
-
     public Users getUserByUsername(String username) {
         String query = "SELECT user_id, chat_id, username, user_firstname, selected_cart, " + 
             "registration_time FROM users WHERE username = ?";        

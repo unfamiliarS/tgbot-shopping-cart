@@ -54,18 +54,7 @@ public class MyCartCommand extends AbstractTextCommand {
                                     connection.getUserById(userId).selectedCartId());
 
         message = "Ваши корзины:";
-        Map<String, String> buttons = new LinkedHashMap<>();
-        carts.stream()
-            .sorted(Comparator.comparing(ShoppingCarts::creationTime))
-            .forEach(cart -> {
-                String cartName = cart.cartId().equals(selectedCart.cartId()) 
-                    ? "✅ " + cart.cartName() 
-                    : cart.cartName();
-                buttons.put(cartName, "/setcart_" + cart.cartId());
-            });
-        InlineKeyboardMarkup keyboard = KeyboardsFabrics.createInlineKeyboard(
-                        buttons,
-                        1);
+        InlineKeyboardMarkup keyboard = getKeyboardForMyCart(carts, selectedCart.cartId());
         sender.sendMessage(chatId, message, keyboard, false);
     }
 
@@ -98,19 +87,22 @@ public class MyCartCommand extends AbstractTextCommand {
             connection.updateSelectedCartForUser(userId, newSelectedCartId);
             
             message = "Ваши корзины:";
-            Map<String, String> buttons = new LinkedHashMap<>();
-            carts.stream()
-                .sorted(Comparator.comparing(ShoppingCarts::creationTime))
-                .forEach(cart -> {
-                    String cartName = cart.cartId().equals(newSelectedCartId) 
-                        ? "✅ " + cart.cartName() 
-                        : cart.cartName();
-                    buttons.put(cartName, "/setcart_" + cart.cartId());
-                });
-            InlineKeyboardMarkup keyboard = KeyboardsFabrics.createInlineKeyboard(
-                            buttons,
-                            1);
+            InlineKeyboardMarkup keyboard = getKeyboardForMyCart(carts, newSelectedCartId);
             sender.editMessage(chatId, messageId, message, keyboard, false);
         }
+    }
+
+    private InlineKeyboardMarkup getKeyboardForMyCart(Set<ShoppingCarts> carts, Long selectedCartId) {
+        Map<String, String> buttons = new LinkedHashMap<>();
+        carts.stream()
+            .sorted(Comparator.comparing(ShoppingCarts::creationTime))
+            .forEach(cart -> {
+                String cartName = cart.cartId().equals(selectedCartId) 
+                    ? "✅ " + cart.cartName() 
+                    : cart.cartName();
+                buttons.put("/setcart_" + cart.cartId(), cartName);
+                buttons.put("/deletecart_" + cart.cartId(), "🗑");
+            });
+        return KeyboardsFabrics.createInlineKeyboard(buttons,2);
     }
 }
