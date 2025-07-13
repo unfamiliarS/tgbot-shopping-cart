@@ -9,7 +9,6 @@ import com.shavarushka.commands.callbackhandlers.interfaces.AbstractCallbackComm
 import com.shavarushka.commands.interfaces.BotState;
 import com.shavarushka.commands.interfaces.MessageSender;
 import com.shavarushka.database.SQLiteConnection;
-import com.shavarushka.database.entities.Users;
 
 public class ConfirmCartDeletion extends AbstractCallbackCommand {
     private final SQLiteConnection connection;

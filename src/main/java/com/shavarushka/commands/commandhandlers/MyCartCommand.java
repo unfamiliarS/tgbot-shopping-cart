@@ -76,18 +76,33 @@ public class MyCartCommand extends AbstractTextCommand {
             Long newSelectedCartId = Long.parseLong(update.getCallbackQuery().getData().substring(getCallbackPattern().length()));
             String message;
             Set<ShoppingCarts> carts = connection.getCartsAssignedToUser(userId);
-
-            if (carts.isEmpty()) {
+            
+            if (connection.getCartById(newSelectedCartId) == null) {
+                // skip if cart doesn't exist
+            } else if (carts.isEmpty()) {
                 message = "У вас нет ни одной корзины:( \n/createnewcart чтобы создать";
                 sender.sendMessage(chatId, message, false);
                 return;
+            } else if (!isThisCartAssignedToUser(newSelectedCartId, userId)) {
+                // skip if this cart isn't assigned to user
+            } else {
+                connection.updateSelectedCartForUser(userId, newSelectedCartId);
             }
 
-            connection.updateSelectedCartForUser(userId, newSelectedCartId);
-            
+            newSelectedCartId = connection.getUserById(userId).selectedCartId();
             message = "Ваши корзины:";
             InlineKeyboardMarkup keyboard = getKeyboardForMyCart(carts, newSelectedCartId);
             sender.editMessage(chatId, messageId, message, keyboard, false);
+        }
+
+        private boolean isThisCartAssignedToUser(Long cartId, Long userId) {
+            Set<ShoppingCarts> userCarts = connection.getCartsAssignedToUser(userId);
+            for (ShoppingCarts cart : userCarts) {
+                if (cart.cartId().equals(cartId)) {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 
