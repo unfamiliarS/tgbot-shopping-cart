@@ -38,6 +38,17 @@ public class MessageSender {
         telegramClient.execute(message.build());
     }
 
+    public void sendMessage(Long chatId, ReplyKeyboard keyboard, boolean withMarkdown) throws TelegramApiException {
+        var message = SendMessage.builder()
+                        .chatId(chatId)
+                        .replyMarkup(keyboard);
+        if (withMarkdown) {
+            message.parseMode(ParseMode.MARKDOWNV2);
+        }
+
+        telegramClient.execute(message.build());
+    }
+
     public void editMessage(Long chatId, Integer messageId, String text, boolean withMarkdown) throws TelegramApiException {
         var message = EditMessageText.builder()
                 .chatId(chatId)

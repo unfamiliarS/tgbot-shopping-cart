@@ -81,7 +81,6 @@ public class CommandManager {
         for (BotCommand command : commands.values()) {
             if (command.shouldProcess(update)) {
                 command.execute(update);
-                return;
             }
         }
     }
