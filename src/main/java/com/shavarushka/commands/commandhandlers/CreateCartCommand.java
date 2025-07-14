@@ -39,8 +39,8 @@ public class CreateCartCommand extends AbstractTextCommand {
         Long chatId = update.getMessage().getChatId();
 
         String message = "Введи название корзины:";
-        InlineKeyboardMarkup keyboard = KeyboardsFabrics.createInlineKeyboard(
-            Map.of("/cancelcreatingnewcart", "Отменить создание"), 1
+        InlineKeyboardMarkup keyboard = KeyboardsFabrics.createKeyboard(
+            Map.of("/cancelcreatingnewcart", "Отменить создание"), 1, InlineKeyboardMarkup.class
         );
         sender.sendMessage(chatId, message, keyboard, false);
         userStates.put(chatId, BotState.WAITING_FOR_CART_NAME);
@@ -80,18 +80,18 @@ public class CreateCartCommand extends AbstractTextCommand {
             if (!isCorrectCartName(cartName)) {
                 message = "Некорректное название для корзины. Попробуй ещё раз.";
                 sender.sendMessage(chatId, message,
-                    KeyboardsFabrics.createInlineKeyboard(
+                    KeyboardsFabrics.createKeyboard(
                         Map.of("/cancelcreatingnewcart", "Отменить создание"),
-                        1), false);
+                        1, InlineKeyboardMarkup.class), false);
                 return;
             }
 
             cartNames.put(chatId, cartName);
             message = "Вы точно уверены\\, что хотите создать *" + MessageSender.escapeMarkdownV2(cartName) + "*\\?";
-            ReplyKeyboard confirmationKeyboard = KeyboardsFabrics.createInlineKeyboard(
+            ReplyKeyboard confirmationKeyboard = KeyboardsFabrics.createKeyboard(
                                             Map.of("/confirmcartcreation", "✅ Подтвердить",
                                                    "/cancelcreatingnewcart", "❌ Отменить"),
-                                                   2);
+                                                   2, InlineKeyboardMarkup.class);
             userStates.put(chatId, BotState.CONFIRMING_CART_CREATION);
             sender.sendMessage(chatId, message, confirmationKeyboard, true);
         }

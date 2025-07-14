@@ -54,10 +54,10 @@ public class DeleteCartCallback extends AbstractCallbackCommand {
                         + "\nПодумай хорошенько🤔";
             }
     
-            ReplyKeyboard confirmationKeyboard = KeyboardsFabrics.createInlineKeyboard(
+            ReplyKeyboard confirmationKeyboard = KeyboardsFabrics.createKeyboard(
                                             Map.of("/confirmcartdeletion_" + cartForDeletionId, "✅ Подтвердить",
                                                     "/cancelcartdeletion", "❌ Отменить"),
-                                                    2);
+                                                    2, InlineKeyboardMarkup.class);
     
             userStates.put(chatId, BotState.CONFIRMING_CART_DELETION);
             sender.sendMessage(chatId, message, confirmationKeyboard, true);
@@ -93,6 +93,6 @@ public class DeleteCartCallback extends AbstractCallbackCommand {
                 buttons.put("/setcart_" + cart.cartId(), cartName);
                 buttons.put("/deletecart_" + cart.cartId(), "🗑");
             });
-        return KeyboardsFabrics.createInlineKeyboard(buttons,2);
+        return KeyboardsFabrics.createKeyboard(buttons, 2, InlineKeyboardMarkup.class);
     }
 }

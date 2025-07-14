@@ -48,8 +48,8 @@ public class InviteUserCommand extends AbstractTextCommand {
 
         sender.sendMessage(chatId, 
                 "Введи @имя_пользователя, которого хочешь пригласить в свою корзину:",
-                KeyboardsFabrics.createInlineKeyboard(Map.of("/cancelinvitinguser", "Отменить ввод"), 
-                1), false);
+                KeyboardsFabrics.createKeyboard(Map.of("/cancelinvitinguser", "Отменить ввод"), 
+                1, InlineKeyboardMarkup.class), false);
         userStates.put(chatId, BotState.WAITING_FOR_USERNAME_TO_INVITE);
     }
 
@@ -92,9 +92,9 @@ public class InviteUserCommand extends AbstractTextCommand {
             if (!isCorrectUsername(usernameToInvite)) {
                 message = "Некорректное имя пользователя, оно должно начинаться с @.\nПопробуй ещё раз.";
                 sender.sendMessage(chatId, message,
-                    KeyboardsFabrics.createInlineKeyboard(
+                    KeyboardsFabrics.createKeyboard(
                         Map.of("/cancelinvitinguser", "Отменить ввод"),
-                        1), false);
+                        1, InlineKeyboardMarkup.class), false);
                 return;
             }
 
@@ -126,7 +126,7 @@ public class InviteUserCommand extends AbstractTextCommand {
         }
 
         private boolean isCorrectUsername(String username) {
-            return username.startsWith("@");  
+            return username.toLowerCase().matches("@[a-z0-9_]+");  
         }
 
         private boolean isItMe(String myUsername, String usernameToInvite) {
@@ -147,9 +147,9 @@ public class InviteUserCommand extends AbstractTextCommand {
             String invitedCart = connection.getCartById(invitedCartId).cartName();
             String invitingMessage = "@" + MessageSender.escapeMarkdownV2(currentUsername) +
                                     " приглашает в корзину *" + MessageSender.escapeMarkdownV2(invitedCart) + "*";
-            InlineKeyboardMarkup keyboard = KeyboardsFabrics.createInlineKeyboard(
+            InlineKeyboardMarkup keyboard = KeyboardsFabrics.createKeyboard(
                                 Map.of("/confirminviting_" + invitedCartId, "✅ Вступить"
-                                    ), 1);
+                                    ), 1, InlineKeyboardMarkup.class);
             sender.sendMessage(invitedChatId, invitingMessage, keyboard, true);
         }
         

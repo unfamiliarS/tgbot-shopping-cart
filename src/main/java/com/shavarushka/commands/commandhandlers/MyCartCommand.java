@@ -117,6 +117,6 @@ public class MyCartCommand extends AbstractTextCommand {
                 buttons.put("/setcart_" + cart.cartId(), cartName);
                 buttons.put("/deletecart_" + cart.cartId(), "🗑");
             });
-        return KeyboardsFabrics.createInlineKeyboard(buttons,2);
+        return KeyboardsFabrics.createKeyboard(buttons,2, InlineKeyboardMarkup.class);
     }
 }

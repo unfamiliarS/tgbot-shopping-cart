@@ -24,6 +24,7 @@ import com.shavarushka.commands.interfaces.BotState;
 import com.shavarushka.commands.interfaces.CallbackCommand;
 import com.shavarushka.commands.interfaces.MessageSender;
 import com.shavarushka.commands.interfaces.TextCommand;
+import com.shavarushka.commands.keyboard.ReplyKeyboardHandler;
 import com.shavarushka.database.SQLiteConnection;
 
 public class CommandManager {
@@ -59,6 +60,9 @@ public class CommandManager {
         registerCommand(new DeleteCartCallback(sender, userStates, connection));
         registerCommand(new CancelCartDeletion(sender, userStates));
         registerCommand(new ConfirmCartDeletion(sender, userStates, connection));
+
+        // register reply keyboard for selected cart
+        registerCommand(new ReplyKeyboardHandler(sender, connection));
     }
 
     public void registerCommand(TextCommand command) {
@@ -67,6 +71,10 @@ public class CommandManager {
 
     public void registerCommand(CallbackCommand command) {
         commands.put(command.getCallbackPattern(), command);
+    }
+
+    public void registerCommand(ReplyKeyboardHandler command) {
+        commands.put(command.getReplyKeyboardHandlerName(), command);
     }
 
     public void processUpdate(Update update) throws TelegramApiException {
