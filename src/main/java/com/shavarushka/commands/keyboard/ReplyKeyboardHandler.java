@@ -2,64 +2,59 @@ package com.shavarushka.commands.keyboard;
 
 import java.util.Map;
 
-import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.shavarushka.commands.KeyboardsFabrics;
-import com.shavarushka.commands.interfaces.BotCommand;
+import com.shavarushka.commands.callbackhandlers.interfaces.SelectedCartNotifier;
 import com.shavarushka.commands.interfaces.MessageSender;
 import com.shavarushka.database.SQLiteConnection;
+import com.shavarushka.database.entities.Users;
 
-public class ReplyKeyboardHandler implements BotCommand {
+public class ReplyKeyboardHandler implements CartSelectionListener {
     protected final MessageSender sender;
     private final SQLiteConnection connection;
 
-    public ReplyKeyboardHandler(MessageSender sender, SQLiteConnection connection) {
+    public ReplyKeyboardHandler(MessageSender sender, SQLiteConnection connection, SelectedCartNotifier notifier) {
         this.sender = sender;
         this.connection = connection;
+        notifier.addCartSelectionListener(this);
     }
 
-    public String getReplyKeyboardHandlerName() {
-        return "keyboard_for_selected_cart";
-    }
-
-    // should override if need to check BotState 
     @Override
-    public boolean shouldProcess(Update update) {
-        Long userId = null;
-        boolean isCartSelected = false;
+    public void onCartSelected(Long userId, Long cartId) {
+        try {
+            Long chatId = getChatIdByUserId(userId);
+            
+            if (chatId != null) {
+                updateKeyboard(cartId, chatId, cartId != null);
+            }
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private Long getChatIdByUserId(Long userId) {
+        Users user = connection.getUserById(userId);
+        return user != null ? user.chatId() : null;
+    }
+
+    private void updateKeyboard(Long cartId, Long chatId, boolean hasCart) throws TelegramApiException {
+        String cartName = connection.getCartById(cartId).cartName();
+        ReplyKeyboard keyboard;
         
-        // check if user have selected cart
-        if (update.hasMessage() && update.getMessage().hasText()) {
-            userId = update.getMessage().getFrom().getId();
-        } else if (update.hasCallbackQuery()) {
-            userId = update.getCallbackQuery().getFrom().getId();    
-        }
-
-        if (userId != null && connection.getUserById(userId).selectedCartId() != null) {
-            isCartSelected = true;
-        }
-
-        return isCartSelected;
-    }
-
-    @Override
-    public void execute(Update update) throws TelegramApiException {
-        Long chatId;
-
-        if (update.hasMessage() && update.getMessage().hasText()) {
-            chatId = update.getMessage().getChatId();
-        } else if (update.hasCallbackQuery()) {
-            chatId = update.getCallbackQuery().getMessage().getChatId();
+        if (hasCart) {
+            keyboard = KeyboardsFabrics.createKeyboard(
+                Map.of("/show_cart", "Отсортировать", 
+                       "/clear_cart", "Поиск"), 
+                2, ReplyKeyboardMarkup.class
+            );
         } else {
-            return;
+            keyboard = new ReplyKeyboardRemove(true);
         }
-
-        ReplyKeyboardMarkup keyboard = KeyboardsFabrics.createKeyboard(
-            Map.of("/start", "/start"), 1, ReplyKeyboardMarkup.class
-        );
-
-        sender.sendMessage(chatId, "f", keyboard, false);
+        
+        sender.sendMessage(chatId, "Вы в корзине: " + cartName, keyboard, false);
     }
 }

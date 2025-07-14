@@ -51,6 +51,8 @@ public class StartCommand extends AbstractTextCommand {
             // TODO: logic to update chatId
         }
 
+        // TODO: update keyboard
+
         sender.sendMessage(chatId, "Привет *" + firstname + "*\\!", true);
     }
 }
