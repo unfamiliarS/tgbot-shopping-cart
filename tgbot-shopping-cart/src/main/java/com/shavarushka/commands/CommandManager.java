@@ -44,6 +44,7 @@ public class CommandManager {
         var inviteUserCommand = new InviteUserCommand(sender, userStates, connection);
         registerCommand(inviteUserCommand);
         registerCommand(inviteUserCommand.new UsernameInputHandler(sender, userStates));
+        registerCommand(new AddProductCommand(sender, userStates));
 
         // register callbacks
         registerCommand(new CancelCreatingCart(sender, userStates));
