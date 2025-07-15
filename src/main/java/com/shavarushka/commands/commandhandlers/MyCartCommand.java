@@ -47,7 +47,7 @@ public class MyCartCommand extends AbstractTextCommand {
         
         // check if user's carts empty
         if (carts.isEmpty()) {
-            message = "У вас нет ни одной корзины:( \n/createnewcart чтобы создать";
+            message = "У тебя нет ни одной корзины😔 \n/createnewcart чтобы создать";
             sender.sendMessage(chatId, message, false);
             return;
         }
@@ -82,7 +82,7 @@ public class MyCartCommand extends AbstractTextCommand {
             if (connection.getCartById(newSelectedCartId) == null) {
                 // skip if cart doesn't exist
             } else if (carts.isEmpty()) {
-                message = "У вас нет ни одной корзины:( \n/createnewcart чтобы создать";
+                message = "У тебя нет ни одной корзины😔 \n/createnewcart чтобы создать";
                 sender.sendMessage(chatId, message, false);
                 return;
             } else if (!isThisCartAssignedToUser(newSelectedCartId, userId)) {

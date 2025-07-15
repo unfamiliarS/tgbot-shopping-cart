@@ -47,14 +47,15 @@ public class ReplyKeyboardHandler implements CartSelectionListener {
         
         if (hasCart) {
             keyboard = KeyboardsFabrics.createKeyboard(
-                Map.of("/show_cart", "Отсортировать", 
-                       "/clear_cart", "Поиск"), 
+                Map.of("/sort_by_cost", "Отсортировать по цене",
+                    "/sort_by_date", "Отсортировать по дате добавления",
+                    "/search", "Поиск"),
                 2, ReplyKeyboardMarkup.class
             );
         } else {
             keyboard = new ReplyKeyboardRemove(true);
         }
-        
-        sender.sendMessage(chatId, "Вы в корзине: " + cartName, keyboard, false);
+        String message = "Вы в корзине: *" + MessageSender.escapeMarkdownV2(cartName) + "*";
+        sender.sendMessage(chatId, message, keyboard, true);
     }
 }

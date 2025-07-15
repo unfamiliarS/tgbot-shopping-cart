@@ -29,16 +29,14 @@ public class CreateCartCommand extends AbstractTextCommand {
 
     @Override
     public String getDescription() {
-        return """
-            Создание новой корзины.
-                    - Используйте только буквы, цифры и -_.,!()""";
+        return "Разрешены только буквы, цифры, символы -_.,!(), а также некоторые эмодзи";
     }
 
     @Override
     public void execute(Update update) throws TelegramApiException {
         Long chatId = update.getMessage().getChatId();
 
-        String message = "Введи название корзины:";
+        String message = getDescription() + "\n\nВведи название корзины:";
         InlineKeyboardMarkup keyboard = KeyboardsFabrics.createKeyboard(
             Map.of("/cancelcreatingnewcart", "Отменить создание"), 1, InlineKeyboardMarkup.class
         );

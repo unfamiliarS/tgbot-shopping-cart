@@ -9,6 +9,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
 public class KeyboardsFabrics {
@@ -58,7 +59,11 @@ public class KeyboardsFabrics {
         KeyboardRow currentRow = new KeyboardRow();
 
         for (Map.Entry<String, String> entry : buttons.entrySet()) {
-            currentRow.add(entry.getValue());
+            currentRow.add(KeyboardButton
+                        .builder()
+                        .text(entry.getValue())
+                        .build()
+            );
 
             if (currentRow.size() >= buttonsPerRow) {
                 keyboardRows.add(currentRow);
@@ -72,6 +77,7 @@ public class KeyboardsFabrics {
 
         return ReplyKeyboardMarkup.builder()
                 .keyboard(keyboardRows)
+                .resizeKeyboard(true)
                 .build();
     }
 }
