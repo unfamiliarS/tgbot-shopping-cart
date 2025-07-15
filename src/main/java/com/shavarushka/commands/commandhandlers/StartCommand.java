@@ -1,21 +1,23 @@
 package com.shavarushka.commands.commandhandlers;
 
+import java.util.List;
 import java.util.Map;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import com.shavarushka.commands.commandhandlers.interfaces.AbstractTextCommand;
+import com.shavarushka.commands.commandhandlers.interfaces.SelectedCartNotifier;
 import com.shavarushka.commands.interfaces.BotState;
 import com.shavarushka.commands.interfaces.MessageSender;
+import com.shavarushka.commands.keyboard.CartSelectionListener;
 import com.shavarushka.database.SQLiteConnection;
 import com.shavarushka.database.entities.Users;
 
-public class StartCommand extends AbstractTextCommand {
+public class StartCommand extends SelectedCartNotifier {
     private final SQLiteConnection connection;
 
-    public StartCommand(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
-        super(sender, userStates);
+    public StartCommand(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection, List<CartSelectionListener> listeners) {
+        super(sender, userStates, listeners);
         this.connection = connection;
     }
 
@@ -46,13 +48,17 @@ public class StartCommand extends AbstractTextCommand {
                             null); // db will figure it out itself
             connection.addUser(user);
         }
+        
+        sender.sendMessage(chatId, "Привет *" + firstname + "*\\!", true);
+        
         // update chatId if needed
         if (chatId != user.chatId()) {
             // TODO: logic to update chatId
         }
+        // update keyboard if needed
+        if (user.selectedCartId() != null) {
+            notifyCartSelectionListeners(userId, user.selectedCartId());
+        }
 
-        // TODO: update keyboard
-
-        sender.sendMessage(chatId, "Привет *" + firstname + "*\\!", true);
     }
 }

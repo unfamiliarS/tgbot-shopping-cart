@@ -25,7 +25,7 @@ public class ConfirmInvitingCallback extends SelectedCartNotifier {
     }
 
     @Override
-    public String getCallbackPattern() {
+    public String getCommand() {
         return "/confirminviting_";
     }
 
@@ -34,7 +34,7 @@ public class ConfirmInvitingCallback extends SelectedCartNotifier {
         Long chatId = update.getCallbackQuery().getMessage().getChatId();
         Integer messageId = update.getCallbackQuery().getMessage().getMessageId();
         Long userId = update.getCallbackQuery().getFrom().getId();
-        Long cartId = Long.parseLong(update.getCallbackQuery().getData().substring(getCallbackPattern().length()));
+        Long cartId = Long.parseLong(update.getCallbackQuery().getData().substring(getCommand().length()));
         String message;
 
         if (!isCartExist(cartId)) {

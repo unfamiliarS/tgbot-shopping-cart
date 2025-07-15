@@ -19,7 +19,7 @@ public class ConfirmCartDeletion extends AbstractCallbackCommand {
     }
 
     @Override
-    public String getCallbackPattern() {
+    public String getCommand() {
         return "/confirmcartdeletion_"; // + cartId
     }
 
@@ -29,7 +29,7 @@ public class ConfirmCartDeletion extends AbstractCallbackCommand {
             return false;
 
         Long chatId = update.getCallbackQuery().getMessage().getChatId();
-        return update.getCallbackQuery().getData().startsWith(getCallbackPattern().strip()) &&
+        return update.getCallbackQuery().getData().startsWith(getCommand().strip()) &&
                userStates.containsKey(chatId) &&
                userStates.get(chatId).equals(BotState.CONFIRMING_CART_DELETION);
     }
@@ -39,7 +39,7 @@ public class ConfirmCartDeletion extends AbstractCallbackCommand {
         Long chatId = update.getCallbackQuery().getMessage().getChatId();
         Long userId = update.getCallbackQuery().getFrom().getId();
         Integer messageId = update.getCallbackQuery().getMessage().getMessageId();
-        Long cartForDeletionId = Long.parseLong(update.getCallbackQuery().getData().substring(getCallbackPattern().length()));
+        Long cartForDeletionId = Long.parseLong(update.getCallbackQuery().getData().substring(getCommand().length()));
         String cartName = connection.getCartById(cartForDeletionId).cartName();
         String message;
 

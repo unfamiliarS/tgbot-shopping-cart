@@ -4,18 +4,16 @@ import java.util.Map;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
 
+import com.shavarushka.commands.interfaces.AbstractCommand;
 import com.shavarushka.commands.interfaces.BotState;
 import com.shavarushka.commands.interfaces.MessageSender;
-import com.shavarushka.commands.interfaces.TextCommand;
 
-public abstract class AbstractTextCommand implements TextCommand {
-    protected final Map<Long, BotState> userStates;
-    protected final MessageSender sender;
-
+public abstract class AbstractTextCommand extends AbstractCommand {
     public AbstractTextCommand(MessageSender sender, Map<Long, BotState> userStates) {
-        this.sender = sender;
-        this.userStates = userStates;
+        super(sender, userStates);
     }
+
+    abstract public String getDescription();
 
     // should override if need to check BotState 
     @Override

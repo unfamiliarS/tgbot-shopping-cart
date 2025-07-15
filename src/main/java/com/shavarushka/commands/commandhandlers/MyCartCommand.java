@@ -66,7 +66,7 @@ public class MyCartCommand extends AbstractTextCommand {
         }
 
         @Override
-        public String getCallbackPattern() {
+        public String getCommand() {
             return "/setcart_";
         }
 
@@ -75,7 +75,7 @@ public class MyCartCommand extends AbstractTextCommand {
             Long chatId = update.getCallbackQuery().getMessage().getChatId();
             Long userId = update.getCallbackQuery().getFrom().getId();
             Integer messageId = update.getCallbackQuery().getMessage().getMessageId();
-            Long newSelectedCartId = Long.parseLong(update.getCallbackQuery().getData().substring(getCallbackPattern().length()));
+            Long newSelectedCartId = Long.parseLong(update.getCallbackQuery().getData().substring(getCommand().length()));
             String message;
             Set<ShoppingCarts> carts = connection.getCartsAssignedToUser(userId);
             

@@ -27,7 +27,7 @@ public class DeleteCartCallback extends AbstractCallbackCommand {
     }
 
     @Override
-    public String getCallbackPattern() {
+    public String getCommand() {
         return "/deletecart_"; // + cardId
     }
 
@@ -35,7 +35,7 @@ public class DeleteCartCallback extends AbstractCallbackCommand {
     public void execute(Update update) throws TelegramApiException {
         Long chatId = update.getCallbackQuery().getMessage().getChatId();
         Integer messageId = update.getCallbackQuery().getMessage().getMessageId();
-        Long cartForDeletionId = Long.parseLong(update.getCallbackQuery().getData().substring(getCallbackPattern().length()));
+        Long cartForDeletionId = Long.parseLong(update.getCallbackQuery().getData().substring(getCommand().length()));
         ShoppingCarts cart = connection.getCartById(cartForDeletionId);
         Users user = connection.getUserById(update.getCallbackQuery().getFrom().getId());
         String message;

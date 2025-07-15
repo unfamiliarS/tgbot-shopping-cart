@@ -11,11 +11,12 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import com.shavarushka.commands.callbackhandlers.*;
 import com.shavarushka.commands.commandhandlers.*;
+import com.shavarushka.commands.generalcommandhandlers.CancelCartDeletion;
+import com.shavarushka.commands.generalcommandhandlers.CancelCreatingCart;
+import com.shavarushka.commands.generalcommandhandlers.CancelInvitingUser;
 import com.shavarushka.commands.interfaces.BotCommand;
 import com.shavarushka.commands.interfaces.BotState;
-import com.shavarushka.commands.interfaces.CallbackCommand;
 import com.shavarushka.commands.interfaces.MessageSender;
-import com.shavarushka.commands.interfaces.TextCommand;
 import com.shavarushka.commands.keyboard.CartSelectionListener;
 import com.shavarushka.commands.keyboard.ReplyKeyboardHandler;
 import com.shavarushka.database.SQLiteConnection;
@@ -33,9 +34,8 @@ public class CommandManager {
         connection = new SQLiteConnection(System.getenv("DB_URL"));
 
         // register commands
-        registerCommand(new StartCommand(sender, userStates, connection));
+        registerCommand(new StartCommand(sender, userStates, connection, selectedCartsListeners));
         registerCommand(new HelpCommand(sender, userStates, commands));
-        // registerCommand(new CancelCommand(sender, userStates));
         var createCartCommand = new CreateCartCommand(sender, userStates, tempNewCartNames);
         registerCommand(createCartCommand);
         registerCommand(createCartCommand.new NameInputHandler(sender, userStates));
@@ -46,10 +46,10 @@ public class CommandManager {
         registerCommand(inviteUserCommand.new UsernameInputHandler(sender, userStates));
 
         // register callbacks
-        registerCommand(new CancelCreatingCartCallback(sender, userStates));
+        registerCommand(new CancelCreatingCart(sender, userStates));
         registerCommand(new ConfirmCartCreationCallback(sender, userStates, connection, tempNewCartNames, selectedCartsListeners));
         registerCommand(mycartCommand.new SetCartCallback(sender, userStates, selectedCartsListeners));
-        registerCommand(new CancelInvitingUserCallback(sender, userStates));
+        registerCommand(new CancelInvitingUser(sender, userStates));
         var confirmInvitingCallback = new ConfirmInvitingCallback(sender, userStates, connection, selectedCartsListeners);
         registerCommand(confirmInvitingCallback);
         registerCommand(new DeleteCartCallback(sender, userStates, connection));
@@ -58,14 +58,11 @@ public class CommandManager {
 
         // create a ReplyKeyboardHandler for correct updating keyboard on selected cart changes
         new ReplyKeyboardHandler(sender, connection, confirmInvitingCallback);
+        
     }
 
-    public void registerCommand(TextCommand command) {
+    public void registerCommand(BotCommand command) {
         commands.put(command.getCommand(), command);
-    }
-
-    public void registerCommand(CallbackCommand command) {
-        commands.put(command.getCallbackPattern(), command);
     }
 
     public void processUpdate(Update update) throws TelegramApiException {

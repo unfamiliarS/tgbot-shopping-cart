@@ -27,7 +27,7 @@ public class ConfirmCartCreationCallback extends SelectedCartNotifier {
     }
 
     @Override
-    public String getCallbackPattern() {
+    public String getCommand() {
         return "/confirmcartcreation";
     }
 
@@ -37,7 +37,7 @@ public class ConfirmCartCreationCallback extends SelectedCartNotifier {
             return false;
 
         Long chatId = update.getCallbackQuery().getMessage().getChatId();
-        return update.getCallbackQuery().getData().startsWith(getCallbackPattern().strip()) &&
+        return update.getCallbackQuery().getData().startsWith(getCommand().strip()) &&
                userStates.containsKey(chatId) &&
                userStates.get(chatId).equals(BotState.CONFIRMING_CART_CREATION);
     }

@@ -1,31 +1,39 @@
-package com.shavarushka.commands.callbackhandlers;
+package com.shavarushka.commands.generalcommandhandlers;
 
 import java.util.Map;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import com.shavarushka.commands.callbackhandlers.interfaces.AbstractCancelCallback;
+import com.shavarushka.commands.generalcommandhandlers.interfaces.AbstractCancelCommand;
 import com.shavarushka.commands.interfaces.BotState;
 import com.shavarushka.commands.interfaces.MessageSender;
 
-public class CancelInvitingUserCallback extends AbstractCancelCallback {
-    public CancelInvitingUserCallback(MessageSender sender, Map<Long, BotState> userStates) {
+public class CancelInvitingUser extends AbstractCancelCommand {
+    public CancelInvitingUser(MessageSender sender, Map<Long, BotState> userStates) {
         super(sender, userStates);
     }
     
     @Override
-    public String getCallbackPattern() {
+    public String getCommand() {
         return "/cancelinvitinguser";
     }
 
     @Override
     public boolean shouldProcess(Update update) {
-        if (!update.hasCallbackQuery())
+        Long chatId;
+        String message;
+        if (update.hasMessage() && update.getMessage().hasText()) {
+            chatId = update.getMessage().getChatId();
+            message = update.getMessage().getText();
+        } else if (update.hasCallbackQuery()) {
+            chatId = update.getCallbackQuery().getMessage().getChatId();
+            message = update.getCallbackQuery().getData();
+        } else {
             return false;
+        }
 
-        Long chatId = update.getCallbackQuery().getMessage().getChatId();
-        return update.getCallbackQuery().getData().startsWith(getCallbackPattern().strip()) &&
+        return message.startsWith(getCommand().strip()) &&
                userStates.containsKey(chatId) &&
                userStates.get(chatId).equals(BotState.WAITING_FOR_USERNAME_TO_INVITE);
     }
