@@ -40,7 +40,7 @@ public class AddProductCommand extends AbstractTextCommand {
     @Override
     public void execute(Update update) throws TelegramApiException {
         Long chatId = update.getMessage().getChatId();
-        Long userId = update.getMessage().getFrom().getId();
+        // Long userId = update.getMessage().getFrom().getId();
         String message = update.getMessage().getText();
         sender.sendMessage(chatId, message, false);
 
