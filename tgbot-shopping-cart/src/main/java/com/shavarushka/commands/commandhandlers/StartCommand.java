@@ -45,7 +45,8 @@ public class StartCommand extends SelectedCartNotifier {
                             firstname,
                             update.getMessage().getFrom().getUserName(),
                             null, // adding later
-                            null); // db will figure it out itself
+                            null // db will figure it out itself
+        );
             connection.addUser(user);
         }
         
@@ -56,9 +57,6 @@ public class StartCommand extends SelectedCartNotifier {
             // TODO: logic to update chatId
         }
         // update keyboard if needed
-        if (user.selectedCartId() != null) {
-            notifyCartSelectionListeners(userId, user.selectedCartId());
-        }
-
+        notifyCartSelectionListeners(userId, user.selectedCartId());
     }
 }

@@ -29,7 +29,7 @@ public class ReplyKeyboardHandler implements CartSelectionListener {
             Long chatId = getChatIdByUserId(userId);
             
             if (chatId != null) {
-                updateKeyboard(cartId, chatId, cartId != null);
+                updateKeyboard(cartId, chatId, (cartId != null && cartId != 0));
             }
         } catch (TelegramApiException e) {
             e.printStackTrace();
@@ -42,20 +42,20 @@ public class ReplyKeyboardHandler implements CartSelectionListener {
     }
 
     private void updateKeyboard(Long cartId, Long chatId, boolean hasCart) throws TelegramApiException {
-        String cartName = connection.getCartById(cartId).cartName();
         ReplyKeyboard keyboard;
-        
+        String message;
+
         if (hasCart) {
+            String cartName = connection.getCartById(cartId).cartName();
             keyboard = KeyboardsFabrics.createKeyboard(
-                Map.of("/sort_by_cost", "Отсортировать по цене",
-                    "/sort_by_date", "Отсортировать по дате добавления",
-                    "/search", "Поиск"),
-                2, ReplyKeyboardMarkup.class
+                Map.of("/create_category", "Создать новую группу"),
+                1, ReplyKeyboardMarkup.class
             );
+            message = "Сейчас выбрана корзина: *" + MessageSender.escapeMarkdownV2(cartName) + "*";
         } else {
             keyboard = new ReplyKeyboardRemove(true);
+            message = "Ты не состоишь не в одной корзине";
         }
-        String message = "Вы в корзине: *" + MessageSender.escapeMarkdownV2(cartName) + "*";
         sender.sendMessage(chatId, message, keyboard, true);
     }
 }

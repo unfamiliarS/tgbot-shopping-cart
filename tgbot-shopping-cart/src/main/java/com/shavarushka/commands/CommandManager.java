@@ -11,9 +11,7 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import com.shavarushka.commands.callbackhandlers.*;
 import com.shavarushka.commands.commandhandlers.*;
-import com.shavarushka.commands.generalcommandhandlers.CancelCartDeletion;
-import com.shavarushka.commands.generalcommandhandlers.CancelCreatingCart;
-import com.shavarushka.commands.generalcommandhandlers.CancelInvitingUser;
+import com.shavarushka.commands.generalcommandhandlers.*;
 import com.shavarushka.commands.interfaces.BotCommand;
 import com.shavarushka.commands.interfaces.BotState;
 import com.shavarushka.commands.interfaces.MessageSender;
@@ -44,7 +42,7 @@ public class CommandManager {
         var inviteUserCommand = new InviteUserCommand(sender, userStates, connection);
         registerCommand(inviteUserCommand);
         registerCommand(inviteUserCommand.new UsernameInputHandler(sender, userStates));
-        registerCommand(new AddProductCommand(sender, userStates));
+        registerCommand(new AddProductCommand(sender, userStates, connection));
 
         // register callbacks
         registerCommand(new CancelCreatingCart(sender, userStates));

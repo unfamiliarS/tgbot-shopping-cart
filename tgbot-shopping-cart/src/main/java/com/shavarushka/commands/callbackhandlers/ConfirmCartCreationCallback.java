@@ -63,7 +63,7 @@ public class ConfirmCartCreationCallback extends SelectedCartNotifier {
                             null); // db will figure it out itself
             connection.addUser(user);
         }
-        connection.addCart(cart, user);
+        connection.addCart(cart, user.userId());
 
         // notify to update keyboard on new selected cart
         user = connection.getUserById(user.userId());

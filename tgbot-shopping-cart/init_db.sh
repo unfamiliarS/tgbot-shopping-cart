@@ -3,7 +3,7 @@
 # set echo
 set -x
 
-DB_FILE=../../../../../../test.db
+DB_FILE=test.db
 rm -f "$DB_FILE"
 
 sql_query="CREATE TABLE IF NOT EXISTS users (
@@ -11,7 +11,7 @@ sql_query="CREATE TABLE IF NOT EXISTS users (
     chat_id INTEGER NOT NULL,
     user_firstname TEXT NOT NULL,
     username TEXT NOT NULL,
-    selected_cart INTEGER,
+    selected_cart_id INTEGER,
     registration_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -34,8 +34,8 @@ CREATE TABLE IF NOT EXISTS products (
     full_url TEXT NOT NULL UNIQUE,
     assigned_cart_id INTEGER NOT NULL,
     product_name TEXT,
-    product_price TEXT,
-    add_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    product_price INTEGER,
+    adding_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (assigned_cart_id) REFERENCES shopping_carts(cart_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
