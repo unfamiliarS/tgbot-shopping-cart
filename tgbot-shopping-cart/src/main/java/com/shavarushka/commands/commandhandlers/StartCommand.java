@@ -33,9 +33,19 @@ public class StartCommand extends SelectedCartNotifier {
 
     @Override
     public void execute(Update update) throws TelegramApiException {
-        Long chatId = update.getMessage().getChatId();
-        Long userId = update.getMessage().getFrom().getId();
-        String firstname = update.getMessage().getFrom().getFirstName();
+        Long chatId, userId;
+        String firstname;
+        if (update.hasMessage() && update.getMessage().hasText()) {
+            chatId = update.getMessage().getChatId();
+            userId = update.getMessage().getFrom().getId();
+            firstname = update.getMessage().getFrom().getFirstName();
+        } else if (update.hasCallbackQuery()) {
+            chatId = update.getCallbackQuery().getMessage().getChatId();
+            userId = update.getCallbackQuery().getFrom().getId();
+            firstname = update.getCallbackQuery().getFrom().getFirstName();
+        } else {
+            return;
+        }
 
         Users user = connection.getUserById(userId);
         // register new user if needed
@@ -59,4 +69,5 @@ public class StartCommand extends SelectedCartNotifier {
         // update keyboard if needed
         notifyCartSelectionListeners(userId, user.selectedCartId());
     }
+
 }

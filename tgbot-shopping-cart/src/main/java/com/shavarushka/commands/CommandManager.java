@@ -42,7 +42,7 @@ public class CommandManager {
         var inviteUserCommand = new InviteUserCommand(sender, userStates, connection);
         registerCommand(inviteUserCommand);
         registerCommand(inviteUserCommand.new UsernameInputHandler(sender, userStates));
-        registerCommand(new AddProductCommand(sender, userStates, connection));
+        registerCommand(new AddProductCommand(sender, userStates, selectedCartsListeners, connection));
         registerCommand(new ListProductsOfCategory(sender, userStates, connection));
 
         // register callbacks
@@ -58,7 +58,6 @@ public class CommandManager {
 
         // create a ReplyKeyboardHandler for correct updating keyboard on selected cart changes
         new ReplyKeyboardHandler(sender, connection, confirmInvitingCallback);
-        
     }
 
     public void registerCommand(BotCommand command) {
@@ -66,6 +65,10 @@ public class CommandManager {
     }
 
     public void processUpdate(Update update) throws TelegramApiException {
+        if (!checkUserRegister(update)) {
+            return;
+        }
+
         for (BotCommand command : commands.values()) {
             if (command.shouldProcess(update)) {
                 command.execute(update);
@@ -73,4 +76,23 @@ public class CommandManager {
             }
         }
     }
+
+    private boolean checkUserRegister(Update update) throws TelegramApiException {
+        Long userId;
+        if (update.hasMessage()) {
+            userId = update.getMessage().getFrom().getId();
+        } else if (update.hasCallbackQuery()) {
+            userId = update.getCallbackQuery().getFrom().getId();
+        } else {
+            return false;
+        }
+        if (connection.getUserById(userId) == null) {
+            BotCommand command = commands.get("/start");
+            command.execute(update);
+            return false;
+        }
+        return true;
+    }
+
+
 }

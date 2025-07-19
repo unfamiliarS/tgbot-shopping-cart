@@ -107,7 +107,9 @@ public class InviteUserCommand extends AbstractTextCommand {
 
             Users invitedUser = connection.getUserByUsername(usernameToInvite.substring(1));
             if (invitedUser == null) {
-                System.out.println("User for " + usernameToInvite + " is missing");
+                message = "Не могу найти пользователя в своей базе😔 Отменяю приглашение...";
+                sender.sendMessage(chatId, message, false);
+                userStates.remove(chatId);
                 return;
             }
 

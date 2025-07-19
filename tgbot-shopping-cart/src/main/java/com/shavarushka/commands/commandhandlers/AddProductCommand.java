@@ -1,23 +1,26 @@
 package com.shavarushka.commands.commandhandlers;
 
+import java.util.List;
 import java.util.Map;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import com.shavarushka.commands.commandhandlers.interfaces.AbstractTextCommand;
+import com.shavarushka.commands.commandhandlers.interfaces.SelectedCartNotifier;
 import com.shavarushka.commands.interfaces.BotState;
 import com.shavarushka.commands.interfaces.MessageSender;
+import com.shavarushka.commands.keyboard.CartSelectionListener;
 import com.shavarushka.database.SQLiteConnection;
 import com.shavarushka.database.entities.Categories;
 import com.shavarushka.database.entities.Products;
 import com.shavarushka.database.entities.Users;
 
-public class AddProductCommand extends AbstractTextCommand {
+public class AddProductCommand extends SelectedCartNotifier {
     private final SQLiteConnection connection;
 
-    public AddProductCommand(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
-        super(sender, userStates);
+    public AddProductCommand(MessageSender sender, Map<Long, BotState> userStates,
+                            List<CartSelectionListener> listeners, SQLiteConnection connection) {
+        super(sender, userStates, listeners);
         this.connection = connection;
     }
 
@@ -90,9 +93,10 @@ public class AddProductCommand extends AbstractTextCommand {
                                                 null,
                                                 null)
             );
-            
+            notifyCartSelectionListeners(userId, cartId);
+
             if (productId != null) {
-                sender.sendMessage(chatId, "Товар успешно добавлен в корзину в категорию *Прочее* 😎", true);
+                sender.sendMessage(chatId, "Товар успешно добавлен в категорию *Прочее* 😎", true);
             } else {
                 sender.sendMessage(chatId, "Ошибка при добавлении товара", false);
             }

@@ -61,17 +61,19 @@ public class ListProductsOfCategory extends AbstractTextCommand {
         Long categoryId = connection.getCategoryByAssignedCartIdAndName(user.selectedCartId(), categoryName).categoryId();
         Set<Products> products = connection.getProductsByCategoryId(categoryId);
         if (!products.isEmpty()) {
-            message = "Всего товаров: " + products.size();
-            sender.sendMessage(chatId, message, false);
+            message = "Всего товаров: *" + products.size() + "*";
+            sender.sendMessage(chatId, message, true);
             for (Products product : products) {
                 sender.sendMessage(chatId, product.fullURL(), false);
             }
+        } else {
+            sender.sendMessage(chatId, "Ошибка при выводе списка товаров", true);
         }
     }
 
     private boolean isCommandContainsCategoryName(Long userId, String categoryName) {
         Users user = connection.getUserById(userId);
-        if (user != null) {
+        if (user != null && user.selectedCartId() != null) {
             Categories category = connection.getCategoryByAssignedCartIdAndName(user.selectedCartId(), categoryName);
             if (category != null) {
                 return category.categoryName() != null;
