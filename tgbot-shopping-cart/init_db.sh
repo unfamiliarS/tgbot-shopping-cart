@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS categories (
 
 CREATE TABLE IF NOT EXISTS products (
     product_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    full_url TEXT NOT NULL UNIQUE,
+    full_url TEXT NOT NULL,
     assigned_category_id INTEGER NOT NULL,
     product_name TEXT,
     product_price INTEGER,

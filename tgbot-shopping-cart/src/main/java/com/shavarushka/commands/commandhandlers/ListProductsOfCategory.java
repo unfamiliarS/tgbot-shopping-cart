@@ -4,8 +4,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import com.shavarushka.commands.KeyboardsFabrics;
 import com.shavarushka.commands.commandhandlers.interfaces.AbstractTextCommand;
 import com.shavarushka.commands.interfaces.BotState;
 import com.shavarushka.commands.interfaces.MessageSender;
@@ -62,9 +64,18 @@ public class ListProductsOfCategory extends AbstractTextCommand {
         Set<Products> products = connection.getProductsByCategoryId(categoryId);
         if (!products.isEmpty()) {
             message = "Всего товаров: *" + products.size() + "*";
+            InlineKeyboardMarkup keyboard;
             sender.sendMessage(chatId, message, true);
             for (Products product : products) {
-                sender.sendMessage(chatId, product.fullURL(), false);
+                keyboard = KeyboardsFabrics.createKeyboard(
+                Map.of(
+                    "/changecategory", "Сменить категорию",
+                    "/deleteproduct" + product.productId(), "🗑"
+                ), 
+                2,
+                InlineKeyboardMarkup.class
+            );
+                sender.sendMessage(chatId, product.fullURL(), keyboard, false);
             }
         } else {
             sender.sendMessage(chatId, "Ошибка при выводе списка товаров", true);

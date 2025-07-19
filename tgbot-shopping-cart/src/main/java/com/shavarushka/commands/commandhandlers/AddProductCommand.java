@@ -4,8 +4,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import com.shavarushka.commands.KeyboardsFabrics;
 import com.shavarushka.commands.commandhandlers.interfaces.SelectedCartNotifier;
 import com.shavarushka.commands.interfaces.BotState;
 import com.shavarushka.commands.interfaces.MessageSender;
@@ -96,7 +98,16 @@ public class AddProductCommand extends SelectedCartNotifier {
             notifyCartSelectionListeners(userId, cartId);
 
             if (productId != null) {
-                sender.sendMessage(chatId, "Товар успешно добавлен в категорию *Прочее* 😎", true);
+                message = "Товар успешно добавлен в категорию *Прочее* 😎\n" + MessageSender.escapeMarkdownV2(productURL);
+                InlineKeyboardMarkup keyboard = KeyboardsFabrics.createKeyboard(
+                    Map.of(
+                        "/changecategory", "Сменить категорию",
+                        "/deleteproduct" + productId, "🗑"
+                    ), 
+                    2,
+                    InlineKeyboardMarkup.class
+                );
+                sender.sendMessage(chatId, message, keyboard, true);
             } else {
                 sender.sendMessage(chatId, "Ошибка при добавлении товара", false);
             }
