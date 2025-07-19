@@ -43,6 +43,7 @@ public class CommandManager {
         registerCommand(inviteUserCommand);
         registerCommand(inviteUserCommand.new UsernameInputHandler(sender, userStates));
         registerCommand(new AddProductCommand(sender, userStates, connection));
+        registerCommand(new ListProductsOfCategory(sender, userStates, connection));
 
         // register callbacks
         registerCommand(new CancelCreatingCart(sender, userStates));

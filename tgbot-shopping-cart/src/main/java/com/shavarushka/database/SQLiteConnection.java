@@ -9,6 +9,7 @@ import java.sql.Statement;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.shavarushka.database.entities.Categories;
 import com.shavarushka.database.entities.Products;
 import com.shavarushka.database.entities.ShoppingCarts;
 import com.shavarushka.database.entities.Users;
@@ -37,18 +38,17 @@ final public class SQLiteConnection {
     // Read---------------------------------------------------------------------------------------------------
 
     public Users getUserById(Long userId) {
-        String query = "SELECT user_id, chat_id, username, user_firstname, selected_cart_id, " + 
-            "registration_time FROM users WHERE user_id = ?";        
+        String query = "SELECT * FROM users WHERE user_id = ?";        
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setLong(1, userId);
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next())
-                return new Users(resultSet.getLong("user_id"),
-                                resultSet.getLong("chat_id"),
-                                resultSet.getString("user_firstname"),
-                                resultSet.getString("username"), 
-                                resultSet.getLong("selected_cart_id"), 
-                                resultSet.getTimestamp("registration_time"));
+            ResultSet rs = statement.executeQuery();
+            if (rs.next())
+                return new Users(rs.getLong("user_id") != 0 ? rs.getLong("user_id") : null,
+                                rs.getLong("chat_id") != 0 ? rs.getLong("chat_id") : null,
+                                rs.getString("user_firstname"),
+                                rs.getString("username"), 
+                                rs.getLong("selected_cart_id") != 0 ? rs.getLong("selected_cart_id") : null, 
+                                rs.getTimestamp("registration_time"));
             return null;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -57,18 +57,17 @@ final public class SQLiteConnection {
     }
 
     public Users getUserByUsername(String username) {
-        String query = "SELECT user_id, chat_id, username, user_firstname, selected_cart_id, " + 
-            "registration_time FROM users WHERE username = ?";        
+        String query = "SELECT * FROM users WHERE username = ?";        
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, username);
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next())
-                return new Users(resultSet.getLong("user_id"),
-                                resultSet.getLong("chat_id"),
-                                resultSet.getString("user_firstname"),
-                                resultSet.getString("username"), 
-                                resultSet.getLong("selected_cart_id"), 
-                                resultSet.getTimestamp("registration_time"));
+            ResultSet rs = statement.executeQuery();
+            if (rs.next())
+                return new Users(rs.getLong("user_id") != 0 ? rs.getLong("user_id") : null,
+                                rs.getLong("chat_id") != 0 ? rs.getLong("chat_id") : null,
+                                rs.getString("user_firstname"),
+                                rs.getString("username"), 
+                                rs.getLong("selected_cart_id") != 0 ? rs.getLong("selected_cart_id") : null, 
+                                rs.getTimestamp("registration_time"));
             return null;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -77,14 +76,14 @@ final public class SQLiteConnection {
     }
 
     public ShoppingCarts getCartById(Long cartId) {
-        String query = "SELECT cart_id, cart_name, creation_time FROM shopping_carts WHERE cart_id = ?";
+        String query = "SELECT * FROM shopping_carts WHERE cart_id = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setLong(1, cartId);
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next())
-                return new ShoppingCarts(resultSet.getLong("cart_id"), 
-                                        resultSet.getString("cart_name"), 
-                                        resultSet.getTimestamp("creation_time"));
+            ResultSet rs = statement.executeQuery();
+            if (rs.next())
+                return new ShoppingCarts(rs.getLong("cart_id") != 0 ? rs.getLong("cart_id") : null, 
+                                        rs.getString("cart_name"), 
+                                        rs.getTimestamp("creation_time"));
             return null;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -93,22 +92,19 @@ final public class SQLiteConnection {
     }
 
     public Set<ShoppingCarts> getCartsAssignedToUser(Long userId) {
-        String query = "SELECT sc.cart_id, sc.cart_name, sc.creation_time " +
-                    "FROM shopping_carts sc " +
+        String query = "SELECT sc.* FROM shopping_carts sc " +
                     "JOIN users_shopping_carts usc ON sc.cart_id = usc.cart_id " +
                     "WHERE usc.user_id = ?";
-
         Set<ShoppingCarts> carts = new HashSet<>();
-
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setLong(1, userId);
-            ResultSet resultSet = statement.executeQuery();
+            ResultSet rs = statement.executeQuery();
 
-            while (resultSet.next()) {
+            while (rs.next()) {
                 ShoppingCarts cart = new ShoppingCarts(
-                    resultSet.getLong("cart_id"),
-                    resultSet.getString("cart_name"),
-                    resultSet.getTimestamp("creation_time")
+                    rs.getLong("cart_id") != 0 ? rs.getLong("cart_id") : null,
+                    rs.getString("cart_name"),
+                    rs.getTimestamp("creation_time")
                 );
                 carts.add(cart);
             }
@@ -119,21 +115,21 @@ final public class SQLiteConnection {
     }
 
     public Set<Users> getUsersAssignedToCart(Long cartId) {
-        String query = "SELECT u.user_id, u.chat_id, u.user_firstname, u.username, u.selected_cart_id, u.registration_time " +
-                    "FROM users u " +
+        String query = "SELECT u.* FROM users u " +
                     "JOIN users_shopping_carts usc ON u.user_id = usc.user_id " +
                     "WHERE usc.cart_id = ?";
         Set<Users> users = new HashSet<>();
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setLong(1, cartId);
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                Users user = new Users(resultSet.getLong("user_id"),
-                                resultSet.getLong("chat_id"),
-                                resultSet.getString("user_firstname"),
-                                resultSet.getString("username"), 
-                                resultSet.getLong("selected_cart_id"), 
-                                resultSet.getTimestamp("registration_time"));
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                Users user = new Users(
+                                rs.getLong("user_id") != 0 ? rs.getLong("user_id") : null,
+                                rs.getLong("chat_id") != 0 ? rs.getLong("chat_id") : null,
+                                rs.getString("user_firstname"),
+                                rs.getString("username"), 
+                                rs.getLong("selected_cart_id") != 0 ? rs.getLong("selected_cart_id") : null, 
+                                rs.getTimestamp("registration_time"));
                 users.add(user);
             }
         } catch (SQLException e) {
@@ -143,21 +139,60 @@ final public class SQLiteConnection {
         return users;
     }
 
-    public Products getProductByUrl(String productUrl) {
-        String query = "SELECT product_id, full_url, assigned_cart_id, product_name, product_price, adding_time FROM products WHERE full_url = ?";
+    public Categories getCategoryById(Long categoryId) {
+        String query = "SELECT * FROM categories WHERE category_id = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setString(1, productUrl);
-            ResultSet resultSet = statement.executeQuery();
-            
-            if (resultSet.next()) {
-                return new Products(
-                    resultSet.getLong("product_id"),
-                    resultSet.getString("full_url"),
-                    resultSet.getLong("assigned_cart_id"),
-                    resultSet.getString("product_name"),
-                    resultSet.getInt("product_price"),
-                    resultSet.getTimestamp("adding_time")
+            statement.setLong(1, categoryId);
+            ResultSet rs = statement.executeQuery();
+            if (rs.next())
+                return new Categories(
+                        rs.getLong("category_id") != 0 ? rs.getLong("category_id") : null,
+                        rs.getLong("assigned_cart_id") != 0 ? rs.getLong("assigned_cart_id") : null,
+                        rs.getString("category_name"), 
+                        rs.getTimestamp("creation_time")
                 );
+            return null;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public Set<Categories> getCategoriesByCartId(Long cartId) {
+        String query = "SELECT * FROM categories WHERE assigned_cart_id = ? ORDER BY creation_time";
+        
+        Set<Categories> categories = new HashSet<>();
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, cartId);
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                categories.add(new Categories(
+                                rs.getLong("category_id") != 0 ? rs.getLong("category_id") : null,
+                                rs.getLong("assigned_cart_id") != 0 ? rs.getLong("assigned_cart_id") : null,
+                                rs.getString("category_name"), 
+                                rs.getTimestamp("creation_time"))
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return categories;
+    }
+
+    public Categories getCategoryByAssignedCartIdAndName(Long cartId, String categoryName) {
+        String query = "SELECT * FROM categories " +
+                    "WHERE assigned_cart_id = ? AND category_name = ?";
+        
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, cartId);
+            statement.setString(2, categoryName);
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) {
+                return new Categories(
+                    rs.getLong("category_id") != 0 ? rs.getLong("category_id") : null,
+                    rs.getLong("assigned_cart_id") != 0 ? rs.getLong("assigned_cart_id") : null,
+                    rs.getString("category_name"), 
+                    rs.getTimestamp("creation_time"));
             }
             return null;
         } catch (SQLException e) {
@@ -166,9 +201,57 @@ final public class SQLiteConnection {
         }
     }
 
+    public Products getProductByUrlAndCart(String url, Long cartId) {
+        String query = "SELECT p.* FROM products p " +
+                    "JOIN categories c ON p.assigned_category_id = c.category_id " +
+                    "WHERE p.full_url = ? AND c.assigned_cart_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            
+            statement.setString(1, url);
+            statement.setLong(2, cartId);
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) {
+                return new Products(
+                    rs.getLong("product_id") != 0 ? rs.getLong("product_id") : null,
+                    rs.getString("full_url"),
+                    rs.getLong("assigned_category_id") != 0 ? rs.getLong("assigned_category_id") : null,
+                    rs.getString("product_name"),
+                    rs.getInt("product_price") != 0 ? rs.getInt("product_price") : null,
+                    rs.getTimestamp("adding_time")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public Set<Products> getProductsByCategoryId(Long categoryId) {
+        String query = "SELECT * FROM products WHERE assigned_category_id = ?";
+        
+        Set<Products> product = new HashSet<>();
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, categoryId);
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                product.add(new Products(
+                    rs.getLong("product_id") != 0 ? rs.getLong("product_id") : null,
+                    rs.getString("full_url"),
+                    rs.getLong("assigned_category_id") != 0 ? rs.getLong("assigned_category_id") : null,
+                    rs.getString("product_name"),
+                    rs.getInt("product_price") != 0 ? rs.getInt("product_price") : null,
+                    rs.getTimestamp("adding_time"))
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return product;
+    }
+
     // Create---------------------------------------------------------------------------------------------------
 
-    public boolean addUser(Users user) {
+    public Long addUser(Users user) {
         String query = user.selectedCartId() == null ? 
             "INSERT INTO users (user_id, chat_id, user_firstname, username) VALUES (?, ?, ?, ?)" :
             "INSERT INTO users (user_id, chat_id, user_firstname, username, selected_cart_id) VALUES (?, ?, ?, ?, ?)";
@@ -180,14 +263,14 @@ final public class SQLiteConnection {
             if (user.selectedCartId() != null)
                 statement.setLong(5, user.selectedCartId());
             statement.executeUpdate();
-            return true;
+            return user.userId();
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
+            return null;
         }
     }
 
-    public boolean addCart(ShoppingCarts cart, Long associatedUserId) {
+    public Long addCart(ShoppingCarts cart, Long associatedUserId) {
         String query = "INSERT INTO shopping_carts (cart_name) VALUES (?)";
         try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, cart.cartName());
@@ -197,14 +280,14 @@ final public class SQLiteConnection {
                     Long cartId = generatedKeys.getLong(1);
                     updateSelectedCartForUser(associatedUserId, cartId);
                     addUserToCartIntermediate(associatedUserId, cartId);
+                    return cartId;
                 } else {
                     throw new SQLException("Creating cart failed, no ID obtained.");
                 }
             }
-            return true;
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
+            return null;
         }
     }
 
@@ -222,44 +305,43 @@ final public class SQLiteConnection {
         }
     }
 
-    public boolean addProduct(Products product, Long associatedCartId) {
-        // String query = "INSERT INTO products (full_url, assigned_cart_id, product_name, product_price) VALUES (?, ?, ?, ?)";
-        String query = "INSERT INTO products (full_url, assigned_cart_id) VALUES (?, ?)";
+    public Long addCategory(Categories category) {
+        String query = "INSERT INTO categories (category_name, assigned_cart_id) VALUES (?, ?)";        
         try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            statement.setString(1, product.fullURL());
-            statement.setLong(2, product.assignedCartId());
-            // statement.setString(3, product.productName());
-            // statement.setInt(4, product.productPrice());
+            statement.setString(1, category.categoryName());
+            statement.setLong(2, category.assignedCartId());
             statement.executeUpdate();
             try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
-                    Long productId = generatedKeys.getLong(1);
-                    addProductToCartIntermediate(productId, associatedCartId);
+                    return generatedKeys.getLong(1);
+                } else {
+                    throw new SQLException("Creating category failed, no ID obtained.");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public Long addProduct(Products product) {
+        String query = "INSERT INTO products (full_url, assigned_category_id) VALUES (?, ?)";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, product.fullURL());
+            statement.setLong(2, product.assignedCategoryId());
+            statement.executeUpdate();
+            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    return generatedKeys.getLong(1);
                 } else {
                     throw new SQLException("Creating product failed, no ID obtained.");
                 }
             }
-            return true;
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
+            return null;
         }
     }
-
-    // add relationship between product and cart to intermediate table
-    public boolean addProductToCartIntermediate(Long productId, Long cartId) {
-        String query = "INSERT OR IGNORE INTO products_shopping_carts (product_id, cart_id) VALUES (?, ?)";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setLong(1, productId);
-            statement.setLong(2, cartId);
-            statement.executeUpdate();
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-   
 
     // Update---------------------------------------------------------------------------------------------------
 

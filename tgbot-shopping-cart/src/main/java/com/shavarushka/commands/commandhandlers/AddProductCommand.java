@@ -9,6 +9,7 @@ import com.shavarushka.commands.commandhandlers.interfaces.AbstractTextCommand;
 import com.shavarushka.commands.interfaces.BotState;
 import com.shavarushka.commands.interfaces.MessageSender;
 import com.shavarushka.database.SQLiteConnection;
+import com.shavarushka.database.entities.Categories;
 import com.shavarushka.database.entities.Products;
 import com.shavarushka.database.entities.Users;
 
@@ -46,25 +47,55 @@ public class AddProductCommand extends AbstractTextCommand {
     public void execute(Update update) throws TelegramApiException {
         Long chatId = update.getMessage().getChatId();
         Long userId = update.getMessage().getFrom().getId();
-        String productURL = update.getMessage().getText();
+        String productURL = update.getMessage().getText().strip();
         Users user = connection.getUserById(userId);
-        Products product;
         String message;
-
-        if ((product = connection.getProductByUrl(productURL)) != null) {
-            connection.addProductToCartIntermediate(product.productId(), user.selectedCartId());
-        } else {
-            product = new Products(null,
-                                   productURL,
-                                   user.selectedCartId(),
-                                   null,
-                                   null,
-                                   null
-            );
-            connection.addProduct(product, user.selectedCartId());
+        
+        Long cartId = user.selectedCartId();
+        if (cartId == null) {
+            message = "У тебя нет ни одной корзины😔 \n/createnewcart чтобы создать";
+            sender.sendMessage(chatId, message, false);
+            return;
         }
         
-        message = update.getMessage().getText() + "\nуспешно добавлен в корзину😎";
-        sender.sendMessage(chatId, message, false);
+        Products product = connection.getProductByUrlAndCart(productURL, cartId);
+        
+        // if product already exist
+        if (product != null) {
+            connection.getCategoryById(product.assignedCategoryId());
+            message = "Этот товар уже есть в твоей корзине в категории *"
+                + connection.getCategoryById(product.assignedCategoryId()).categoryName()
+                + "*";
+            sender.sendMessage(chatId, message, true);
+        // if product is new
+        } else {
+            Categories defaultCategory = connection.getCategoryByAssignedCartIdAndName(cartId, "Прочее");
+            Long defaultCategoryId;
+            // if defaultCategory isn't create yet
+            if (defaultCategory == null) {
+                defaultCategoryId = connection.addCategory(new Categories(null, 
+                                                                                cartId,
+                                                                                "Прочее",
+                                                                                null)
+                );
+            } else {
+                defaultCategoryId = defaultCategory.categoryId();
+            }
+            
+            Long productId = connection.addProduct(new Products(
+                                                null,
+                                                productURL,
+                                                defaultCategoryId,
+                                                null,
+                                                null,
+                                                null)
+            );
+            
+            if (productId != null) {
+                sender.sendMessage(chatId, "Товар успешно добавлен в корзину в категорию *Прочее* 😎", true);
+            } else {
+                sender.sendMessage(chatId, "Ошибка при добавлении товара", false);
+            }
+        }
     }
 }

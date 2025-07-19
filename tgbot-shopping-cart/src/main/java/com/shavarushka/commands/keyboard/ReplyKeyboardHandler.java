@@ -1,5 +1,6 @@
 package com.shavarushka.commands.keyboard;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
@@ -11,6 +12,7 @@ import com.shavarushka.commands.KeyboardsFabrics;
 import com.shavarushka.commands.callbackhandlers.interfaces.SelectedCartNotifier;
 import com.shavarushka.commands.interfaces.MessageSender;
 import com.shavarushka.database.SQLiteConnection;
+import com.shavarushka.database.entities.Categories;
 import com.shavarushka.database.entities.Users;
 
 public class ReplyKeyboardHandler implements CartSelectionListener {
@@ -48,8 +50,7 @@ public class ReplyKeyboardHandler implements CartSelectionListener {
         if (hasCart) {
             String cartName = connection.getCartById(cartId).cartName();
             keyboard = KeyboardsFabrics.createKeyboard(
-                Map.of("/create_category", "Создать новую группу"),
-                1, ReplyKeyboardMarkup.class
+                getCategoriesWithCreateNew(cartId),1, ReplyKeyboardMarkup.class
             );
             message = "Сейчас выбрана корзина: *" + MessageSender.escapeMarkdownV2(cartName) + "*";
         } else {
@@ -57,5 +58,20 @@ public class ReplyKeyboardHandler implements CartSelectionListener {
             message = "Ты не состоишь не в одной корзине";
         }
         sender.sendMessage(chatId, message, keyboard, true);
+    }
+
+    private Map<String, String> getCategories(Long cartId) {
+        Map<String, String> result = new HashMap<>();
+        int cntr = 0; 
+        for (Categories category : connection.getCategoriesByCartId(cartId)) {
+            result.put("category" + ++cntr, category.categoryName());
+        }
+        return result;
+    }
+
+    private Map<String, String> getCategoriesWithCreateNew(Long cartId) {
+        Map<String, String> categories = getCategories(cartId);
+        categories.put("create_new_category", "Создать категорию");
+        return categories;
     }
 }

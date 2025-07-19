@@ -29,22 +29,22 @@ CREATE TABLE IF NOT EXISTS users_shopping_carts (
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS products (
-    product_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    full_url TEXT NOT NULL UNIQUE,
+CREATE TABLE IF NOT EXISTS categories (
+    category_id INTEGER PRIMARY KEY AUTOINCREMENT,
     assigned_cart_id INTEGER NOT NULL,
-    product_name TEXT,
-    product_price INTEGER,
-    adding_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    category_name TEXT NOT NULL DEFAULT 'Прочее',
+    creation_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (assigned_cart_id) REFERENCES shopping_carts(cart_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS products_shopping_carts (
-    cart_id INTEGER NOT NULL,
-    product_id INTEGER NOT NULL,
-    PRIMARY KEY (cart_id, product_id),
-    FOREIGN KEY (cart_id) REFERENCES shopping_carts(cart_id) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY (product_id) REFERENCES products(product_id) ON UPDATE CASCADE ON DELETE CASCADE
+CREATE TABLE IF NOT EXISTS products (
+    product_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    full_url TEXT NOT NULL UNIQUE,
+    assigned_category_id INTEGER NOT NULL,
+    product_name TEXT,
+    product_price INTEGER,
+    adding_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (assigned_category_id) REFERENCES categories(category_id) ON UPDATE CASCADE ON DELETE CASCADE
 );"
 
 # 'dnf in sqlite -y' for sqlite3 command

@@ -54,7 +54,6 @@ public class CreateCartCommand extends AbstractTextCommand {
             return "create_cartname";
         }
 
-        @Override
         public String getDescription() {
             return "";
         }
