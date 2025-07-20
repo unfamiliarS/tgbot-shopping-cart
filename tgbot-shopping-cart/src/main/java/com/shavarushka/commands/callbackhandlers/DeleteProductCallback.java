@@ -18,11 +18,8 @@ import com.shavarushka.database.entities.ShoppingCarts;
 import com.shavarushka.database.entities.Users;
 
 public class DeleteProductCallback extends AbstractCallbackCommand {
-    private final SQLiteConnection connection;
-
     public DeleteProductCallback(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
-        super(sender, userStates);
-        this.connection = connection;
+        super(sender, userStates, connection);
     }
 
     @Override
@@ -61,7 +58,7 @@ public class DeleteProductCallback extends AbstractCallbackCommand {
             message = "Точно уверен, что хочешь удалить товар\n" + product.fullURL() + " ?";
             InlineKeyboardMarkup confirmationKeyboard = KeyboardsFabrics.createKeyboard(
                                             Map.of("/confirmproductdeletion_" + productId, "✅ Подтвердить",
-                                                    "/cancelproductdeletion", "❌ Отменить"),
+                                                    "/cancelproductdeletion_" + productId, "❌ Отменить"),
                                                     2, InlineKeyboardMarkup.class);
     
             userStates.put(chatId, BotState.CONFIRMING_PRODUCT_DELETION);

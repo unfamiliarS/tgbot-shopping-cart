@@ -16,12 +16,9 @@ import com.shavarushka.database.entities.ShoppingCarts;
 import com.shavarushka.database.entities.Users;
 
 public class ConfirmInvitingCallback extends SelectedCartNotifierCallback {
-    private final SQLiteConnection connection;
-
     public ConfirmInvitingCallback(MessageSender sender, Map<Long, BotState> userStates,
                                 SQLiteConnection connection, List<CartSelectionListener> listeners) {
-        super(sender, userStates, listeners);
-        this.connection = connection;
+        super(sender, userStates, connection, listeners);
     }
 
     @Override

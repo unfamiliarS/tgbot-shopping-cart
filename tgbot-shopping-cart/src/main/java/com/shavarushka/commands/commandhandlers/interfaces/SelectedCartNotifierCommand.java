@@ -7,12 +7,14 @@ import com.shavarushka.commands.interfaces.BotState;
 import com.shavarushka.commands.interfaces.MessageSender;
 import com.shavarushka.commands.interfaces.SelectedCartNotifier;
 import com.shavarushka.commands.keyboard.CartSelectionListener;
+import com.shavarushka.database.SQLiteConnection;
 
 public abstract class SelectedCartNotifierCommand extends AbstractTextCommand implements SelectedCartNotifier {
     private final List<CartSelectionListener> cartSelectionListeners;
 
-    public SelectedCartNotifierCommand(MessageSender sender, Map<Long, BotState> userStates, List<CartSelectionListener> listeners) {
-        super(sender, userStates);
+    public SelectedCartNotifierCommand(MessageSender sender, Map<Long, BotState> userStates,
+                                    SQLiteConnection connection, List<CartSelectionListener> listeners) {
+        super(sender, userStates, connection);
         cartSelectionListeners = listeners;
     }
 

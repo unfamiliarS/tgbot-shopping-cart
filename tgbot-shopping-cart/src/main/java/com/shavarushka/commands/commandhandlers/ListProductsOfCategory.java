@@ -17,11 +17,8 @@ import com.shavarushka.database.entities.Products;
 import com.shavarushka.database.entities.Users;
 
 public class ListProductsOfCategory extends AbstractTextCommand {
-    private final SQLiteConnection connection;
-
     public ListProductsOfCategory(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
-        super(sender, userStates);
-        this.connection = connection;
+        super(sender, userStates, connection);
     }
     
     @Override
@@ -63,9 +60,7 @@ public class ListProductsOfCategory extends AbstractTextCommand {
         Long categoryId = connection.getCategoryByAssignedCartIdAndName(user.selectedCartId(), categoryName).categoryId();
         Set<Products> products = connection.getProductsByCategoryId(categoryId);
         if (!products.isEmpty()) {
-            message = "Всего товаров: *" + products.size() + "*";
             InlineKeyboardMarkup keyboard;
-            sender.sendMessage(chatId, message, true);
             for (Products product : products) {
                 keyboard = KeyboardsFabrics.createKeyboard(
                 Map.of(

@@ -7,10 +7,11 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import com.shavarushka.commands.interfaces.AbstractCommand;
 import com.shavarushka.commands.interfaces.BotState;
 import com.shavarushka.commands.interfaces.MessageSender;
+import com.shavarushka.database.SQLiteConnection;
 
 public abstract class AbstractCallbackCommand extends AbstractCommand {
-    public AbstractCallbackCommand(MessageSender sender, Map<Long, BotState> userStates) {
-        super(sender, userStates);
+    public AbstractCallbackCommand(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
+        super(sender, userStates, connection);
     }
 
     // should override if need to check BotState

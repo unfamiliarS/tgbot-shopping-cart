@@ -18,12 +18,9 @@ import com.shavarushka.database.entities.Products;
 import com.shavarushka.database.entities.Users;
 
 public class AddProductCommand extends SelectedCartNotifierCommand {
-    private final SQLiteConnection connection;
-
     public AddProductCommand(MessageSender sender, Map<Long, BotState> userStates,
                             List<CartSelectionListener> listeners, SQLiteConnection connection) {
-        super(sender, userStates, listeners);
-        this.connection = connection;
+        super(sender, userStates, connection, listeners);
     }
 
     @Override
@@ -54,6 +51,7 @@ public class AddProductCommand extends SelectedCartNotifierCommand {
         Long userId = update.getMessage().getFrom().getId();
         String productURL = update.getMessage().getText().strip();
         Users user = connection.getUserById(userId);
+        boolean isNeedToNotify = false;
         String message;
         
         Long cartId = user.selectedCartId();
@@ -83,8 +81,11 @@ public class AddProductCommand extends SelectedCartNotifierCommand {
                                                                                 "Прочее",
                                                                                 null)
                 );
+                isNeedToNotify = true;
             } else {
                 defaultCategoryId = defaultCategory.categoryId();
+                if (isDefaultCategoryEmpty(defaultCategoryId))
+                    isNeedToNotify = true;
             }
             
             Long productId = connection.addProduct(new Products(
@@ -95,7 +96,9 @@ public class AddProductCommand extends SelectedCartNotifierCommand {
                                                 null,
                                                 null)
             );
-            notifyCartSelectionListeners(userId, cartId);
+
+            if (isNeedToNotify)
+                notifyCartSelectionListeners(userId, cartId);
 
             if (productId != null) {
                 message = "Товар успешно добавлен в категорию *Прочее* 😎\n" + MessageSender.escapeMarkdownV2(productURL);
@@ -103,7 +106,7 @@ public class AddProductCommand extends SelectedCartNotifierCommand {
                     Map.of(
                         "/changecategory", "Сменить категорию",
                         "/deleteproduct_" + productId, "🗑"
-                    ), 
+                    ),
                     2,
                     InlineKeyboardMarkup.class
                 );
@@ -112,5 +115,13 @@ public class AddProductCommand extends SelectedCartNotifierCommand {
                 sender.sendMessage(chatId, "Ошибка при добавлении товара", false);
             }
         }
+    }
+
+    private boolean isDefaultCategoryEmpty(Long cartId) {
+        Categories defaultCategory = connection.getCategoryByAssignedCartIdAndName(cartId, "Прочее");
+        if (connection.getProductsByCategoryId(defaultCategory.categoryId()).isEmpty()) {
+            return true;
+        }
+        return false;
     }
 }

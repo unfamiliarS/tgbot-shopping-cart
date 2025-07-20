@@ -14,12 +14,9 @@ import com.shavarushka.database.SQLiteConnection;
 import com.shavarushka.database.entities.Users;
 
 public class ConfirmProductDeletionCallback extends SelectedCartNotifierCallback {
-    private final SQLiteConnection connection;
-
     public ConfirmProductDeletionCallback(MessageSender sender, Map<Long, BotState> userStates,
                                         List<CartSelectionListener> listeners, SQLiteConnection connection) {
-        super(sender, userStates, listeners);
-        this.connection = connection;
+        super(sender, userStates, connection, listeners);
     }
 
     @Override
@@ -45,17 +42,15 @@ public class ConfirmProductDeletionCallback extends SelectedCartNotifierCallback
         Long productId = Long.parseLong(update.getCallbackQuery().getData().substring(getCommand().length()));
         Integer messageId = update.getCallbackQuery().getMessage().getMessageId();
         Users user = connection.getUserById(userId);
-        String message;
         
         if (isProductExist(productId)) {
             boolean isProductLastInTheCategory = isProductLastInTheCategory(productId);
             connection.deleteProduct(productId);
-            message = "✅ Товар удален😎";
-            sender.editMessage(chatId, messageId, message, false);
             if (isProductLastInTheCategory) {
                 notifyCartSelectionListeners(userId, user.selectedCartId());
             }
         }
+        sender.deleteMessage(chatId, messageId);
         userStates.remove(chatId);
     }
 

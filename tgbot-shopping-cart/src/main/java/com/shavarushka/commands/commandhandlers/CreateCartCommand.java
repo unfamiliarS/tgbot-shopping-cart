@@ -11,14 +11,15 @@ import com.shavarushka.commands.KeyboardsFabrics;
 import com.shavarushka.commands.commandhandlers.interfaces.AbstractTextCommand;
 import com.shavarushka.commands.interfaces.BotState;
 import com.shavarushka.commands.interfaces.MessageSender;
+import com.shavarushka.database.SQLiteConnection;
 import com.vdurmont.emoji.EmojiManager;
 import com.vdurmont.emoji.EmojiParser;
 
 public class CreateCartCommand extends AbstractTextCommand {
     private final Map<Long, String> cartNames;
 
-    public CreateCartCommand(MessageSender sender, Map<Long, BotState> userStates, Map<Long, String> cartNames) {
-        super(sender, userStates);
+    public CreateCartCommand(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection, Map<Long, String> cartNames) {
+        super(sender, userStates, connection);
         this.cartNames = cartNames;
     }
 
@@ -45,8 +46,8 @@ public class CreateCartCommand extends AbstractTextCommand {
     }
 
     public class NameInputHandler extends AbstractTextCommand {
-        public NameInputHandler(MessageSender sender, Map<Long, BotState> userStates) {
-            super(sender, userStates);
+        public NameInputHandler(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
+            super(sender, userStates, connection);
         }
 
         @Override

@@ -4,13 +4,17 @@ import java.util.Map;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
 
+import com.shavarushka.database.SQLiteConnection;
+
 public abstract class AbstractCommand implements BotCommand {
     protected final MessageSender sender;
     protected final Map<Long, BotState> userStates;
+    protected final SQLiteConnection connection;
 
-    public AbstractCommand(MessageSender sender, Map<Long, BotState> userStates) {
+    public AbstractCommand(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
         this.sender = sender;
         this.userStates = userStates;
+        this.connection = connection;
     }
 
     @Override

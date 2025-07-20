@@ -14,11 +14,9 @@ import com.shavarushka.database.SQLiteConnection;
 import com.shavarushka.database.entities.Users;
 
 public class StartCommand extends SelectedCartNotifierCommand {
-    private final SQLiteConnection connection;
-
-    public StartCommand(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection, List<CartSelectionListener> listeners) {
-        super(sender, userStates, listeners);
-        this.connection = connection;
+    public StartCommand(MessageSender sender, Map<Long, BotState> userStates,
+                    SQLiteConnection connection, List<CartSelectionListener> listeners) {
+        super(sender, userStates, connection, listeners);
     }
 
     @Override

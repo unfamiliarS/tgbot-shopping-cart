@@ -1,17 +1,18 @@
-package com.shavarushka.commands.generalcommandhandlers;
+package com.shavarushka.commands.callbackhandlers;
 
 import java.util.Map;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import com.shavarushka.commands.generalcommandhandlers.interfaces.AbstractCancelCommand;
+import com.shavarushka.commands.callbackhandlers.interfaces.AbstractCancelCallback;
 import com.shavarushka.commands.interfaces.BotState;
 import com.shavarushka.commands.interfaces.MessageSender;
+import com.shavarushka.database.SQLiteConnection;
 
-public class CancelCreatingCart extends AbstractCancelCommand {
-    public CancelCreatingCart(MessageSender sender, Map<Long, BotState> userStates) {
-        super(sender, userStates);
+public class CancelCreatingCart extends AbstractCancelCallback {
+    public CancelCreatingCart(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
+        super(sender, userStates, connection);
     }
     
     @Override
@@ -21,17 +22,11 @@ public class CancelCreatingCart extends AbstractCancelCommand {
 
     @Override
     public boolean shouldProcess(Update update) {
-        Long chatId;
-        String message;
-        if (update.hasMessage() && update.getMessage().hasText()) {
-            chatId = update.getMessage().getChatId();
-            message = update.getMessage().getText();
-        } else if (update.hasCallbackQuery()) {
-            chatId = update.getCallbackQuery().getMessage().getChatId();
-            message = update.getCallbackQuery().getData();
-        } else {
+        if (!update.hasCallbackQuery())
             return false;
-        }
+            
+        Long chatId = update.getCallbackQuery().getMessage().getChatId();
+        String message = update.getCallbackQuery().getData();
 
         return message.startsWith(getCommand().strip()) &&
                userStates.containsKey(chatId) &&

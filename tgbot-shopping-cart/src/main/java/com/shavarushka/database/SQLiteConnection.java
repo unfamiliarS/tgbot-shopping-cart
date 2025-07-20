@@ -13,8 +13,9 @@ import com.shavarushka.database.entities.Categories;
 import com.shavarushka.database.entities.Products;
 import com.shavarushka.database.entities.ShoppingCarts;
 import com.shavarushka.database.entities.Users;
+import com.shavarushka.database.interfaces.DBConnection;
 
-final public class SQLiteConnection {
+final public class SQLiteConnection implements DBConnection {
     private Connection connection;
 
     public SQLiteConnection(String url) {

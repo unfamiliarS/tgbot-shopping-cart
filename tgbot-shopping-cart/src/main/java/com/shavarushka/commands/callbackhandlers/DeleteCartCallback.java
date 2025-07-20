@@ -19,11 +19,8 @@ import com.shavarushka.database.entities.ShoppingCarts;
 import com.shavarushka.database.entities.Users;
 
 public class DeleteCartCallback extends AbstractCallbackCommand {
-    private final SQLiteConnection connection;
-
     public DeleteCartCallback(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
-        super(sender, userStates);
-        this.connection = connection;
+        super(sender, userStates, connection);
     }
 
     @Override

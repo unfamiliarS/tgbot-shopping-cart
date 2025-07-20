@@ -15,14 +15,12 @@ import com.shavarushka.database.entities.ShoppingCarts;
 import com.shavarushka.database.entities.Users;
 
 public class ConfirmCartCreationCallback extends SelectedCartNotifierCallback {
-    private final SQLiteConnection connection;
     private final Map<Long, String> cartNames;
 
     public ConfirmCartCreationCallback(MessageSender sender, Map<Long, BotState> userStates,
                                     SQLiteConnection connection, Map<Long, String> cartNames,
                                     List<CartSelectionListener> listeners) {
-        super(sender, userStates, listeners);
-        this.connection = connection;
+        super(sender, userStates, connection, listeners);
         this.cartNames = cartNames;
     }
 
@@ -70,8 +68,6 @@ public class ConfirmCartCreationCallback extends SelectedCartNotifierCallback {
         notifyCartSelectionListeners(user.userId(), user.selectedCartId());
         
         userStates.remove(chatId);
-        String message = "✅ Корзина *" + MessageSender.escapeMarkdownV2(cartName) + "* создана";
-        sender.editMessage(chatId, messageId, message, true);
-
+        sender.deleteMessage(chatId, messageId);
     }
 }

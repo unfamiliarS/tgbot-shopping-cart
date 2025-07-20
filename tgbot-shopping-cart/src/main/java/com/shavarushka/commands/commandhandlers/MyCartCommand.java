@@ -20,11 +20,8 @@ import com.shavarushka.database.SQLiteConnection;
 import com.shavarushka.database.entities.ShoppingCarts;
 
 public class MyCartCommand extends AbstractTextCommand {
-    private final SQLiteConnection connection;
-
     public MyCartCommand(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
-        super(sender, userStates);
-        this.connection = connection;
+        super(sender, userStates, connection);
     }
 
     @Override
@@ -61,8 +58,9 @@ public class MyCartCommand extends AbstractTextCommand {
     }
 
     public class SetCartCallback extends SelectedCartNotifierCallback {
-        public SetCartCallback(MessageSender sender, Map<Long, BotState> userStates, List<CartSelectionListener> listeners) {
-            super(sender, userStates, listeners);
+        public SetCartCallback(MessageSender sender, Map<Long, BotState> userStates,
+                            SQLiteConnection connection, List<CartSelectionListener> listeners) {
+            super(sender, userStates, connection, listeners);
         }
 
         @Override
@@ -85,8 +83,10 @@ public class MyCartCommand extends AbstractTextCommand {
                 message = "У тебя нет ни одной корзины😔 \n/createnewcart чтобы создать";
                 sender.sendMessage(chatId, message, false);
                 return;
+            } else if (isThisCartAlreadySelected(userId, newSelectedCartId)) {
+                // skip
             } else if (!isThisCartAssignedToUser(newSelectedCartId, userId)) {
-                // skip if this cart isn't assigned to user
+                // skip
             } else {
                 connection.updateSelectedCartForUser(userId, newSelectedCartId);
                 // notify to update keyboard on new selected cart
@@ -107,6 +107,11 @@ public class MyCartCommand extends AbstractTextCommand {
                 }
             }
             return false;
+        }
+
+        private boolean isThisCartAlreadySelected(Long userId, Long newSelectedCartId) {
+            Long selectedCartId = connection.getUserById(userId).selectedCartId();
+            return selectedCartId != null && selectedCartId.equals(newSelectedCartId);
         }
     }
 
