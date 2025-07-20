@@ -3,23 +3,21 @@ package com.shavarushka.commands.callbackhandlers;
 import java.util.Map;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.shavarushka.commands.callbackhandlers.interfaces.AbstractCancelCallback;
 import com.shavarushka.commands.interfaces.BotState;
 import com.shavarushka.commands.interfaces.MessageSender;
-import com.shavarushka.commands.keyboard.KeyboardsFabrics;
 import com.shavarushka.database.SQLiteConnection;
 
-public class CancelProductDeletion extends AbstractCancelCallback {
-    public CancelProductDeletion(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
+public class CancelCreatingCategory extends AbstractCancelCallback {
+    public CancelCreatingCategory(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
         super(sender, userStates, connection);
     }
     
     @Override
     public String getCommand() {
-        return "/cancelproductdeletion_";
+        return "/cancelcreatingcategory";
     }
 
     @Override
@@ -32,23 +30,13 @@ public class CancelProductDeletion extends AbstractCancelCallback {
 
         return message.startsWith(getCommand().strip()) &&
                userStates.containsKey(chatId) &&
-               userStates.get(chatId).equals(BotState.CONFIRMING_PRODUCT_DELETION);
+               (userStates.get(chatId).equals(BotState.WAITING_FOR_CATEGORY_NAME) ||
+               userStates.get(chatId).equals(BotState.CONFIRMING_CATEGORY_CREATION));
     }
 
     @Override
     public void execute(Update update) throws TelegramApiException {
-        Long productId = Long.parseLong(update.getCallbackQuery().getData().substring(getCommand().length()));
-        
-        String message = connection.getProductById(productId).fullURL();
-        InlineKeyboardMarkup keyboard = KeyboardsFabrics.createKeyboard(
-            Map.of(
-                "/changecategory", "Сменить категорию",
-                "/deleteproduct_" + productId, "🗑"
-            ), 
-            2,
-            InlineKeyboardMarkup.class
-        );
-
-        processCanceling(update, message, keyboard);
+        String message = "❌ Отменяю создание категории...";
+        processCanceling(update, message);
     }
 }

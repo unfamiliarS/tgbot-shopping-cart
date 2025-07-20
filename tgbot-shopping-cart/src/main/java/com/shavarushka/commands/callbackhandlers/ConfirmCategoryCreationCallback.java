@@ -11,22 +11,22 @@ import com.shavarushka.commands.interfaces.BotState;
 import com.shavarushka.commands.interfaces.MessageSender;
 import com.shavarushka.commands.keyboard.CartSelectionListener;
 import com.shavarushka.database.SQLiteConnection;
-import com.shavarushka.database.entities.ShoppingCarts;
+import com.shavarushka.database.entities.Categories;
 import com.shavarushka.database.entities.Users;
 
-public class ConfirmCartCreationCallback extends SelectedCartNotifierCallback {
-    private final Map<Long, String> cartNames;
+public class ConfirmCategoryCreationCallback extends SelectedCartNotifierCallback {
+    private final Map<Long, String> categoryNames;
 
-    public ConfirmCartCreationCallback(MessageSender sender, Map<Long, BotState> userStates,
-                                    SQLiteConnection connection, Map<Long, String> cartNames,
+    public ConfirmCategoryCreationCallback(MessageSender sender, Map<Long, BotState> userStates,
+                                    SQLiteConnection connection, Map<Long, String> categoryNames,
                                     List<CartSelectionListener> listeners) {
         super(sender, userStates, connection, listeners);
-        this.cartNames = cartNames;
+        this.categoryNames = categoryNames;
     }
 
     @Override
     public String getCommand() {
-        return "/confirmcartcreation";
+        return "/confirmcategorycreation";
     }
 
     @Override
@@ -37,27 +37,29 @@ public class ConfirmCartCreationCallback extends SelectedCartNotifierCallback {
         Long chatId = update.getCallbackQuery().getMessage().getChatId();
         return update.getCallbackQuery().getData().startsWith(getCommand().strip()) &&
                userStates.containsKey(chatId) &&
-               userStates.get(chatId).equals(BotState.CONFIRMING_CART_CREATION);
+               userStates.get(chatId).equals(BotState.CONFIRMING_CATEGORY_CREATION);
     }
 
     @Override
     public void execute(Update update) throws TelegramApiException {
         Long chatId = update.getCallbackQuery().getMessage().getChatId();
-        Integer messageId = update.getCallbackQuery().getMessage().getMessageId();
-        String cartName = cartNames.remove(chatId);
-        Users user = connection.getUserById(update.getCallbackQuery().getFrom().getId());
+        Long userId = update.getCallbackQuery().getFrom().getId();
+        Users user = connection.getUserById(chatId);
+        String categoryName = categoryNames.remove(userId);
+        String message;
         
-        if (cartName != null) {
-            // create shopping cart
-            ShoppingCarts cart = new ShoppingCarts(null, cartName, null);
-            connection.addCart(cart, user.userId());
+        if (categoryName != null) {
+            // create category
+            Categories category = new Categories(null, user.selectedCartId(), categoryName, null);
+            connection.addCategory(category);
     
-            // notify to update keyboard on new selected cart
+            // notify to update keyboard on added category
             user = connection.getUserById(user.userId());            
             notifyCartSelectionListeners(user.userId(), user.selectedCartId());
             
             userStates.remove(chatId);
-            sender.deleteMessage(chatId, messageId);
+            message = "✅ Категория *" + MessageSender.escapeMarkdownV2(categoryName) + "* создана😎";
+            sender.sendMessage(chatId, message, true);
         }
     }
 }

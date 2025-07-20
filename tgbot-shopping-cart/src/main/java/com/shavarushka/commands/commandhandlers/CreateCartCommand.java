@@ -7,10 +7,10 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import com.shavarushka.commands.KeyboardsFabrics;
 import com.shavarushka.commands.commandhandlers.interfaces.AbstractTextCommand;
 import com.shavarushka.commands.interfaces.BotState;
 import com.shavarushka.commands.interfaces.MessageSender;
+import com.shavarushka.commands.keyboard.KeyboardsFabrics;
 import com.shavarushka.database.SQLiteConnection;
 import com.vdurmont.emoji.EmojiManager;
 import com.vdurmont.emoji.EmojiParser;
@@ -75,7 +75,7 @@ public class CreateCartCommand extends AbstractTextCommand {
             String cartName = update.getMessage().getText();
             String message;
             
-            if (!isCorrectCartName(cartName)) {
+            if (!isCorrectName(cartName)) {
                 message = "Некорректное название для корзины. Попробуй ещё раз.";
                 sender.sendMessage(chatId, message,
                     KeyboardsFabrics.createKeyboard(
@@ -94,7 +94,7 @@ public class CreateCartCommand extends AbstractTextCommand {
             sender.sendMessage(chatId, message, confirmationKeyboard, true);
         }
 
-        private boolean isCorrectCartName(String cartName) {
+        private boolean isCorrectName(String cartName) {
             // not null and not empty check
             if (cartName == null || cartName.strip().isEmpty()) {
                 return false;

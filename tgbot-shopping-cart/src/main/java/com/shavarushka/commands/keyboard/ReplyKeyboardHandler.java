@@ -8,7 +8,6 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import com.shavarushka.commands.KeyboardsFabrics;
 import com.shavarushka.commands.interfaces.SelectedCartNotifier;
 import com.shavarushka.commands.interfaces.MessageSender;
 import com.shavarushka.database.SQLiteConnection;
@@ -64,9 +63,6 @@ public class ReplyKeyboardHandler implements CartSelectionListener {
         Map<String, String> result = new HashMap<>();
         int cntr = 0; 
         for (Categories category : connection.getCategoriesByCartId(cartId)) {
-            if (category.categoryName().equals("Прочее") && isDefaultCategoryEmpty(cartId)) {
-                continue;
-            }
             result.put("category" + ++cntr, category.categoryName());
         }
         return result;

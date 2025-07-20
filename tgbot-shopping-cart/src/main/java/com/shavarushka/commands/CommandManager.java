@@ -21,7 +21,7 @@ import com.shavarushka.database.SQLiteConnection;
 public class CommandManager {
     private final Map<String, BotCommand> commands = new HashMap<>();
     private final Map<Long, BotState> userStates = new HashMap<>();
-    private final Map<Long, String> tempNewCartNames = new HashMap<>();
+    private final Map<Long, String> tempNewNames = new HashMap<>();
     private final List<CartSelectionListener> selectedCartsListeners = new ArrayList<>();
     private final MessageSender sender;
     private final SQLiteConnection connection;
@@ -32,7 +32,7 @@ public class CommandManager {
 
         // register commands
         registerCommand(new StartCommand(sender, userStates, connection, selectedCartsListeners));
-        var createCartCommand = new CreateCartCommand(sender, userStates, connection, tempNewCartNames);
+        var createCartCommand = new CreateCartCommand(sender, userStates, connection, tempNewNames);
         registerCommand(createCartCommand);
         registerCommand(createCartCommand.new NameInputHandler(sender, userStates, connection));
         var mycartCommand = new MyCartCommand(sender, userStates, connection);
@@ -42,10 +42,15 @@ public class CommandManager {
         registerCommand(inviteUserCommand.new UsernameInputHandler(sender, userStates, connection));
         registerCommand(new AddProductCommand(sender, userStates, selectedCartsListeners, connection));
         registerCommand(new ListProductsOfCategory(sender, userStates, connection));
+        var addCategoryCommand = new AddCategoryCommand(sender, userStates, connection, tempNewNames, selectedCartsListeners);
+        registerCommand(addCategoryCommand);
+        registerCommand(addCategoryCommand.new CategoryNameInputHandler(sender, userStates, connection));
+        registerCommand(new ConfirmCategoryCreationCallback(sender, userStates, connection, tempNewNames, selectedCartsListeners));
+        registerCommand(new CancelCreatingCategory(sender, userStates, connection));
 
         // register callbacks
         registerCommand(new CancelCreatingCart(sender, userStates, connection));
-        registerCommand(new ConfirmCartCreationCallback(sender, userStates, connection, tempNewCartNames, selectedCartsListeners));
+        registerCommand(new ConfirmCartCreationCallback(sender, userStates, connection, tempNewNames, selectedCartsListeners));
         registerCommand(mycartCommand.new SetCartCallback(sender, userStates, connection, selectedCartsListeners));
         registerCommand(new CancelInvitingUser(sender, userStates, connection));
         var confirmInvitingCallback = new ConfirmInvitingCallback(sender, userStates, connection, selectedCartsListeners);
