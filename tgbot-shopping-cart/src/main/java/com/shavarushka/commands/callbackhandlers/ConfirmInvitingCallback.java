@@ -7,7 +7,7 @@ import java.util.Set;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import com.shavarushka.commands.callbackhandlers.interfaces.SelectedCartNotifier;
+import com.shavarushka.commands.callbackhandlers.interfaces.SelectedCartNotifierCallback;
 import com.shavarushka.commands.interfaces.BotState;
 import com.shavarushka.commands.interfaces.MessageSender;
 import com.shavarushka.commands.keyboard.CartSelectionListener;
@@ -15,7 +15,7 @@ import com.shavarushka.database.SQLiteConnection;
 import com.shavarushka.database.entities.ShoppingCarts;
 import com.shavarushka.database.entities.Users;
 
-public class ConfirmInvitingCallback extends SelectedCartNotifier {
+public class ConfirmInvitingCallback extends SelectedCartNotifierCallback {
     private final SQLiteConnection connection;
 
     public ConfirmInvitingCallback(MessageSender sender, Map<Long, BotState> userStates,

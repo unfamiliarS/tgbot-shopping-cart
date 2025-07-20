@@ -201,6 +201,28 @@ final public class SQLiteConnection {
         }
     }
 
+    public Products getProductById(Long productId) {
+        String query = "SELECT * FROM products WHERE product_id = ?";        
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, productId);
+            ResultSet rs = statement.executeQuery();
+            if (rs.next())
+                return new Products(
+                    rs.getLong("product_id") != 0 ? rs.getLong("product_id") : null,
+                    rs.getString("full_url"),
+                    rs.getLong("assigned_category_id") != 0 ? rs.getLong("assigned_category_id") : null,
+                    rs.getString("product_name"),
+                    rs.getInt("product_price") != 0 ? rs.getInt("product_price") : null,
+                    rs.getTimestamp("adding_time")
+                );
+            return null;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    // in cart url only unique
     public Products getProductByUrlAndCart(String url, Long cartId) {
         String query = "SELECT p.* FROM products p " +
                     "JOIN categories c ON p.assigned_category_id = c.category_id " +
@@ -377,6 +399,30 @@ final public class SQLiteConnection {
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setLong(1, cartId);
             statement.setLong(2, userId);
+            int affectedRows = statement.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean deleteCategory(Long categoryId) {
+        String query = "DELETE FROM categories WHERE category_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, categoryId);
+            int affectedRows = statement.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean deleteProduct(Long productId) {
+        String query = "DELETE FROM products WHERE product_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, productId);
             int affectedRows = statement.executeUpdate();
             return affectedRows > 0;
         } catch (SQLException e) {

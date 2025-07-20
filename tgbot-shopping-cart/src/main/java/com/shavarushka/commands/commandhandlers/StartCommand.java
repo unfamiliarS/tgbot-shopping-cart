@@ -6,14 +6,14 @@ import java.util.Map;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import com.shavarushka.commands.commandhandlers.interfaces.SelectedCartNotifier;
+import com.shavarushka.commands.commandhandlers.interfaces.SelectedCartNotifierCommand;
 import com.shavarushka.commands.interfaces.BotState;
 import com.shavarushka.commands.interfaces.MessageSender;
 import com.shavarushka.commands.keyboard.CartSelectionListener;
 import com.shavarushka.database.SQLiteConnection;
 import com.shavarushka.database.entities.Users;
 
-public class StartCommand extends SelectedCartNotifier {
+public class StartCommand extends SelectedCartNotifierCommand {
     private final SQLiteConnection connection;
 
     public StartCommand(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection, List<CartSelectionListener> listeners) {

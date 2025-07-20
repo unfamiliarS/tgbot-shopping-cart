@@ -2,6 +2,7 @@ package com.shavarushka.commands.interfaces;
 
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
@@ -74,6 +75,11 @@ public class MessageSender {
         telegramClient.execute(message.build());
     }
 
+    public void deleteMessage(Long chatId, Integer messageId) throws TelegramApiException {
+        DeleteMessage deleteMessage = new DeleteMessage(chatId.toString(), messageId);
+        telegramClient.execute(deleteMessage);
+    }
+    
     static public String escapeMarkdownV2(String text) {
         return text.replace("_", "\\_")
                 .replace("*", "\\*")

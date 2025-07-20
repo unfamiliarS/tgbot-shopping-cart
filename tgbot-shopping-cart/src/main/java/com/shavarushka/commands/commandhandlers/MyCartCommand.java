@@ -11,7 +11,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.shavarushka.commands.KeyboardsFabrics;
-import com.shavarushka.commands.callbackhandlers.interfaces.SelectedCartNotifier;
+import com.shavarushka.commands.callbackhandlers.interfaces.SelectedCartNotifierCallback;
 import com.shavarushka.commands.commandhandlers.interfaces.AbstractTextCommand;
 import com.shavarushka.commands.interfaces.BotState;
 import com.shavarushka.commands.interfaces.MessageSender;
@@ -60,7 +60,7 @@ public class MyCartCommand extends AbstractTextCommand {
         sender.sendMessage(chatId, message, keyboard, false);
     }
 
-    public class SetCartCallback extends SelectedCartNotifier {
+    public class SetCartCallback extends SelectedCartNotifierCallback {
         public SetCartCallback(MessageSender sender, Map<Long, BotState> userStates, List<CartSelectionListener> listeners) {
             super(sender, userStates, listeners);
         }

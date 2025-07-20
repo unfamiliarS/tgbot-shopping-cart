@@ -33,7 +33,6 @@ public class CommandManager {
 
         // register commands
         registerCommand(new StartCommand(sender, userStates, connection, selectedCartsListeners));
-        // registerCommand(new HelpCommand(sender, userStates, commands));
         var createCartCommand = new CreateCartCommand(sender, userStates, tempNewCartNames);
         registerCommand(createCartCommand);
         registerCommand(createCartCommand.new NameInputHandler(sender, userStates));
@@ -54,7 +53,9 @@ public class CommandManager {
         registerCommand(confirmInvitingCallback);
         registerCommand(new DeleteCartCallback(sender, userStates, connection));
         registerCommand(new CancelCartDeletion(sender, userStates));
-        registerCommand(new ConfirmCartDeletion(sender, userStates, connection));
+        registerCommand(new ConfirmCartDeletionCallback(sender, userStates, connection));
+        registerCommand(new DeleteProductCallback(sender, userStates, connection));
+        registerCommand(new ConfirmProductDeletionCallback(sender, userStates, selectedCartsListeners, connection));
 
         // create a ReplyKeyboardHandler for correct updating keyboard on selected cart changes
         new ReplyKeyboardHandler(sender, connection, confirmInvitingCallback);

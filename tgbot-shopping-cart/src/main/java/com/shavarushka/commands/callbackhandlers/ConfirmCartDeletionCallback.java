@@ -1,6 +1,7 @@
 package com.shavarushka.commands.callbackhandlers;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -9,11 +10,13 @@ import com.shavarushka.commands.callbackhandlers.interfaces.AbstractCallbackComm
 import com.shavarushka.commands.interfaces.BotState;
 import com.shavarushka.commands.interfaces.MessageSender;
 import com.shavarushka.database.SQLiteConnection;
+import com.shavarushka.database.entities.Categories;
+import com.shavarushka.database.entities.Products;
 
-public class ConfirmCartDeletion extends AbstractCallbackCommand {
+public class ConfirmCartDeletionCallback extends AbstractCallbackCommand {
     private final SQLiteConnection connection;
 
-    public ConfirmCartDeletion(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
+    public ConfirmCartDeletionCallback(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
         super(sender, userStates);
         this.connection = connection;
     }
@@ -44,12 +47,29 @@ public class ConfirmCartDeletion extends AbstractCallbackCommand {
         String message;
 
         if (connection.getUsersAssignedToCart(cartForDeletionId).size() <= 1) {
-            connection.deleteCart(cartForDeletionId);
+            deleteCartTheirCategoriesAndProducts(cartForDeletionId);
         }
         connection.deleteCartFromIntermediate(userId, cartForDeletionId);
 
         userStates.remove(chatId);
         message = "✅ Корзина *" + MessageSender.escapeMarkdownV2(cartName) + "* удалена😎";
         sender.editMessage(chatId, messageId, message, true);
+    }
+
+    private void deleteCartTheirCategoriesAndProducts(Long cartForDeletionId) {
+        Set<Categories> categoriesForDeletion = connection.getCategoriesByCartId(cartForDeletionId);
+        Set<Products> productsForDeletion;
+        if (!categoriesForDeletion.isEmpty()) {
+            for (Categories category : categoriesForDeletion) {
+                productsForDeletion = connection.getProductsByCategoryId(category.categoryId());
+                if (!productsForDeletion.isEmpty()) {
+                    for (Products product : productsForDeletion) {
+                        connection.deleteProduct(product.productId());
+                    }
+                }
+                connection.deleteCategory(category.categoryId());
+            }
+        }
+        connection.deleteCart(cartForDeletionId);        
     }
 }

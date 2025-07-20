@@ -70,7 +70,7 @@ public class ListProductsOfCategory extends AbstractTextCommand {
                 keyboard = KeyboardsFabrics.createKeyboard(
                 Map.of(
                     "/changecategory", "Сменить категорию",
-                    "/deleteproduct" + product.productId(), "🗑"
+                    "/deleteproduct_" + product.productId(), "🗑"
                 ), 
                 2,
                 InlineKeyboardMarkup.class
@@ -78,7 +78,7 @@ public class ListProductsOfCategory extends AbstractTextCommand {
                 sender.sendMessage(chatId, product.fullURL(), keyboard, false);
             }
         } else {
-            sender.sendMessage(chatId, "Ошибка при выводе списка товаров", true);
+            sender.sendMessage(chatId, "Категория пуста", true);
         }
     }
 

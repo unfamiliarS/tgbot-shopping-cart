@@ -6,7 +6,7 @@ import java.util.Map;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import com.shavarushka.commands.callbackhandlers.interfaces.SelectedCartNotifier;
+import com.shavarushka.commands.callbackhandlers.interfaces.SelectedCartNotifierCallback;
 import com.shavarushka.commands.interfaces.BotState;
 import com.shavarushka.commands.interfaces.MessageSender;
 import com.shavarushka.commands.keyboard.CartSelectionListener;
@@ -14,7 +14,7 @@ import com.shavarushka.database.SQLiteConnection;
 import com.shavarushka.database.entities.ShoppingCarts;
 import com.shavarushka.database.entities.Users;
 
-public class ConfirmCartCreationCallback extends SelectedCartNotifier {
+public class ConfirmCartCreationCallback extends SelectedCartNotifierCallback {
     private final SQLiteConnection connection;
     private final Map<Long, String> cartNames;
 

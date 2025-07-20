@@ -8,7 +8,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.shavarushka.commands.KeyboardsFabrics;
-import com.shavarushka.commands.commandhandlers.interfaces.SelectedCartNotifier;
+import com.shavarushka.commands.commandhandlers.interfaces.SelectedCartNotifierCommand;
 import com.shavarushka.commands.interfaces.BotState;
 import com.shavarushka.commands.interfaces.MessageSender;
 import com.shavarushka.commands.keyboard.CartSelectionListener;
@@ -17,7 +17,7 @@ import com.shavarushka.database.entities.Categories;
 import com.shavarushka.database.entities.Products;
 import com.shavarushka.database.entities.Users;
 
-public class AddProductCommand extends SelectedCartNotifier {
+public class AddProductCommand extends SelectedCartNotifierCommand {
     private final SQLiteConnection connection;
 
     public AddProductCommand(MessageSender sender, Map<Long, BotState> userStates,
@@ -102,7 +102,7 @@ public class AddProductCommand extends SelectedCartNotifier {
                 InlineKeyboardMarkup keyboard = KeyboardsFabrics.createKeyboard(
                     Map.of(
                         "/changecategory", "Сменить категорию",
-                        "/deleteproduct" + productId, "🗑"
+                        "/deleteproduct_" + productId, "🗑"
                     ), 
                     2,
                     InlineKeyboardMarkup.class
