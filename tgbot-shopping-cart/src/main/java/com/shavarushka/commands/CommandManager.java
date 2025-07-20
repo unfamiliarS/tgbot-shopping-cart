@@ -57,7 +57,7 @@ public class CommandManager {
         registerCommand(new ConfirmProductDeletionCallback(sender, userStates, selectedCartsListeners, connection));
         registerCommand(new CancelProductDeletion(sender, userStates, connection));
 
-        // create a ReplyKeyboardHandler for correct updating keyboard on selected cart changes
+        // create a ReplyKeyboardHandler for correct updating keyboard on cart changes
         new ReplyKeyboardHandler(sender, connection, confirmInvitingCallback);
     }
 
