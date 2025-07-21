@@ -1,4 +1,4 @@
-package com.shavarushka.commands.interfaces;
+package com.shavarushka.commands;
 
 public enum BotState {
     WAITING_FOR_CART_NAME,
@@ -7,5 +7,6 @@ public enum BotState {
     CONFIRMING_CART_CREATION,
     CONFIRMING_CATEGORY_CREATION,
     CONFIRMING_CART_DELETION,
+    CONFIRMING_CATEGORY_DELETION,
     CONFIRMING_PRODUCT_DELETION
 }

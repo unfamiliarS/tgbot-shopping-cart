@@ -12,8 +12,6 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 import com.shavarushka.commands.callbackhandlers.*;
 import com.shavarushka.commands.commandhandlers.*;
 import com.shavarushka.commands.interfaces.BotCommand;
-import com.shavarushka.commands.interfaces.BotState;
-import com.shavarushka.commands.interfaces.MessageSender;
 import com.shavarushka.commands.keyboard.CartSelectionListener;
 import com.shavarushka.commands.keyboard.ReplyKeyboardHandler;
 import com.shavarushka.database.SQLiteConnection;
@@ -47,6 +45,7 @@ public class CommandManager {
         registerCommand(addCategoryCommand.new CategoryNameInputHandler(sender, userStates, connection));
         registerCommand(new ConfirmCategoryCreationCallback(sender, userStates, connection, tempNewNames, selectedCartsListeners));
         registerCommand(new CancelCreatingCategory(sender, userStates, connection));
+        registerCommand(new DeleteCategoryCommand(sender, userStates, connection));
 
         // register callbacks
         registerCommand(new CancelCreatingCart(sender, userStates, connection));
@@ -59,8 +58,11 @@ public class CommandManager {
         registerCommand(new CancelCartDeletion(sender, userStates, connection));
         registerCommand(new ConfirmCartDeletionCallback(sender, userStates, connection));
         registerCommand(new DeleteProductCallback(sender, userStates, connection));
-        registerCommand(new ConfirmProductDeletionCallback(sender, userStates, selectedCartsListeners, connection));
+        registerCommand(new ConfirmProductDeletionCallback(sender, userStates, connection));
         registerCommand(new CancelProductDeletion(sender, userStates, connection));
+        registerCommand(new DeleteCategoryCallback(sender, userStates, connection));
+        registerCommand(new ConfirmCategoryDeletion(sender, userStates, connection, selectedCartsListeners));
+        registerCommand(new CancelCategoryDeletion(sender, userStates, connection));
 
         // create a ReplyKeyboardHandler for correct updating keyboard on cart changes
         new ReplyKeyboardHandler(sender, connection, confirmInvitingCallback);

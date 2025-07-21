@@ -6,9 +6,9 @@ import java.util.Map;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import com.shavarushka.commands.BotState;
+import com.shavarushka.commands.MessageSender;
 import com.shavarushka.commands.callbackhandlers.interfaces.SelectedCartNotifierCallback;
-import com.shavarushka.commands.interfaces.BotState;
-import com.shavarushka.commands.interfaces.MessageSender;
 import com.shavarushka.commands.keyboard.CartSelectionListener;
 import com.shavarushka.database.SQLiteConnection;
 import com.shavarushka.database.entities.Categories;
@@ -44,6 +44,8 @@ public class ConfirmCategoryCreationCallback extends SelectedCartNotifierCallbac
     public void execute(Update update) throws TelegramApiException {
         Long chatId = update.getCallbackQuery().getMessage().getChatId();
         Long userId = update.getCallbackQuery().getFrom().getId();
+        Integer messageId = update.getCallbackQuery().getMessage().getMessageId();
+
         Users user = connection.getUserById(chatId);
         String categoryName = categoryNames.remove(userId);
         String message;
@@ -59,7 +61,7 @@ public class ConfirmCategoryCreationCallback extends SelectedCartNotifierCallbac
             
             userStates.remove(chatId);
             message = "✅ Категория *" + MessageSender.escapeMarkdownV2(categoryName) + "* создана😎";
-            sender.sendMessage(chatId, message, true);
+            sender.editMessage(chatId, messageId, message, false);
         }
     }
 }

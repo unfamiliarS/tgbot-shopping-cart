@@ -5,9 +5,9 @@ import java.util.Map;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import com.shavarushka.commands.BotState;
+import com.shavarushka.commands.MessageSender;
 import com.shavarushka.commands.callbackhandlers.interfaces.AbstractCancelCallback;
-import com.shavarushka.commands.interfaces.BotState;
-import com.shavarushka.commands.interfaces.MessageSender;
 import com.shavarushka.database.SQLiteConnection;
 
 public class CancelCartDeletion extends AbstractCancelCallback {

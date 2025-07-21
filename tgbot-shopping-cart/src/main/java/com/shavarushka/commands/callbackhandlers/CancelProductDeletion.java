@@ -6,9 +6,9 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import com.shavarushka.commands.BotState;
+import com.shavarushka.commands.MessageSender;
 import com.shavarushka.commands.callbackhandlers.interfaces.AbstractCancelCallback;
-import com.shavarushka.commands.interfaces.BotState;
-import com.shavarushka.commands.interfaces.MessageSender;
 import com.shavarushka.commands.keyboard.KeyboardsFabrics;
 import com.shavarushka.database.SQLiteConnection;
 
@@ -37,7 +37,7 @@ public class CancelProductDeletion extends AbstractCancelCallback {
 
     @Override
     public void execute(Update update) throws TelegramApiException {
-        Long productId = Long.parseLong(update.getCallbackQuery().getData().substring(getCommand().length()));
+        Long productId = extractIdFromMessage(update.getCallbackQuery().getData());
         
         String message = connection.getProductById(productId).fullURL();
         InlineKeyboardMarkup keyboard = KeyboardsFabrics.createKeyboard(

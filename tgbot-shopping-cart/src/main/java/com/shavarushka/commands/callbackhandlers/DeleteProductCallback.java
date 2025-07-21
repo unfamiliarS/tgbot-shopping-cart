@@ -7,9 +7,9 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import com.shavarushka.commands.BotState;
+import com.shavarushka.commands.MessageSender;
 import com.shavarushka.commands.callbackhandlers.interfaces.AbstractCallbackCommand;
-import com.shavarushka.commands.interfaces.BotState;
-import com.shavarushka.commands.interfaces.MessageSender;
 import com.shavarushka.commands.keyboard.KeyboardsFabrics;
 import com.shavarushka.database.SQLiteConnection;
 import com.shavarushka.database.entities.Categories;
@@ -42,7 +42,7 @@ public class DeleteProductCallback extends AbstractCallbackCommand {
     public void execute(Update update) throws TelegramApiException {
         Long chatId = update.getCallbackQuery().getMessage().getChatId();
         Integer messageId = update.getCallbackQuery().getMessage().getMessageId();
-        Long productId = Long.parseLong(update.getCallbackQuery().getData().substring(getCommand().length()));
+        Long productId = extractIdFromMessage(update.getCallbackQuery().getData());
         Users user = connection.getUserById(update.getCallbackQuery().getFrom().getId());
         Products product;
         String message;

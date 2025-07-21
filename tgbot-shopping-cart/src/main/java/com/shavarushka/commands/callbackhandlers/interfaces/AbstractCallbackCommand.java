@@ -4,9 +4,9 @@ import java.util.Map;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
 
+import com.shavarushka.commands.BotState;
+import com.shavarushka.commands.MessageSender;
 import com.shavarushka.commands.interfaces.AbstractCommand;
-import com.shavarushka.commands.interfaces.BotState;
-import com.shavarushka.commands.interfaces.MessageSender;
 import com.shavarushka.database.SQLiteConnection;
 
 public abstract class AbstractCallbackCommand extends AbstractCommand {
@@ -24,5 +24,9 @@ public abstract class AbstractCallbackCommand extends AbstractCommand {
         String callback = update.getCallbackQuery().getData();
         return !userStates.containsKey(chatId) &&
                 callback.startsWith(getCommand().strip());
+    }
+
+    protected Long extractIdFromMessage(String message) {
+        return Long.parseLong(message.substring(getCommand().length()));
     }
 }

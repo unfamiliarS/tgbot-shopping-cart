@@ -6,9 +6,9 @@ import java.util.Map;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import com.shavarushka.commands.BotState;
+import com.shavarushka.commands.MessageSender;
 import com.shavarushka.commands.commandhandlers.interfaces.SelectedCartNotifierCommand;
-import com.shavarushka.commands.interfaces.BotState;
-import com.shavarushka.commands.interfaces.MessageSender;
 import com.shavarushka.commands.keyboard.CartSelectionListener;
 import com.shavarushka.database.SQLiteConnection;
 import com.shavarushka.database.entities.Users;

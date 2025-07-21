@@ -8,10 +8,10 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import com.shavarushka.commands.BotState;
+import com.shavarushka.commands.MessageSender;
 import com.shavarushka.commands.commandhandlers.interfaces.AbstractTextCommand;
 import com.shavarushka.commands.commandhandlers.interfaces.SelectedCartNotifierCommand;
-import com.shavarushka.commands.interfaces.BotState;
-import com.shavarushka.commands.interfaces.MessageSender;
 import com.shavarushka.commands.keyboard.CartSelectionListener;
 import com.shavarushka.commands.keyboard.KeyboardsFabrics;
 import com.shavarushka.database.SQLiteConnection;
@@ -43,7 +43,7 @@ public class AddCategoryCommand extends SelectedCartNotifierCommand {
 
         String message = getDescription() + "\n\nВведи название категории:";
         InlineKeyboardMarkup keyboard = KeyboardsFabrics.createKeyboard(
-            Map.of("/cancelcreatingnewcart", "Отменить создание"), 1, InlineKeyboardMarkup.class
+            Map.of("/cancelcreatingcategory", "Отменить создание"), 1, InlineKeyboardMarkup.class
         );
         sender.sendMessage(chatId, message, keyboard, false);
         userStates.put(chatId, BotState.WAITING_FOR_CATEGORY_NAME);
@@ -82,7 +82,7 @@ public class AddCategoryCommand extends SelectedCartNotifierCommand {
             if (!isCorrectName(categoryName)) {
                 message = "Некорректное название для категории. Попробуй ещё раз.";
                 var keyboard = KeyboardsFabrics.createKeyboard(
-                        Map.of("/cancelcreatingnewcart", "Отменить создание"),
+                        Map.of("/cancelcreatingcategory", "Отменить создание"),
                         1, InlineKeyboardMarkup.class
                 ); 
                 sender.sendMessage(chatId, message, keyboard, false);

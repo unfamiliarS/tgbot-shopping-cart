@@ -8,8 +8,8 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import com.shavarushka.commands.MessageSender;
 import com.shavarushka.commands.interfaces.SelectedCartNotifier;
-import com.shavarushka.commands.interfaces.MessageSender;
 import com.shavarushka.database.SQLiteConnection;
 import com.shavarushka.database.entities.Categories;
 import com.shavarushka.database.entities.Users;
@@ -49,7 +49,7 @@ public class ReplyKeyboardHandler implements CartSelectionListener {
         if (hasCart) {
             String cartName = connection.getCartById(cartId).cartName();
             keyboard = KeyboardsFabrics.createKeyboard(
-                getCategoriesWithCreateNew(cartId),1, ReplyKeyboardMarkup.class
+                getCategoriesWithCreateNewAndDelete(cartId),2, ReplyKeyboardMarkup.class
             );
             message = "Корзина: *" + MessageSender.escapeMarkdownV2(cartName) + "*";
         } else {
@@ -74,11 +74,9 @@ public class ReplyKeyboardHandler implements CartSelectionListener {
         return categories;
     }
 
-    private boolean isDefaultCategoryEmpty(Long cartId) {
-        Categories defaultCategory = connection.getCategoryByAssignedCartIdAndName(cartId, "Прочее");
-        if (connection.getProductsByCategoryId(defaultCategory.categoryId()).isEmpty()) {
-            return true;
-        }
-        return false;
+    private Map<String, String> getCategoriesWithCreateNewAndDelete(Long cartId) {
+        Map<String, String> categories = getCategoriesWithCreateNew(cartId);
+        categories.put("delete_category", "Удалить категорию");
+        return categories;
     }
 }

@@ -1,22 +1,18 @@
 package com.shavarushka.commands.callbackhandlers;
 
-import java.util.List;
 import java.util.Map;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import com.shavarushka.commands.callbackhandlers.interfaces.SelectedCartNotifierCallback;
-import com.shavarushka.commands.interfaces.BotState;
-import com.shavarushka.commands.interfaces.MessageSender;
-import com.shavarushka.commands.keyboard.CartSelectionListener;
+import com.shavarushka.commands.BotState;
+import com.shavarushka.commands.MessageSender;
+import com.shavarushka.commands.callbackhandlers.interfaces.AbstractCallbackCommand;
 import com.shavarushka.database.SQLiteConnection;
-import com.shavarushka.database.entities.Users;
 
-public class ConfirmProductDeletionCallback extends SelectedCartNotifierCallback {
-    public ConfirmProductDeletionCallback(MessageSender sender, Map<Long, BotState> userStates,
-                                        List<CartSelectionListener> listeners, SQLiteConnection connection) {
-        super(sender, userStates, connection, listeners);
+public class ConfirmProductDeletionCallback extends AbstractCallbackCommand {
+    public ConfirmProductDeletionCallback(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
+        super(sender, userStates, connection);
     }
 
     @Override
@@ -38,17 +34,11 @@ public class ConfirmProductDeletionCallback extends SelectedCartNotifierCallback
     @Override
     public void execute(Update update) throws TelegramApiException {
         Long chatId = update.getCallbackQuery().getMessage().getChatId();
-        Long userId = update.getCallbackQuery().getFrom().getId();
-        Long productId = Long.parseLong(update.getCallbackQuery().getData().substring(getCommand().length()));
+        Long productId = extractIdFromMessage(update.getCallbackQuery().getData());
         Integer messageId = update.getCallbackQuery().getMessage().getMessageId();
-        Users user = connection.getUserById(userId);
         
         if (isProductExist(productId)) {
-            boolean isProductLastInTheCategory = isProductLastInTheCategory(productId);
             connection.deleteProduct(productId);
-            if (isProductLastInTheCategory) {
-                notifyCartSelectionListeners(userId, user.selectedCartId());
-            }
         }
         sender.deleteMessage(chatId, messageId);
         userStates.remove(chatId);
@@ -56,9 +46,5 @@ public class ConfirmProductDeletionCallback extends SelectedCartNotifierCallback
 
     private boolean isProductExist(Long productId) {
         return connection.getProductById(productId) != null;
-    }
-
-    private boolean isProductLastInTheCategory(Long productId) {
-        return connection.getProductsByCategoryId(connection.getProductById(productId).assignedCategoryId()).size() == 1;
     }
 }

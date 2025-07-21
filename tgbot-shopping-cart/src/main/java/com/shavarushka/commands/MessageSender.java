@@ -1,4 +1,4 @@
-package com.shavarushka.commands.interfaces;
+package com.shavarushka.commands;
 
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;

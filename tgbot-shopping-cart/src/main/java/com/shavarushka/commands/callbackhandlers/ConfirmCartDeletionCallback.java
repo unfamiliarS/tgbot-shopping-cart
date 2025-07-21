@@ -6,9 +6,9 @@ import java.util.Set;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import com.shavarushka.commands.BotState;
+import com.shavarushka.commands.MessageSender;
 import com.shavarushka.commands.callbackhandlers.interfaces.AbstractCallbackCommand;
-import com.shavarushka.commands.interfaces.BotState;
-import com.shavarushka.commands.interfaces.MessageSender;
 import com.shavarushka.database.SQLiteConnection;
 import com.shavarushka.database.entities.Categories;
 import com.shavarushka.database.entities.Products;
@@ -39,7 +39,7 @@ public class ConfirmCartDeletionCallback extends AbstractCallbackCommand {
         Long chatId = update.getCallbackQuery().getMessage().getChatId();
         Long userId = update.getCallbackQuery().getFrom().getId();
         Integer messageId = update.getCallbackQuery().getMessage().getMessageId();
-        Long cartForDeletionId = Long.parseLong(update.getCallbackQuery().getData().substring(getCommand().length()));
+        Long cartForDeletionId = extractIdFromMessage(update.getCallbackQuery().getData());
         String cartName = connection.getCartById(cartForDeletionId).cartName();
         String message;
 

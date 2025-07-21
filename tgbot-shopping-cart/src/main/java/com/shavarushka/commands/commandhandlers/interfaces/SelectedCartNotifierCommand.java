@@ -3,8 +3,8 @@ package com.shavarushka.commands.commandhandlers.interfaces;
 import java.util.List;
 import java.util.Map;
 
-import com.shavarushka.commands.interfaces.BotState;
-import com.shavarushka.commands.interfaces.MessageSender;
+import com.shavarushka.commands.BotState;
+import com.shavarushka.commands.MessageSender;
 import com.shavarushka.commands.interfaces.SelectedCartNotifier;
 import com.shavarushka.commands.keyboard.CartSelectionListener;
 import com.shavarushka.database.SQLiteConnection;

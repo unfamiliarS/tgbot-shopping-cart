@@ -10,10 +10,10 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import com.shavarushka.commands.BotState;
+import com.shavarushka.commands.MessageSender;
 import com.shavarushka.commands.callbackhandlers.interfaces.SelectedCartNotifierCallback;
 import com.shavarushka.commands.commandhandlers.interfaces.AbstractTextCommand;
-import com.shavarushka.commands.interfaces.BotState;
-import com.shavarushka.commands.interfaces.MessageSender;
 import com.shavarushka.commands.keyboard.CartSelectionListener;
 import com.shavarushka.commands.keyboard.KeyboardsFabrics;
 import com.shavarushka.database.SQLiteConnection;
@@ -73,7 +73,7 @@ public class MyCartCommand extends AbstractTextCommand {
             Long chatId = update.getCallbackQuery().getMessage().getChatId();
             Long userId = update.getCallbackQuery().getFrom().getId();
             Integer messageId = update.getCallbackQuery().getMessage().getMessageId();
-            Long newSelectedCartId = Long.parseLong(update.getCallbackQuery().getData().substring(getCommand().length()));
+            Long newSelectedCartId = extractIdFromMessage(update.getCallbackQuery().getData());
             String message;
             Set<ShoppingCarts> carts = connection.getCartsAssignedToUser(userId);
             
@@ -93,10 +93,11 @@ public class MyCartCommand extends AbstractTextCommand {
                 notifyCartSelectionListeners(userId, newSelectedCartId);
             }
 
-            newSelectedCartId = connection.getUserById(userId).selectedCartId();
-            message = "Ваши корзины:";
-            InlineKeyboardMarkup keyboard = getKeyboardForMyCart(carts, newSelectedCartId);
-            sender.editMessage(chatId, messageId, message, keyboard, false);
+            // newSelectedCartId = connection.getUserById(userId).selectedCartId();
+            // message = "Ваши корзины:";
+            // InlineKeyboardMarkup keyboard = getKeyboardForMyCart(carts, newSelectedCartId);
+            // sender.editMessage(chatId, messageId, message, keyboard, false);
+            sender.deleteMessage(chatId, messageId);
         }
 
         private boolean isThisCartAssignedToUser(Long cartId, Long userId) {

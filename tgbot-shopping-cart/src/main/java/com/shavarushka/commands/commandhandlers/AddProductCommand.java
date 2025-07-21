@@ -7,9 +7,9 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import com.shavarushka.commands.BotState;
+import com.shavarushka.commands.MessageSender;
 import com.shavarushka.commands.commandhandlers.interfaces.SelectedCartNotifierCommand;
-import com.shavarushka.commands.interfaces.BotState;
-import com.shavarushka.commands.interfaces.MessageSender;
 import com.shavarushka.commands.keyboard.CartSelectionListener;
 import com.shavarushka.commands.keyboard.KeyboardsFabrics;
 import com.shavarushka.database.SQLiteConnection;
@@ -84,8 +84,6 @@ public class AddProductCommand extends SelectedCartNotifierCommand {
                 isNeedToNotify = true;
             } else {
                 defaultCategoryId = defaultCategory.categoryId();
-                // if (isDefaultCategoryEmpty(defaultCategoryId))
-                //     isNeedToNotify = true;
             }
             
             Long productId = connection.addProduct(new Products(
@@ -115,13 +113,5 @@ public class AddProductCommand extends SelectedCartNotifierCommand {
                 sender.sendMessage(chatId, "Ошибка при добавлении товара", false);
             }
         }
-    }
-
-    private boolean isDefaultCategoryEmpty(Long cartId) {
-        Categories defaultCategory = connection.getCategoryByAssignedCartIdAndName(cartId, "Прочее");
-        if (connection.getProductsByCategoryId(defaultCategory.categoryId()).isEmpty()) {
-            return true;
-        }
-        return false;
     }
 }
