@@ -61,7 +61,7 @@ public class ConfirmCategoryCreationCallback extends SelectedCartNotifierCallbac
             
             userStates.remove(chatId);
             message = "✅ Категория *" + MessageSender.escapeMarkdownV2(categoryName) + "* создана😎";
-            sender.editMessage(chatId, messageId, message, false);
+            sender.editMessage(chatId, messageId, message, true);
         }
     }
 }

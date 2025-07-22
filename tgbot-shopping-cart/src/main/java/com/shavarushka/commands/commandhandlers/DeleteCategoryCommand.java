@@ -50,7 +50,7 @@ public class DeleteCategoryCommand extends AbstractTextCommand {
             .forEach(category -> {
                 buttons.put("/deletecategory_" + category.categoryId(), "🗑 " + category.categoryName());
             });
-        return KeyboardsFabrics.createKeyboard(buttons,2, InlineKeyboardMarkup.class);
+        return KeyboardsFabrics.createKeyboard(buttons,1, InlineKeyboardMarkup.class);
     }
 
 

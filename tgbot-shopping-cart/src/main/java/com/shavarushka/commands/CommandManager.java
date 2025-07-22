@@ -73,19 +73,20 @@ public class CommandManager {
     }
 
     public void processUpdate(Update update) throws TelegramApiException {
-        if (!checkIfUserRegister(update)) {
-            return;
-        }
+        boolean isUserRegister = isUserRegister(update);
 
         for (BotCommand command : commands.values()) {
             if (command.shouldProcess(update)) {
+                if (!isUserRegister) {
+                    command = commands.get("/start");
+                }
                 command.execute(update);
                 return;
             }
         }
     }
 
-    private boolean checkIfUserRegister(Update update) throws TelegramApiException {
+    private boolean isUserRegister(Update update) throws TelegramApiException {
         Long userId;
         if (update.hasMessage()) {
             userId = update.getMessage().getFrom().getId();
@@ -94,13 +95,7 @@ public class CommandManager {
         } else {
             return false;
         }
-        if (connection.getUserById(userId) == null) {
-            BotCommand command = commands.get("/start");
-            command.execute(update);
-            return false;
-        }
-        return true;
+
+        return connection.getUserById(userId) != null;
     }
-
-
 }
