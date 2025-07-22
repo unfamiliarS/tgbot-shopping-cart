@@ -2,6 +2,8 @@ package com.shavarushka.commands.commandhandlers;
 
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -40,7 +42,8 @@ public class AddProductCommand extends SelectedCartNotifierCommand {
 
         Long chatId = update.getMessage().getChatId();
         String message = update.getMessage().getText();
-        String regexURL = "^https://.*$";
+        String regexURL = "(?s).*https?://.*";
+        System.out.println(message.matches(regexURL));
         return !userStates.containsKey(chatId) &&
                 message.matches(regexURL);
     }
@@ -49,7 +52,7 @@ public class AddProductCommand extends SelectedCartNotifierCommand {
     public void execute(Update update) throws TelegramApiException {
         Long chatId = update.getMessage().getChatId();
         Long userId = update.getMessage().getFrom().getId();
-        String productURL = update.getMessage().getText().strip();
+        String productURL = extractUrlFromMessage(update.getMessage().getText().strip());
         Users user = connection.getUserById(userId);
         boolean isNeedToNotify = false;
         String message;
@@ -60,7 +63,11 @@ public class AddProductCommand extends SelectedCartNotifierCommand {
             sender.sendMessage(chatId, message, false);
             return;
         }
-        
+        if (productURL.isEmpty()) {
+            System.out.println("don't find url from message");
+            return;
+        }
+
         Products product = connection.getProductByUrlAndCart(productURL, cartId);
         
         // if product already exist
@@ -104,7 +111,7 @@ public class AddProductCommand extends SelectedCartNotifierCommand {
                 message = "Товар успешно добавлен в категорию *Прочее* 😎\n" + MessageSender.escapeMarkdownV2(productURL);
                 InlineKeyboardMarkup keyboard = KeyboardsFabrics.createKeyboard(
                     Map.of(
-                        "/purchasestatus", product.productPurchaseStatusAsString(),
+                        "/purchasestatus_" + productId, product.productPurchaseStatusAsString(),
                         "/changecategoryfor_" + productId, "Сменить категорию",
                         "/deleteproduct_" + productId, "🗑"
                     ),
@@ -116,5 +123,18 @@ public class AddProductCommand extends SelectedCartNotifierCommand {
                 sender.sendMessage(chatId, "Ошибка при добавлении товара", false);
             }
         }
+    }
+
+    private String extractUrlFromMessage(String message) {
+        String urlRegex = "https?://.*";
+        
+        Pattern pattern = Pattern.compile(urlRegex);
+        Matcher matcher = pattern.matcher(message);
+        
+        if (matcher.find()) {
+            return matcher.group();
+        }
+        
+        return "";
     }
 }

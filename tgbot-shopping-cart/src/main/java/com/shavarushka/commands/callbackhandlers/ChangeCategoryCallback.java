@@ -36,8 +36,8 @@ public class ChangeCategoryCallback extends AbstractCallbackCommand {
         Integer messageId = update.getCallbackQuery().getMessage().getMessageId();
         Users user = connection.getUserById(userId);
         Long productId = extractIdFromMessage(update.getCallbackQuery().getData());
-        Products product = connection.getProductById(productId);
-        String message = product.fullURL() + "\n";
+        Products product;
+        String message;
         
         if (user.selectedCartId() == null) {
             message = "У тебя нет ни одной корзины😔 \n/createnewcart чтобы создать";
@@ -48,6 +48,9 @@ public class ChangeCategoryCallback extends AbstractCallbackCommand {
             sender.deleteMessage(chatId, messageId);
             return;
         }
+
+        product = connection.getProductById(productId);
+        message = product.fullURL() + "\n";
 
         message += "Выбери новую категорию:";
         var keyboard = getKeyboardWithCategories(
@@ -99,7 +102,7 @@ public class ChangeCategoryCallback extends AbstractCallbackCommand {
                     String message = product.fullURL();
                     var keyboard = KeyboardsFabrics.createKeyboard(
                         Map.of(
-                            "/purchasestatus", product.productPurchaseStatusAsString(),
+                            "/purchasestatus_" + productId, product.productPurchaseStatusAsString(),
                             "/changecategoryfor_" + productId, "Сменить категорию",
                             "/deleteproduct_" + productId, "🗑"
                         ),

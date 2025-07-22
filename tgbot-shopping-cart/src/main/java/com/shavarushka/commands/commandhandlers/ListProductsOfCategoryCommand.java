@@ -64,7 +64,7 @@ public class ListProductsOfCategoryCommand extends AbstractTextCommand {
             for (Products product : products) {
                 keyboard = KeyboardsFabrics.createKeyboard(
                 Map.of(
-                    "/purchasestatus", product.productPurchaseStatusAsString(),
+                    "/purchasestatus_" + product.productId(), product.productPurchaseStatusAsString(),
                     "/changecategoryfor_" + product.productId(), "Сменить категорию",
                     "/deleteproduct_" + product.productId(), "🗑"
                 ), 

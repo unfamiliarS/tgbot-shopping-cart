@@ -398,6 +398,19 @@ final public class SQLiteConnection implements DBConnection {
         }
     }
 
+    public boolean updatePurchaseStatusForProduct(Long productId, Boolean purchaseStatus) {
+        String query = "UPDATE OR IGNORE products SET product_purchase_status = ? WHERE product_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setBoolean(1, purchaseStatus);
+            statement.setLong(2, productId);
+            int affectedRows = statement.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     // Delete---------------------------------------------------------------------------------------------------
 
     public boolean deleteCart(Long cartId) {

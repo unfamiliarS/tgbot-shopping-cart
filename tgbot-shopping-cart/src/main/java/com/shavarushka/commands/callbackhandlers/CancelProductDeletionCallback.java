@@ -41,9 +41,9 @@ public class CancelProductDeletionCallback extends AbstractCancelCallback {
         Long productId = extractIdFromMessage(update.getCallbackQuery().getData());
         Products product = connection.getProductById(productId);
         String message = connection.getProductById(productId).fullURL();
-        InlineKeyboardMarkup keyboard = KeyboardsFabrics.createKeyboard(
+        var keyboard = KeyboardsFabrics.createKeyboard(
             Map.of(
-                "/purchasestatus", product.productPurchaseStatusAsString(),
+                "/purchasestatus_" + productId, product.productPurchaseStatusAsString(),
                 "/changecategoryfor_" + productId, "Сменить категорию",
                 "/deleteproduct_" + productId, "🗑"
             ), 
