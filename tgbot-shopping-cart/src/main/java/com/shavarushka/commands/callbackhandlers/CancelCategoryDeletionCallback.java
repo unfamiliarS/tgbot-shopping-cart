@@ -10,9 +10,9 @@ import com.shavarushka.commands.MessageSender;
 import com.shavarushka.commands.callbackhandlers.interfaces.AbstractCancelCallback;
 import com.shavarushka.database.SQLiteConnection;
 
-public class CancelCategoryDeletion extends AbstractCancelCallback {
+public class CancelCategoryDeletionCallback extends AbstractCancelCallback {
 
-    public CancelCategoryDeletion(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
+    public CancelCategoryDeletionCallback(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
         super(sender, userStates, connection);
     }
 

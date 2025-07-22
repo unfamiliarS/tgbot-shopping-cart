@@ -39,30 +39,30 @@ public class CommandManager {
         registerCommand(inviteUserCommand);
         registerCommand(inviteUserCommand.new UsernameInputHandler(sender, userStates, connection));
         registerCommand(new AddProductCommand(sender, userStates, selectedCartsListeners, connection));
-        registerCommand(new ListProductsOfCategory(sender, userStates, connection));
+        registerCommand(new ListProductsOfCategoryCommand(sender, userStates, connection));
         var addCategoryCommand = new AddCategoryCommand(sender, userStates, connection, tempNewNames, selectedCartsListeners);
         registerCommand(addCategoryCommand);
         registerCommand(addCategoryCommand.new CategoryNameInputHandler(sender, userStates, connection));
         registerCommand(new ConfirmCategoryCreationCallback(sender, userStates, connection, tempNewNames, selectedCartsListeners));
-        registerCommand(new CancelCreatingCategory(sender, userStates, connection));
+        registerCommand(new CancelCreatingCategoryCallback(sender, userStates, connection));
         registerCommand(new DeleteCategoryCommand(sender, userStates, connection));
 
         // register callbacks
-        registerCommand(new CancelCreatingCart(sender, userStates, connection));
+        registerCommand(new CancelCreatingCartCallback(sender, userStates, connection));
         registerCommand(new ConfirmCartCreationCallback(sender, userStates, connection, tempNewNames, selectedCartsListeners));
         registerCommand(mycartCommand.new SetCartCallback(sender, userStates, connection, selectedCartsListeners));
-        registerCommand(new CancelInvitingUser(sender, userStates, connection));
+        registerCommand(new CancelInvitingUserCallback(sender, userStates, connection));
         var confirmInvitingCallback = new ConfirmInvitingCallback(sender, userStates, connection, selectedCartsListeners);
         registerCommand(confirmInvitingCallback);
         registerCommand(new DeleteCartCallback(sender, userStates, connection));
-        registerCommand(new CancelCartDeletion(sender, userStates, connection));
+        registerCommand(new CancelCartDeletionCallback(sender, userStates, connection));
         registerCommand(new ConfirmCartDeletionCallback(sender, userStates, connection));
         registerCommand(new DeleteProductCallback(sender, userStates, connection));
         registerCommand(new ConfirmProductDeletionCallback(sender, userStates, connection));
-        registerCommand(new CancelProductDeletion(sender, userStates, connection));
+        registerCommand(new CancelProductDeletionCallback(sender, userStates, connection));
         registerCommand(new DeleteCategoryCallback(sender, userStates, connection));
-        registerCommand(new ConfirmCategoryDeletion(sender, userStates, connection, selectedCartsListeners));
-        registerCommand(new CancelCategoryDeletion(sender, userStates, connection));
+        registerCommand(new ConfirmCategoryDeletionCallback(sender, userStates, connection, selectedCartsListeners));
+        registerCommand(new CancelCategoryDeletionCallback(sender, userStates, connection));
 
         // create a ReplyKeyboardHandler for correct updating keyboard on cart changes
         new ReplyKeyboardHandler(sender, connection, confirmInvitingCallback);

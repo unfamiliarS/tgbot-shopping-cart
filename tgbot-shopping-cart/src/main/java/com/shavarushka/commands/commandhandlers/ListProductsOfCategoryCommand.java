@@ -16,8 +16,8 @@ import com.shavarushka.database.entities.Categories;
 import com.shavarushka.database.entities.Products;
 import com.shavarushka.database.entities.Users;
 
-public class ListProductsOfCategory extends AbstractTextCommand {
-    public ListProductsOfCategory(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
+public class ListProductsOfCategoryCommand extends AbstractTextCommand {
+    public ListProductsOfCategoryCommand(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
         super(sender, userStates, connection);
     }
     

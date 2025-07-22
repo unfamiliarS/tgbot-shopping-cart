@@ -12,8 +12,8 @@ import com.shavarushka.commands.callbackhandlers.interfaces.AbstractCancelCallba
 import com.shavarushka.commands.keyboard.KeyboardsFabrics;
 import com.shavarushka.database.SQLiteConnection;
 
-public class CancelProductDeletion extends AbstractCancelCallback {
-    public CancelProductDeletion(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
+public class CancelProductDeletionCallback extends AbstractCancelCallback {
+    public CancelProductDeletionCallback(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
         super(sender, userStates, connection);
     }
     

@@ -10,14 +10,14 @@ import com.shavarushka.commands.MessageSender;
 import com.shavarushka.commands.callbackhandlers.interfaces.AbstractCancelCallback;
 import com.shavarushka.database.SQLiteConnection;
 
-public class CancelInvitingUser extends AbstractCancelCallback {
-    public CancelInvitingUser(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
+public class CancelCreatingCartCallback extends AbstractCancelCallback {
+    public CancelCreatingCartCallback(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
         super(sender, userStates, connection);
     }
     
     @Override
     public String getCommand() {
-        return "/cancelinvitinguser";
+        return "/cancelcreatingnewcart";
     }
 
     @Override
@@ -30,12 +30,13 @@ public class CancelInvitingUser extends AbstractCancelCallback {
 
         return message.startsWith(getCommand().strip()) &&
                userStates.containsKey(chatId) &&
-               userStates.get(chatId).equals(BotState.WAITING_FOR_USERNAME_TO_INVITE);
+               (userStates.get(chatId).equals(BotState.WAITING_FOR_CART_NAME) ||
+               userStates.get(chatId).equals(BotState.CONFIRMING_CART_CREATION));
     }
 
     @Override
     public void execute(Update update) throws TelegramApiException {
-        String message = "❌ Отменяю создание приглашения...";
+        String message = "❌ Отменяю создание корзины...";
         processCanceling(update, message);
     }
 }

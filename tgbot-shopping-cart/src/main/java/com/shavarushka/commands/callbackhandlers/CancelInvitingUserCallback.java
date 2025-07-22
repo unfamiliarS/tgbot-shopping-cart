@@ -10,14 +10,14 @@ import com.shavarushka.commands.MessageSender;
 import com.shavarushka.commands.callbackhandlers.interfaces.AbstractCancelCallback;
 import com.shavarushka.database.SQLiteConnection;
 
-public class CancelCreatingCategory extends AbstractCancelCallback {
-    public CancelCreatingCategory(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
+public class CancelInvitingUserCallback extends AbstractCancelCallback {
+    public CancelInvitingUserCallback(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
         super(sender, userStates, connection);
     }
     
     @Override
     public String getCommand() {
-        return "/cancelcreatingcategory";
+        return "/cancelinvitinguser";
     }
 
     @Override
@@ -30,13 +30,12 @@ public class CancelCreatingCategory extends AbstractCancelCallback {
 
         return message.startsWith(getCommand().strip()) &&
                userStates.containsKey(chatId) &&
-               (userStates.get(chatId).equals(BotState.WAITING_FOR_CATEGORY_NAME) ||
-               userStates.get(chatId).equals(BotState.CONFIRMING_CATEGORY_CREATION));
+               userStates.get(chatId).equals(BotState.WAITING_FOR_USERNAME_TO_INVITE);
     }
 
     @Override
     public void execute(Update update) throws TelegramApiException {
-        String message = "❌ Отменяю создание категории...";
+        String message = "❌ Отменяю создание приглашения...";
         processCanceling(update, message);
     }
 }

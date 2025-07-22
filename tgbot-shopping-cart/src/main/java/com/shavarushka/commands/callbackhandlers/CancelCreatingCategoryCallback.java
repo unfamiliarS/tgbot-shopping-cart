@@ -10,14 +10,14 @@ import com.shavarushka.commands.MessageSender;
 import com.shavarushka.commands.callbackhandlers.interfaces.AbstractCancelCallback;
 import com.shavarushka.database.SQLiteConnection;
 
-public class CancelCartDeletion extends AbstractCancelCallback {
-    public CancelCartDeletion(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
+public class CancelCreatingCategoryCallback extends AbstractCancelCallback {
+    public CancelCreatingCategoryCallback(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
         super(sender, userStates, connection);
     }
-
+    
     @Override
     public String getCommand() {
-        return "/cancelcartdeletion";
+        return "/cancelcreatingcategory";
     }
 
     @Override
@@ -30,13 +30,13 @@ public class CancelCartDeletion extends AbstractCancelCallback {
 
         return message.startsWith(getCommand().strip()) &&
                userStates.containsKey(chatId) &&
-               userStates.get(chatId).equals(BotState.CONFIRMING_CART_DELETION);
+               (userStates.get(chatId).equals(BotState.WAITING_FOR_CATEGORY_NAME) ||
+               userStates.get(chatId).equals(BotState.CONFIRMING_CATEGORY_CREATION));
     }
 
     @Override
     public void execute(Update update) throws TelegramApiException {
-        String message = "❌ Отменяю удаление корзины...";
+        String message = "❌ Отменяю создание категории...";
         processCanceling(update, message);
     }
-
 }

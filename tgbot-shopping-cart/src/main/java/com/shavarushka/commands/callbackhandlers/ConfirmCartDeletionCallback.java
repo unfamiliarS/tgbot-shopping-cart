@@ -47,8 +47,8 @@ public class ConfirmCartDeletionCallback extends AbstractCallbackCommand {
             deleteCartTheirCategoriesAndProducts(cartForDeletionId);
         }
         connection.deleteCartFromIntermediate(userId, cartForDeletionId);
-
         userStates.remove(chatId);
+
         message = "✅ Корзина *" + MessageSender.escapeMarkdownV2(cartName) + "* удалена😎";
         sender.editMessage(chatId, messageId, message, true);
     }
