@@ -36,8 +36,13 @@ public class CreateCartCommand extends AbstractTextCommand {
     @Override
     public void execute(Update update) throws TelegramApiException {
         Long chatId = update.getMessage().getChatId();
+        Long userId = update.getMessage().getFrom().getId();
+        String message;
+    
+        if (!checkForUserExisting(chatId, userId))
+            return;
 
-        String message = getDescription() + "\n\nВведи название корзины:";
+        message = getDescription() + "\n\nВведи название корзины:";
         InlineKeyboardMarkup keyboard = KeyboardsFabrics.createKeyboard(
             Map.of("/cancelcreatingnewcart", "Отменить создание"), 1, InlineKeyboardMarkup.class
         );

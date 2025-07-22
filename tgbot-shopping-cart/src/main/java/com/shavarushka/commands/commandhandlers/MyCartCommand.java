@@ -40,15 +40,10 @@ public class MyCartCommand extends AbstractTextCommand {
         Long userId = update.getMessage().getFrom().getId();
         String message;
         
-        Set<ShoppingCarts> carts = connection.getCartsAssignedToUser(userId);
-        
-        // check if user's carts empty
-        if (carts.isEmpty()) {
-            message = "У тебя нет ни одной корзины😔 \n/createnewcart чтобы создать";
-            sender.sendMessage(chatId, message, false);
+        if (!checkForUserExisting(chatId, userId) || !checkForCartExisting(chatId, userId))
             return;
-        }
         
+        Set<ShoppingCarts> carts = connection.getCartsAssignedToUser(userId);
         ShoppingCarts selectedCart = connection.getCartById(
                                     connection.getUserById(userId).selectedCartId());
 
@@ -72,17 +67,15 @@ public class MyCartCommand extends AbstractTextCommand {
         public void execute(Update update) throws TelegramApiException {
             Long chatId = update.getCallbackQuery().getMessage().getChatId();
             Long userId = update.getCallbackQuery().getFrom().getId();
+            
+            if (!checkForUserExisting(chatId, userId) || !checkForCartExisting(chatId, userId))
+                return;
+
             Integer messageId = update.getCallbackQuery().getMessage().getMessageId();
             Long newSelectedCartId = extractIdFromMessage(update.getCallbackQuery().getData());
-            String message;
-            Set<ShoppingCarts> carts = connection.getCartsAssignedToUser(userId);
             
             if (connection.getCartById(newSelectedCartId) == null) {
                 // skip if cart doesn't exist
-            } else if (carts.isEmpty()) {
-                message = "У тебя нет ни одной корзины😔 \n/createnewcart чтобы создать";
-                sender.sendMessage(chatId, message, false);
-                return;
             } else if (isThisCartAlreadySelected(userId, newSelectedCartId)) {
                 // skip
             } else if (!isThisCartAssignedToUser(newSelectedCartId, userId)) {
@@ -93,10 +86,6 @@ public class MyCartCommand extends AbstractTextCommand {
                 notifyCartSelectionListeners(userId, newSelectedCartId);
             }
 
-            // newSelectedCartId = connection.getUserById(userId).selectedCartId();
-            // message = "Ваши корзины:";
-            // InlineKeyboardMarkup keyboard = getKeyboardForMyCart(carts, newSelectedCartId);
-            // sender.editMessage(chatId, messageId, message, keyboard, false);
             sender.deleteMessage(chatId, messageId);
         }
 

@@ -29,11 +29,16 @@ public class DeleteCartCallback extends AbstractCallbackCommand {
     @Override
     public void execute(Update update) throws TelegramApiException {
         Long chatId = update.getCallbackQuery().getMessage().getChatId();
+        Long userId = update.getCallbackQuery().getFrom().getId();
+        String message;
+    
+        if (!checkForUserExisting(chatId, userId) || !checkForCartExisting(chatId, userId))
+            return;
+
         Integer messageId = update.getCallbackQuery().getMessage().getMessageId();
         Long cartForDeletionId = extractIdFromMessage(update.getCallbackQuery().getData());
         ShoppingCarts cart = connection.getCartById(cartForDeletionId);
         Users user = connection.getUserById(update.getCallbackQuery().getFrom().getId());
-        String message;
         
         if (connection.getCartById(cartForDeletionId) == null) {
             // skip if cart doesn't exist
@@ -58,7 +63,6 @@ public class DeleteCartCallback extends AbstractCallbackCommand {
             sender.sendMessage(chatId, message, confirmationKeyboard, true);
             sender.deleteMessage(chatId, messageId);
         }
-        // updateMyCartInfo(user.userId(), user.selectedCartId(), chatId, messageId);
     }
 
     private boolean isThisCartAssignedToUser(Long cartId, Long userId) {
@@ -70,25 +74,4 @@ public class DeleteCartCallback extends AbstractCallbackCommand {
         }
         return false;
     }
-
-    // private void updateMyCartInfo(Long userId, Long selectedCartId, Long chatId, Integer messageId) throws TelegramApiException {
-    //     Set<ShoppingCarts> carts = connection.getCartsAssignedToUser(userId);
-    //     String message = "Ваши корзины:";
-    //     InlineKeyboardMarkup keyboard = getKeyboardForMyCart(carts, selectedCartId);
-    //     sender.editMessage(chatId, messageId, message, keyboard, false);
-    // }
-
-    // private InlineKeyboardMarkup getKeyboardForMyCart(Set<ShoppingCarts> carts, Long selectedCartId) {
-    //     Map<String, String> buttons = new LinkedHashMap<>();
-    //     carts.stream()
-    //         .sorted(Comparator.comparing(ShoppingCarts::creationTime))
-    //         .forEach(cart -> {
-    //             String cartName = cart.cartId().equals(selectedCartId) 
-    //                 ? "✅ " + cart.cartName() 
-    //                 : cart.cartName();
-    //             buttons.put("/setcart_" + cart.cartId(), cartName);
-    //             buttons.put("/deletecart_" + cart.cartId(), "🗑");
-    //         });
-    //     return KeyboardsFabrics.createKeyboard(buttons, 2, InlineKeyboardMarkup.class);
-    // }
 }

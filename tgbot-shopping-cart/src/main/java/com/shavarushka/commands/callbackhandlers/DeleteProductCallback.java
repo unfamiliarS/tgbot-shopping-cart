@@ -28,24 +28,18 @@ public class DeleteProductCallback extends AbstractCallbackCommand {
     }
 
     @Override
-    public boolean shouldProcess(Update update) {
-        if (!update.hasCallbackQuery())
-            return false;
-
-        Long chatId = update.getCallbackQuery().getMessage().getChatId();
-        String callback = update.getCallbackQuery().getData();
-        return !userStates.containsKey(chatId) &&
-                callback.startsWith(getCommand().strip());
-    }
-
-    @Override
     public void execute(Update update) throws TelegramApiException {
         Long chatId = update.getCallbackQuery().getMessage().getChatId();
+        Long userId = update.getCallbackQuery().getFrom().getId();
+        String message;
+    
+        if (!checkForUserExisting(chatId, userId) || !checkForCartExisting(chatId, userId))
+            return;
+
         Integer messageId = update.getCallbackQuery().getMessage().getMessageId();
         Long productId = extractIdFromMessage(update.getCallbackQuery().getData());
         Users user = connection.getUserById(update.getCallbackQuery().getFrom().getId());
         Products product;
-        String message;
         
         if (!isProductExist(productId)) {
             sender.deleteMessage(chatId, messageId);

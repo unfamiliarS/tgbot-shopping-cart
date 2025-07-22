@@ -29,10 +29,14 @@ public class ConfirmInvitingCallback extends SelectedCartNotifierCallback {
     @Override
     public void execute(Update update) throws TelegramApiException {
         Long chatId = update.getCallbackQuery().getMessage().getChatId();
-        Integer messageId = update.getCallbackQuery().getMessage().getMessageId();
         Long userId = update.getCallbackQuery().getFrom().getId();
-        Long cartId = extractIdFromMessage(update.getCallbackQuery().getData());
         String message;
+    
+        if (!checkForUserExisting(chatId, userId))
+            return;
+
+        Integer messageId = update.getCallbackQuery().getMessage().getMessageId();
+        Long cartId = extractIdFromMessage(update.getCallbackQuery().getData());
 
         if (!isCartExist(cartId)) {
             message = "Такой корзины несуществует...😔 Возможно она была удалена🤔";

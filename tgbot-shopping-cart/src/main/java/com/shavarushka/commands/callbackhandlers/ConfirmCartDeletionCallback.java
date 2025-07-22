@@ -39,13 +39,14 @@ public class ConfirmCartDeletionCallback extends AbstractCallbackCommand {
         Long chatId = update.getCallbackQuery().getMessage().getChatId();
         Long userId = update.getCallbackQuery().getFrom().getId();
         Integer messageId = update.getCallbackQuery().getMessage().getMessageId();
+        String message;
         Long cartForDeletionId = extractIdFromMessage(update.getCallbackQuery().getData());
         String cartName = connection.getCartById(cartForDeletionId).cartName();
-        String message;
 
         if (connection.getUsersAssignedToCart(cartForDeletionId).size() <= 1) {
             deleteCartTheirCategoriesAndProducts(cartForDeletionId);
         }
+
         connection.deleteCartFromIntermediate(userId, cartForDeletionId);
         userStates.remove(chatId);
 

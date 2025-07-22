@@ -22,7 +22,6 @@ public class Bot implements LongPollingSingleThreadUpdateConsumer {
         try {
             commandManager.processUpdate(update);
         } catch (TelegramApiRequestException e) {
-        // TODO: Add button handling with the same value as "selected cart"
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }

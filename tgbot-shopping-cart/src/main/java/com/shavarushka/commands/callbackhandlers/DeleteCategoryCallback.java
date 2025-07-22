@@ -27,10 +27,15 @@ public class DeleteCategoryCallback extends AbstractCallbackCommand {
     @Override
     public void execute(Update update) throws TelegramApiException {
         Long chatId = update.getCallbackQuery().getMessage().getChatId();
+        Long userId = update.getCallbackQuery().getFrom().getId();
+        String message;
+    
+        if (!checkForUserExisting(chatId, userId) || !checkForCartExisting(chatId, userId))
+            return;
+
         Integer messageId = update.getCallbackQuery().getMessage().getMessageId();
         Long categoryId = extractIdFromMessage(update.getCallbackQuery().getData());
         Categories category;
-        String message;
 
         if (!isCategoryExist(categoryId)) {
             message = "Такой категории не существует🤔";

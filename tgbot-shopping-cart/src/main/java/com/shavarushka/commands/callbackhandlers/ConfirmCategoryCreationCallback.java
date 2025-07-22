@@ -45,10 +45,10 @@ public class ConfirmCategoryCreationCallback extends SelectedCartNotifierCallbac
         Long chatId = update.getCallbackQuery().getMessage().getChatId();
         Long userId = update.getCallbackQuery().getFrom().getId();
         Integer messageId = update.getCallbackQuery().getMessage().getMessageId();
+        String message;
 
         Users user = connection.getUserById(chatId);
         String categoryName = categoryNames.remove(userId);
-        String message;
         
         if (categoryName != null) {
             // create category

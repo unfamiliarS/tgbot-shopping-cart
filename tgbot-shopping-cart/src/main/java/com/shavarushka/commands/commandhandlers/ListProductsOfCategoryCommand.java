@@ -10,7 +10,6 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import com.shavarushka.commands.BotState;
 import com.shavarushka.commands.MessageSender;
 import com.shavarushka.commands.commandhandlers.interfaces.AbstractTextCommand;
-import com.shavarushka.commands.keyboard.KeyboardsFabrics;
 import com.shavarushka.database.SQLiteConnection;
 import com.shavarushka.database.entities.Categories;
 import com.shavarushka.database.entities.Products;
@@ -47,9 +46,13 @@ public class ListProductsOfCategoryCommand extends AbstractTextCommand {
     public void execute(Update update) throws TelegramApiException {
         Long chatId = update.getMessage().getChatId();
         Long userId = update.getMessage().getFrom().getId();
+        String message;
+        
+        if (!checkForUserExisting(chatId, userId) || !checkForCartExisting(chatId, userId))
+            return;
+
         String categoryName = update.getMessage().getText();
         Users user = connection.getUserById(userId);
-        String message;
 
         if (user.selectedCartId() == null) {
             message = "У тебя нет ни одной корзины😔 \n/createnewcart чтобы создать";
@@ -62,15 +65,7 @@ public class ListProductsOfCategoryCommand extends AbstractTextCommand {
         if (!products.isEmpty()) {
             InlineKeyboardMarkup keyboard;
             for (Products product : products) {
-                keyboard = KeyboardsFabrics.createKeyboard(
-                Map.of(
-                    "/purchasestatus_" + product.productId(), product.productPurchaseStatusAsString(),
-                    "/changecategoryfor_" + product.productId(), "Сменить категорию",
-                    "/deleteproduct_" + product.productId(), "🗑"
-                ), 
-                2,
-                InlineKeyboardMarkup.class
-            );
+                keyboard = getProductKeyboard(product);
                 sender.sendMessage(chatId, product.fullURL(), keyboard, false);
             }
         } else {

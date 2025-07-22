@@ -35,11 +35,20 @@ public class DeleteCategoryCommand extends AbstractTextCommand {
     public void execute(Update update) throws TelegramApiException {
         Long chatId = update.getMessage().getChatId();
         Long userId = update.getMessage().getFrom().getId();
-        Long selectedCartId = connection.getUserById(userId).selectedCartId();
         String message;
+        
+        if (!checkForUserExisting(chatId, userId) || !checkForCartExisting(chatId, userId))
+            return;
 
-        message = "Выбери какую корзину хочешь удалить";
-        var keyboard = getKeyboardWithCategoriesWithoutDefault(connection.getCategoriesByCartId(selectedCartId));
+        Long selectedCartId = connection.getUserById(userId).selectedCartId();
+        Set<Categories> categories = connection.getCategoriesByCartId(selectedCartId);
+        if (categories.size() <= 1) {
+            message = "У тебя нет ни одной категории, которую можно удалить";
+            sender.sendMessage(chatId, message, false);
+            return;
+        }
+        message = "Выбери какую категорию хочешь удалить";
+        var keyboard = getKeyboardWithCategoriesWithoutDefault(categories);
         sender.sendMessage(chatId, message, keyboard, false);
     }
 

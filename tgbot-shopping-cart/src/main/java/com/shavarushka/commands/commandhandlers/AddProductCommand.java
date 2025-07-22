@@ -13,7 +13,6 @@ import com.shavarushka.commands.BotState;
 import com.shavarushka.commands.MessageSender;
 import com.shavarushka.commands.commandhandlers.interfaces.SelectedCartNotifierCommand;
 import com.shavarushka.commands.keyboard.CartSelectionListener;
-import com.shavarushka.commands.keyboard.KeyboardsFabrics;
 import com.shavarushka.database.SQLiteConnection;
 import com.shavarushka.database.entities.Categories;
 import com.shavarushka.database.entities.Products;
@@ -43,7 +42,6 @@ public class AddProductCommand extends SelectedCartNotifierCommand {
         Long chatId = update.getMessage().getChatId();
         String message = update.getMessage().getText();
         String regexURL = "(?s).*https?://.*";
-        System.out.println(message.matches(regexURL));
         return !userStates.containsKey(chatId) &&
                 message.matches(regexURL);
     }
@@ -52,17 +50,16 @@ public class AddProductCommand extends SelectedCartNotifierCommand {
     public void execute(Update update) throws TelegramApiException {
         Long chatId = update.getMessage().getChatId();
         Long userId = update.getMessage().getFrom().getId();
+        String message;
+    
+        if (!checkForUserExisting(chatId, userId) || !checkForCartExisting(chatId, userId))
+            return;
+
         String productURL = extractUrlFromMessage(update.getMessage().getText().strip());
         Users user = connection.getUserById(userId);
         boolean isNeedToNotify = false;
-        String message;
         
         Long cartId = user.selectedCartId();
-        if (cartId == null) {
-            message = "У тебя нет ни одной корзины😔 \n/createnewcart чтобы создать";
-            sender.sendMessage(chatId, message, false);
-            return;
-        }
         if (productURL.isEmpty()) {
             System.out.println("don't find url from message");
             return;
@@ -108,16 +105,9 @@ public class AddProductCommand extends SelectedCartNotifierCommand {
                 notifyCartSelectionListeners(userId, cartId);
 
             if (productId != null) {
+                product = connection.getProductById(productId);
                 message = "Товар успешно добавлен в категорию *Прочее* 😎\n" + MessageSender.escapeMarkdownV2(productURL);
-                InlineKeyboardMarkup keyboard = KeyboardsFabrics.createKeyboard(
-                    Map.of(
-                        "/purchasestatus_" + productId, product.productPurchaseStatusAsString(),
-                        "/changecategoryfor_" + productId, "Сменить категорию",
-                        "/deleteproduct_" + productId, "🗑"
-                    ),
-                    2,
-                    InlineKeyboardMarkup.class
-                );
+                InlineKeyboardMarkup keyboard = getProductKeyboard(product);
                 sender.sendMessage(chatId, message, keyboard, true);
             } else {
                 sender.sendMessage(chatId, "Ошибка при добавлении товара", false);

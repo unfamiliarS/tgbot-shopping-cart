@@ -40,8 +40,13 @@ public class AddCategoryCommand extends SelectedCartNotifierCommand {
     @Override
     public void execute(Update update) throws TelegramApiException {
         Long chatId = update.getMessage().getChatId();
+        Long userId = update.getMessage().getFrom().getId();
+        String message;
+    
+        if (!checkForUserExisting(chatId, userId) || !checkForCartExisting(chatId, userId))
+            return;
 
-        String message = getDescription() + "\n\nВведи название категории:";
+        message = getDescription() + "\n\nВведи название категории:";
         InlineKeyboardMarkup keyboard = KeyboardsFabrics.createKeyboard(
             Map.of("/cancelcreatingcategory", "Отменить создание"), 1, InlineKeyboardMarkup.class
         );

@@ -34,14 +34,9 @@ public class InviteUserCommand extends AbstractTextCommand {
     public void execute(Update update) throws TelegramApiException {
         Long chatId = update.getMessage().getChatId();
         Long userId = update.getMessage().getFrom().getId();
-        String message;
-        
-        // check if user's carts empty
-        if (connection.getCartsAssignedToUser(userId).isEmpty()) {
-            message = "У тебя нет ни одной корзины😔 \n/createnewcart чтобы создать";
-            sender.sendMessage(chatId, message, false);
+    
+        if (!checkForUserExisting(chatId, userId) || !checkForCartExisting(chatId, userId))
             return;
-        }
 
         sender.sendMessage(chatId, 
                 "Введи @имя_пользователя, которого хочешь пригласить в свою корзину:",

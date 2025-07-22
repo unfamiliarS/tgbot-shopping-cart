@@ -43,9 +43,10 @@ public class ConfirmCartCreationCallback extends SelectedCartNotifierCallback {
     @Override
     public void execute(Update update) throws TelegramApiException {
         Long chatId = update.getCallbackQuery().getMessage().getChatId();
+        Long userId = update.getCallbackQuery().getFrom().getId();
         Integer messageId = update.getCallbackQuery().getMessage().getMessageId();
         String cartName = cartNames.remove(chatId);
-        Users user = connection.getUserById(update.getCallbackQuery().getFrom().getId());
+        Users user = connection.getUserById(userId);
         
         if (cartName != null) {
             // create shopping cart

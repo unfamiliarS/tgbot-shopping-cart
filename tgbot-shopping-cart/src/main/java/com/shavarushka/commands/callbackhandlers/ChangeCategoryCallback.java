@@ -33,21 +33,18 @@ public class ChangeCategoryCallback extends AbstractCallbackCommand {
     public void execute(Update update) throws TelegramApiException {
         Long chatId = update.getCallbackQuery().getMessage().getChatId();
         Long userId = update.getCallbackQuery().getFrom().getId();
+        String message;
+        
+        if (!checkForUserExisting(chatId, userId) || !checkForCartExisting(chatId, userId))
+            return;
+        
         Integer messageId = update.getCallbackQuery().getMessage().getMessageId();
         Users user = connection.getUserById(userId);
         Long productId = extractIdFromMessage(update.getCallbackQuery().getData());
         Products product;
-        String message;
         
-        if (user.selectedCartId() == null) {
-            message = "У тебя нет ни одной корзины😔 \n/createnewcart чтобы создать";
-            sender.sendMessage(chatId, message, false);
+        if (!checkForProductExisting(chatId, messageId, productId))
             return;
-        }
-        if (!isProductExist(productId)) {
-            sender.deleteMessage(chatId, messageId);
-            return;
-        }
 
         product = connection.getProductById(productId);
         message = product.fullURL() + "\n";
@@ -59,10 +56,6 @@ public class ChangeCategoryCallback extends AbstractCallbackCommand {
             product.assignedCategoryId()
         );
         sender.editMessage(chatId, messageId, message, keyboard, false);
-    }
-
-    private boolean isProductExist(Long productId) {
-        return connection.getProductById(productId) != null;
     }
 
     private InlineKeyboardMarkup getKeyboardWithCategories(Set<Categories> categories, Long productId, Long assignedCategoryId) {
@@ -91,6 +84,12 @@ public class ChangeCategoryCallback extends AbstractCallbackCommand {
         @Override
         public void execute(Update update) throws TelegramApiException {
             Long chatId = update.getCallbackQuery().getMessage().getChatId();
+            Long userId = update.getCallbackQuery().getFrom().getId();
+            String message;
+        
+            if (!checkForUserExisting(chatId, userId) || !checkForCartExisting(chatId, userId))
+                return;
+
             Long[] categoryId_productId = extractTwoIdFromMessage(update.getCallbackQuery().getData());
             Long categoryId = categoryId_productId[0];
             Long productId = categoryId_productId[1];
@@ -99,19 +98,10 @@ public class ChangeCategoryCallback extends AbstractCallbackCommand {
 
             if (product != null && connection.getCategoryById(categoryId) != null) {
                 if (categoryId.equals(product.assignedCategoryId())) {
-                    String message = product.fullURL();
-                    var keyboard = KeyboardsFabrics.createKeyboard(
-                        Map.of(
-                            "/purchasestatus_" + productId, product.productPurchaseStatusAsString(),
-                            "/changecategoryfor_" + productId, "Сменить категорию",
-                            "/deleteproduct_" + productId, "🗑"
-                        ),
-                        2,
-                        InlineKeyboardMarkup.class
-                    );
+                    message = product.fullURL();
+                    var keyboard = getProductKeyboard(product);
                     sender.editMessage(chatId, messageId, message, keyboard, false);
                 } else if (connection.updateCategoryForProduct(productId, categoryId)) {
-                    System.out.println("Category was changed");
                     sender.deleteMessage(chatId, messageId);
                 }                
             } else {

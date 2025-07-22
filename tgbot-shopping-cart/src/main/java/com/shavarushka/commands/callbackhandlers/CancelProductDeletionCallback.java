@@ -3,13 +3,11 @@ package com.shavarushka.commands.callbackhandlers;
 import java.util.Map;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.shavarushka.commands.BotState;
 import com.shavarushka.commands.MessageSender;
 import com.shavarushka.commands.callbackhandlers.interfaces.AbstractCancelCallback;
-import com.shavarushka.commands.keyboard.KeyboardsFabrics;
 import com.shavarushka.database.SQLiteConnection;
 import com.shavarushka.database.entities.Products;
 
@@ -38,18 +36,11 @@ public class CancelProductDeletionCallback extends AbstractCancelCallback {
 
     @Override
     public void execute(Update update) throws TelegramApiException {
+        String message;
         Long productId = extractIdFromMessage(update.getCallbackQuery().getData());
         Products product = connection.getProductById(productId);
-        String message = connection.getProductById(productId).fullURL();
-        var keyboard = KeyboardsFabrics.createKeyboard(
-            Map.of(
-                "/purchasestatus_" + productId, product.productPurchaseStatusAsString(),
-                "/changecategoryfor_" + productId, "Сменить категорию",
-                "/deleteproduct_" + productId, "🗑"
-            ), 
-            2,
-            InlineKeyboardMarkup.class
-        );
+        message = connection.getProductById(productId).fullURL();
+        var keyboard = getProductKeyboard(product);
 
         processCanceling(update, message, keyboard);
     }
