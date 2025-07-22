@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS products (
     assigned_category_id INTEGER NOT NULL,
     product_name TEXT,
     product_price INTEGER,
+    product_purchase_status BOOLEAN NOT NULL CHECK (product_purchase_status IN (0, 1)),
     adding_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (assigned_category_id) REFERENCES categories(category_id) ON UPDATE CASCADE ON DELETE CASCADE
 );"

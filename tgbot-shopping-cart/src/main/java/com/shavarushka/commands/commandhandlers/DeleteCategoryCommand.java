@@ -39,19 +39,18 @@ public class DeleteCategoryCommand extends AbstractTextCommand {
         String message;
 
         message = "Выбери какую корзину хочешь удалить";
-        var keyboard = getKeyboardWithCategories(connection.getCategoriesByCartId(selectedCartId));
+        var keyboard = getKeyboardWithCategoriesWithoutDefault(connection.getCategoriesByCartId(selectedCartId));
         sender.sendMessage(chatId, message, keyboard, false);
     }
 
-    private InlineKeyboardMarkup getKeyboardWithCategories(Set<Categories> categories) {
+    private InlineKeyboardMarkup getKeyboardWithCategoriesWithoutDefault(Set<Categories> categories) {
         Map<String, String> buttons = new LinkedHashMap<>();
         categories.stream()
             .sorted(Comparator.comparing(Categories::creationTime))
+            .filter(category -> !category.categoryName().equals("Прочее"))
             .forEach(category -> {
                 buttons.put("/deletecategory_" + category.categoryId(), "🗑 " + category.categoryName());
             });
-        return KeyboardsFabrics.createKeyboard(buttons,1, InlineKeyboardMarkup.class);
+        return KeyboardsFabrics.createKeyboard(buttons,2, InlineKeyboardMarkup.class);
     }
-
-
 }

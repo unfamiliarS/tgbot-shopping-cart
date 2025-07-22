@@ -44,6 +44,10 @@ public class KeyboardsFabrics {
             }
         }
         
+        if (!currentRow.isEmpty()) {
+            keyboardRows.add(currentRow);
+        }
+        
         return InlineKeyboardMarkup
                 .builder()
                 .keyboard(keyboardRows)

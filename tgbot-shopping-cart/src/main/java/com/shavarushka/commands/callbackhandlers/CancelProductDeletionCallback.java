@@ -11,6 +11,7 @@ import com.shavarushka.commands.MessageSender;
 import com.shavarushka.commands.callbackhandlers.interfaces.AbstractCancelCallback;
 import com.shavarushka.commands.keyboard.KeyboardsFabrics;
 import com.shavarushka.database.SQLiteConnection;
+import com.shavarushka.database.entities.Products;
 
 public class CancelProductDeletionCallback extends AbstractCancelCallback {
     public CancelProductDeletionCallback(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
@@ -38,11 +39,12 @@ public class CancelProductDeletionCallback extends AbstractCancelCallback {
     @Override
     public void execute(Update update) throws TelegramApiException {
         Long productId = extractIdFromMessage(update.getCallbackQuery().getData());
-        
+        Products product = connection.getProductById(productId);
         String message = connection.getProductById(productId).fullURL();
         InlineKeyboardMarkup keyboard = KeyboardsFabrics.createKeyboard(
             Map.of(
-                "/changecategory", "Сменить категорию",
+                "/purchasestatus", product.productPurchaseStatusAsString(),
+                "/changecategoryfor_" + productId, "Сменить категорию",
                 "/deleteproduct_" + productId, "🗑"
             ), 
             2,

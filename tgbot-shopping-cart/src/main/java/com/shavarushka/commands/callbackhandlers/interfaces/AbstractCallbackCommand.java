@@ -27,6 +27,18 @@ public abstract class AbstractCallbackCommand extends AbstractCommand {
     }
 
     protected Long extractIdFromMessage(String message) {
+        // parse string of type: /command_firstId
         return Long.parseLong(message.substring(getCommand().length()));
+    }
+
+    protected Long[] extractTwoIdFromMessage(String message) {
+        // parse string of type: /command_firstId_secondId
+        Long[] result = new Long[2];
+        String firstStep = message.substring(getCommand().length());
+        String[] strResult = firstStep.split("_");
+        for (int i = 0; i < result.length; i++) {
+            result[i] = Long.parseLong(strResult[i]);
+        }
+        return result;
     }
 }

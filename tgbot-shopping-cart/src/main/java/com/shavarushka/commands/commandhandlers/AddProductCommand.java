@@ -86,14 +86,16 @@ public class AddProductCommand extends SelectedCartNotifierCommand {
                 defaultCategoryId = defaultCategory.categoryId();
             }
             
-            Long productId = connection.addProduct(new Products(
-                                                null,
-                                                productURL,
-                                                defaultCategoryId,
-                                                null,
-                                                null,
-                                                null)
+            product = new Products(
+                                null,
+                                productURL,
+                                defaultCategoryId,
+                                null,
+                                null,
+                                false,
+                                null
             );
+            Long productId = connection.addProduct(product);
 
             if (isNeedToNotify)
                 notifyCartSelectionListeners(userId, cartId);
@@ -102,7 +104,8 @@ public class AddProductCommand extends SelectedCartNotifierCommand {
                 message = "Товар успешно добавлен в категорию *Прочее* 😎\n" + MessageSender.escapeMarkdownV2(productURL);
                 InlineKeyboardMarkup keyboard = KeyboardsFabrics.createKeyboard(
                     Map.of(
-                        "/changecategory", "Сменить категорию",
+                        "/purchasestatus", product.productPurchaseStatusAsString(),
+                        "/changecategoryfor_" + productId, "Сменить категорию",
                         "/deleteproduct_" + productId, "🗑"
                     ),
                     2,

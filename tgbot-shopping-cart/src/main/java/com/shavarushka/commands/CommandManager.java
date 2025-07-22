@@ -63,6 +63,9 @@ public class CommandManager {
         registerCommand(new DeleteCategoryCallback(sender, userStates, connection));
         registerCommand(new ConfirmCategoryDeletionCallback(sender, userStates, connection, selectedCartsListeners));
         registerCommand(new CancelCategoryDeletionCallback(sender, userStates, connection));
+        var changecategory = new ChangeCategoryCallback(sender, userStates, connection);
+        registerCommand(changecategory);
+        registerCommand(changecategory.new ConfirmCategoryChangingCallback(sender, userStates, connection));
 
         // create a ReplyKeyboardHandler for correct updating keyboard on cart changes
         new ReplyKeyboardHandler(sender, connection, confirmInvitingCallback);

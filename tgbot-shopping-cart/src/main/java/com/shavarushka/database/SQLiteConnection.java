@@ -214,6 +214,7 @@ final public class SQLiteConnection implements DBConnection {
                     rs.getLong("assigned_category_id") != 0 ? rs.getLong("assigned_category_id") : null,
                     rs.getString("product_name"),
                     rs.getInt("product_price") != 0 ? rs.getInt("product_price") : null,
+                    rs.getBoolean("product_purchase_status"),
                     rs.getTimestamp("adding_time")
                 );
             return null;
@@ -240,6 +241,7 @@ final public class SQLiteConnection implements DBConnection {
                     rs.getLong("assigned_category_id") != 0 ? rs.getLong("assigned_category_id") : null,
                     rs.getString("product_name"),
                     rs.getInt("product_price") != 0 ? rs.getInt("product_price") : null,
+                    rs.getBoolean("product_purchase_status"),
                     rs.getTimestamp("adding_time")
                 );
             }
@@ -263,6 +265,7 @@ final public class SQLiteConnection implements DBConnection {
                     rs.getLong("assigned_category_id") != 0 ? rs.getLong("assigned_category_id") : null,
                     rs.getString("product_name"),
                     rs.getInt("product_price") != 0 ? rs.getInt("product_price") : null,
+                    rs.getBoolean("product_purchase_status"),
                     rs.getTimestamp("adding_time"))
                 );
             }
@@ -348,10 +351,11 @@ final public class SQLiteConnection implements DBConnection {
     }
 
     public Long addProduct(Products product) {
-        String query = "INSERT INTO products (full_url, assigned_category_id) VALUES (?, ?)";
+        String query = "INSERT INTO products (full_url, assigned_category_id, product_purchase_status) VALUES (?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, product.fullURL());
             statement.setLong(2, product.assignedCategoryId());
+            statement.setBoolean(3, product.productPurchaseStatus());
             statement.executeUpdate();
             try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
@@ -373,6 +377,19 @@ final public class SQLiteConnection implements DBConnection {
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setLong(1, cartId);
             statement.setLong(2, userId);
+            int affectedRows = statement.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean updateCategoryForProduct(Long productId, Long categoryId) {
+        String query = "UPDATE OR IGNORE products SET assigned_category_id = ? WHERE product_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, categoryId);
+            statement.setLong(2, productId);
             int affectedRows = statement.executeUpdate();
             return affectedRows > 0;
         } catch (SQLException e) {
