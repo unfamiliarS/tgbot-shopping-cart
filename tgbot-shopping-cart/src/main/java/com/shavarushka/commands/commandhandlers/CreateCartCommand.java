@@ -12,6 +12,7 @@ import com.shavarushka.commands.MessageSender;
 import com.shavarushka.commands.commandhandlers.interfaces.AbstractTextCommand;
 import com.shavarushka.commands.keyboard.KeyboardsFabrics;
 import com.shavarushka.database.SQLiteConnection;
+import com.shavarushka.database.entities.ShoppingCarts;
 import com.vdurmont.emoji.EmojiManager;
 import com.vdurmont.emoji.EmojiParser;
 
@@ -77,15 +78,17 @@ public class CreateCartCommand extends AbstractTextCommand {
         @Override
         public void execute(Update update) throws TelegramApiException {
             Long chatId = update.getMessage().getChatId();
+            Long userId = update.getMessage().getFrom().getId();
             String cartName = update.getMessage().getText();
             String message;
             
-            if (!isCorrectName(cartName)) {
-                message = "Некорректное название для корзины. Попробуй ещё раз.";
-                sender.sendMessage(chatId, message,
-                    KeyboardsFabrics.createKeyboard(
-                        Map.of("/cancelcreatingnewcart", "Отменить создание"),
-                        1, InlineKeyboardMarkup.class), false);
+            if (isCartAlreadyExist(userId, cartName)) {
+                message = "Корзина с таким названием уже существует 😔 Попробуй ещё раз 🔄";
+                sender.sendMessage(chatId, message, false);
+                return;
+            } else if (!isCorrectName(cartName)) {
+                message = "Некорректное название для корзины 😔 Попробуй ещё раз 🔄";
+                sender.sendMessage(chatId, message, false);
                 return;
             }
 
@@ -130,6 +133,14 @@ public class CreateCartCommand extends AbstractTextCommand {
         private boolean isPureEmoji(String str) {
             String textWithoutEmoji = EmojiParser.removeAllEmojis(str);
             return textWithoutEmoji.isEmpty();
+        }
+
+        private boolean isCartAlreadyExist(Long userId, String newCartName) {
+            for (ShoppingCarts cart : connection.getCartsAssignedToUser(userId)) {
+                if (newCartName.equals(cart.cartName()))
+                    return true;
+            }
+            return false;
         }
     }
 }

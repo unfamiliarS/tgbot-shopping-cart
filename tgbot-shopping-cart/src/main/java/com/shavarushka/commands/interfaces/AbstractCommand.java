@@ -1,5 +1,6 @@
 package com.shavarushka.commands.interfaces;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -42,15 +43,11 @@ public abstract class AbstractCommand implements BotCommand {
     }
 
     protected InlineKeyboardMarkup getProductKeyboard(Products product) {
-        return KeyboardsFabrics.createKeyboard(
-                Map.of(
-                    "/purchasestatus_" + product.productId(), product.productPurchaseStatusAsString(),
-                    "/changecategoryfor_" + product.productId(), "🔄 Сменить категорию",
-                    "/deleteproduct_" + product.productId(), "🗑 Удалить"
-                ),
-                3,
-                InlineKeyboardMarkup.class
-            );
+        Map<String, String> buttons = new LinkedHashMap<>();
+        buttons.put("/deleteproduct_" + product.productId(), "🗑 Удалить");
+        buttons.put("/purchasestatus_" + product.productId(), product.productPurchaseStatusAsString());
+        buttons.put("/changecategoryfor_" + product.productId(), "🔄 Сменить категорию");
+        return KeyboardsFabrics.createKeyboard(buttons, 2, InlineKeyboardMarkup.class);
     }
 
     // base check ups

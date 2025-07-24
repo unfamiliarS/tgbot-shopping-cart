@@ -15,6 +15,7 @@ import com.shavarushka.commands.commandhandlers.interfaces.SelectedCartNotifierC
 import com.shavarushka.commands.keyboard.CartSelectionListener;
 import com.shavarushka.commands.keyboard.KeyboardsFabrics;
 import com.shavarushka.database.SQLiteConnection;
+import com.shavarushka.database.entities.Categories;
 import com.vdurmont.emoji.EmojiManager;
 import com.vdurmont.emoji.EmojiParser;
 
@@ -81,16 +82,18 @@ public class AddCategoryCommand extends SelectedCartNotifierCommand {
         @Override
         public void execute(Update update) throws TelegramApiException {
             Long chatId = update.getMessage().getChatId();
+            Long userId = update.getMessage().getFrom().getId();
+            Long selectedCartId = connection.getUserById(userId).selectedCartId();
             String categoryName = update.getMessage().getText();
             String message;
-            
-            if (!isCorrectName(categoryName)) {
-                message = "Некорректное название для категории. Попробуй ещё раз.";
-                var keyboard = KeyboardsFabrics.createKeyboard(
-                        Map.of("/cancelcreatingcategory", "Отменить создание"),
-                        1, InlineKeyboardMarkup.class
-                ); 
-                sender.sendMessage(chatId, message, keyboard, false);
+
+            if (isCategoryAlreadyExist(selectedCartId, categoryName)) {
+                message = "Категория с таким названием уже существует 😔 Попробуй ещё раз 🔄";
+                sender.sendMessage(chatId, message, false);
+                return;
+            } else if (!isCorrectName(categoryName)) {
+                message = "Некорректное название для категории 😔 Попробуй ещё раз 🔄";
+                sender.sendMessage(chatId, message, false);
                 return;
             }
 
@@ -104,37 +107,48 @@ public class AddCategoryCommand extends SelectedCartNotifierCommand {
             sender.sendMessage(chatId, message, confirmationKeyboard, true);
         }
 
-        private boolean isCorrectName(String cartName) {
+        private boolean isCorrectName(String name) {
             // not null and not empty check
-            if (cartName == null || cartName.strip().isEmpty()) {
+            if (name == null || name.strip().isEmpty()) {
                 return false;
             }
             // length check
-            if (cartName.length() > 43) {
+            if (name.length() > 43) {
                 return false;
             }
 
             // check for allowed chars
-            if (isPureEmoji(cartName)) {
+            if (isPureEmoji(name)) {
                 return true;
             }
             String allowedCharsRegex = "^[a-zA-Zа-яА-ЯёЁ0-9\\s\\-_,.!()]+$";
-            if (EmojiManager.containsEmoji(cartName)) {
-                String textWithoutEmoji = EmojiParser.removeAllEmojis(cartName);
+            if (EmojiManager.containsEmoji(name)) {
+                String textWithoutEmoji = EmojiParser.removeAllEmojis(name);
                 if (textWithoutEmoji.matches(allowedCharsRegex)) {
                     return true;
                 }
             }
-            if (cartName.matches(allowedCharsRegex)) {
+            if (name.matches(allowedCharsRegex)
+                && !name.equals("Удалить категорию")
+                && !name.equals("Создать категорию")) {
                 return true;
             }
 
+            
             return false;
         }
 
         private boolean isPureEmoji(String str) {
             String textWithoutEmoji = EmojiParser.removeAllEmojis(str);
             return textWithoutEmoji.isEmpty();
+        }
+
+        private boolean isCategoryAlreadyExist(Long currentCartId, String newCategoryName) {
+            for (Categories category : connection.getCategoriesByCartId(currentCartId)) {
+                if (newCategoryName.equals(category.categoryName()))
+                    return true;
+            }
+            return false;
         }
     }
 }

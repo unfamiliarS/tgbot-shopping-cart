@@ -42,24 +42,24 @@ public class DeleteCategoryCommand extends AbstractTextCommand {
 
         Long selectedCartId = connection.getUserById(userId).selectedCartId();
         Set<Categories> categories = connection.getCategoriesByCartId(selectedCartId);
-        if (categories.size() <= 1) {
+        if (categories.size() == 0) {
             message = "У тебя нет ни одной категории, которую можно удалить";
             sender.sendMessage(chatId, message, false);
             return;
         }
         message = "Выбери какую категорию хочешь удалить";
-        var keyboard = getKeyboardWithCategoriesWithoutDefault(categories);
+        var keyboard = getKeyboardWithCategories(categories);
         sender.sendMessage(chatId, message, keyboard, false);
     }
 
-    private InlineKeyboardMarkup getKeyboardWithCategoriesWithoutDefault(Set<Categories> categories) {
+    private InlineKeyboardMarkup getKeyboardWithCategories(Set<Categories> categories) {
         Map<String, String> buttons = new LinkedHashMap<>();
         categories.stream()
             .sorted(Comparator.comparing(Categories::creationTime))
-            .filter(category -> !category.categoryName().equals("Прочее"))
             .forEach(category -> {
                 buttons.put("/deletecategory_" + category.categoryId(), "🗑 " + category.categoryName());
             });
-        return KeyboardsFabrics.createKeyboard(buttons,2, InlineKeyboardMarkup.class);
+            buttons.put("/close", "❌ Отменить");
+        return KeyboardsFabrics.createKeyboard(buttons,1, InlineKeyboardMarkup.class);
     }
 }

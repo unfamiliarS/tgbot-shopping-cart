@@ -46,7 +46,6 @@ public class ListProductsOfCategoryCommand extends AbstractTextCommand {
     public void execute(Update update) throws TelegramApiException {
         Long chatId = update.getMessage().getChatId();
         Long userId = update.getMessage().getFrom().getId();
-        String message;
         
         if (!checkForUserExisting(chatId, userId) || !checkForCartExisting(chatId, userId))
             return;
@@ -54,18 +53,11 @@ public class ListProductsOfCategoryCommand extends AbstractTextCommand {
         String categoryName = update.getMessage().getText();
         Users user = connection.getUserById(userId);
 
-        if (user.selectedCartId() == null) {
-            message = "У тебя нет ни одной корзины😔 \n/createnewcart чтобы создать";
-            sender.sendMessage(chatId, message, false);
-            return;
-        }
-
         Long categoryId = connection.getCategoryByAssignedCartIdAndName(user.selectedCartId(), categoryName).categoryId();
         Set<Products> products = connection.getProductsByCategoryId(categoryId);
         if (!products.isEmpty()) {
-            InlineKeyboardMarkup keyboard;
             for (Products product : products) {
-                keyboard = getProductKeyboard(product);
+                var keyboard = getProductKeyboard(product);
                 sender.sendMessage(chatId, product.fullURL(), keyboard, false);
             }
         } else {

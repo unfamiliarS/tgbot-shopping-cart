@@ -35,7 +35,6 @@ public class DeleteCartCallback extends AbstractCallbackCommand {
         if (!checkForUserExisting(chatId, userId) || !checkForCartExisting(chatId, userId))
             return;
 
-        Integer messageId = update.getCallbackQuery().getMessage().getMessageId();
         Long cartForDeletionId = extractIdFromMessage(update.getCallbackQuery().getData());
         ShoppingCarts cart = connection.getCartById(cartForDeletionId);
         Users user = connection.getUserById(update.getCallbackQuery().getFrom().getId());
@@ -54,14 +53,14 @@ public class DeleteCartCallback extends AbstractCallbackCommand {
                         + "\nПодумай хорошенько🤔";
             }
     
-            ReplyKeyboard confirmationKeyboard = KeyboardsFabrics.createKeyboard(
-                                            Map.of("/confirmcartdeletion_" + cartForDeletionId, "✅ Подтвердить",
-                                                    "/cancelcartdeletion", "❌ Отменить"),
-                                                    2, InlineKeyboardMarkup.class);
+            var confirmationKeyboard = KeyboardsFabrics.createKeyboard(
+                Map.of("/confirmcartdeletion_" + cartForDeletionId, "✅ Подтвердить",
+                        "/cancelcartdeletion", "❌ Отменить"),
+                        2, InlineKeyboardMarkup.class
+            );
     
             userStates.put(chatId, BotState.CONFIRMING_CART_DELETION);
             sender.sendMessage(chatId, message, confirmationKeyboard, true);
-            sender.deleteMessage(chatId, messageId);
         }
     }
 

@@ -82,7 +82,7 @@ public class InviteUserCommand extends AbstractTextCommand {
             String message;
 
             if (!isCorrectUsername(usernameToInvite)) {
-                message = "Некорректное имя пользователя, оно должно начинаться с @.\nПопробуй ещё раз.";
+                message = "Некорректное имя пользователя.\nПопробуй ещё раз.";
                 sender.sendMessage(chatId, message,
                     KeyboardsFabrics.createKeyboard(
                         Map.of("/cancelinvitinguser", "Отменить ввод"),

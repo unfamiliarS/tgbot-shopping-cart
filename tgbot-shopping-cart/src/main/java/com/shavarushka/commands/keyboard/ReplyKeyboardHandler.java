@@ -1,6 +1,7 @@
 package com.shavarushka.commands.keyboard;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
@@ -60,23 +61,30 @@ public class ReplyKeyboardHandler implements CartSelectionListener {
     }
 
     private Map<String, String> getCategories(Long cartId) {
-        Map<String, String> result = new HashMap<>();
-        int cntr = 0; 
+        Map<String, String> result = new LinkedHashMap<>();
+        int cntr = 0;
+        Categories defCategory = null;
         for (Categories category : connection.getCategoriesByCartId(cartId)) {
+            if (category.categoryName().equals("Прочее")) {
+                defCategory = category;
+                continue;
+            }
             result.put("category" + ++cntr, category.categoryName());
         }
+        if (defCategory != null)
+            result.put("category" + ++cntr, defCategory.categoryName());
         return result;
     }
 
-    private Map<String, String> getCategoriesWithCreateNew(Long cartId) {
+    private Map<String, String> getCategoriesWithDelete(Long cartId) {
         Map<String, String> categories = getCategories(cartId);
-        categories.put("create_new_category", "Создать категорию");
+        categories.put("delete_category", "Удалить категорию");
         return categories;
     }
 
     private Map<String, String> getCategoriesWithCreateNewAndDelete(Long cartId) {
-        Map<String, String> categories = getCategoriesWithCreateNew(cartId);
-        categories.put("delete_category", "Удалить категорию");
+        Map<String, String> categories = getCategoriesWithDelete(cartId);
+        categories.put("create_new_category", "Создать категорию");
         return categories;
     }
 }

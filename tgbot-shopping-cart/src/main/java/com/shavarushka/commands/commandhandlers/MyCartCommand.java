@@ -67,7 +67,8 @@ public class MyCartCommand extends AbstractTextCommand {
         public void execute(Update update) throws TelegramApiException {
             Long chatId = update.getCallbackQuery().getMessage().getChatId();
             Long userId = update.getCallbackQuery().getFrom().getId();
-            
+            String message;
+
             if (!checkForUserExisting(chatId, userId) || !checkForCartExisting(chatId, userId))
                 return;
 
@@ -86,7 +87,10 @@ public class MyCartCommand extends AbstractTextCommand {
                 notifyCartSelectionListeners(userId, newSelectedCartId);
             }
 
-            sender.deleteMessage(chatId, messageId);
+            newSelectedCartId = connection.getUserById(userId).selectedCartId();
+            message = "Ваши корзины:";
+            InlineKeyboardMarkup keyboard = getKeyboardForMyCart(connection.getCartsAssignedToUser(userId), newSelectedCartId);
+            sender.editMessage(chatId, messageId, message, keyboard, false);
         }
 
         private boolean isThisCartAssignedToUser(Long cartId, Long userId) {
@@ -116,6 +120,7 @@ public class MyCartCommand extends AbstractTextCommand {
                 buttons.put("/setcart_" + cart.cartId(), cartName);
                 buttons.put("/deletecart_" + cart.cartId(), "🗑");
             });
+            buttons.put("/close", "✖ Закрыть");
         return KeyboardsFabrics.createKeyboard(buttons,2, InlineKeyboardMarkup.class);
     }
 }
