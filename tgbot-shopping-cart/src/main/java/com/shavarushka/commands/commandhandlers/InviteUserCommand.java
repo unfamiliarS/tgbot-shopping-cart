@@ -141,7 +141,7 @@ public class InviteUserCommand extends AbstractTextCommand {
             String invitedCart = connection.getCartById(invitedCartId).cartName();
             String invitingMessage = "@" + MessageSender.escapeMarkdownV2(currentUsername) +
                                     " приглашает в корзину *" + MessageSender.escapeMarkdownV2(invitedCart) + "*";
-            InlineKeyboardMarkup keyboard = KeyboardsFabrics.createKeyboard(
+            var keyboard = KeyboardsFabrics.createKeyboard(
                                 Map.of("/confirminviting_" + invitedCartId, "✅ Вступить"
                                     ), 1, InlineKeyboardMarkup.class);
             sender.sendMessage(invitedChatId, invitingMessage, keyboard, true);

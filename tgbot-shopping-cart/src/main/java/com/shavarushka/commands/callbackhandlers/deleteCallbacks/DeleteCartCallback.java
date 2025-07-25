@@ -1,11 +1,10 @@
-package com.shavarushka.commands.callbackhandlers;
+package com.shavarushka.commands.callbackhandlers.deleteCallbacks;
 
 import java.util.Map;
 import java.util.Set;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.shavarushka.commands.BotState;

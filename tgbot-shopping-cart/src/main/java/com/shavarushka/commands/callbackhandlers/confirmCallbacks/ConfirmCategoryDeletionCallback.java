@@ -1,4 +1,4 @@
-package com.shavarushka.commands.callbackhandlers;
+package com.shavarushka.commands.callbackhandlers.confirmCallbacks;
 
 import java.util.List;
 import java.util.Map;

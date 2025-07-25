@@ -11,6 +11,7 @@ import java.util.Set;
 
 import com.shavarushka.database.entities.Categories;
 import com.shavarushka.database.entities.Products;
+import com.shavarushka.database.entities.Settings;
 import com.shavarushka.database.entities.ShoppingCarts;
 import com.shavarushka.database.entities.Users;
 import com.shavarushka.database.interfaces.DBConnection;
@@ -275,6 +276,25 @@ final public class SQLiteConnection implements DBConnection {
         return product;
     }
 
+    public Settings getSettingsById(Long userId) {
+        String query = "SELECT * FROM settings WHERE setting_id = ?";        
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, userId);
+            ResultSet rs = statement.executeQuery();
+            if (rs.next())
+                return new Settings(
+                    rs.getLong("setting_id"),
+                    rs.getBoolean("list_already_purchased"),
+                    rs.getBoolean("notify_about_products"),
+                    rs.getBoolean("notify_about_inviting")
+                );
+            return null;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     // Create---------------------------------------------------------------------------------------------------
 
     public Long addUser(Users user) {
@@ -364,6 +384,22 @@ final public class SQLiteConnection implements DBConnection {
                     throw new SQLException("Creating product failed, no ID obtained.");
                 }
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public Long addSettings(Settings settings) {
+        String query = "INSERT INTO settings (setting_id, list_already_purchased, notify_about_products, notify_about_inviting) VALUES (?, ?, ?, ?)";
+
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, settings.settingId());
+            statement.setBoolean(2, settings.listAlreadyPurchased());
+            statement.setBoolean(3, settings.notifyAboutProducts());
+            statement.setBoolean(4, settings.notifyAboutInviting());
+            statement.executeUpdate();
+            return settings.settingId();
         } catch (SQLException e) {
             e.printStackTrace();
             return null;

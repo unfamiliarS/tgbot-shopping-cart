@@ -46,6 +46,14 @@ CREATE TABLE IF NOT EXISTS products (
     product_purchase_status BOOLEAN NOT NULL CHECK (product_purchase_status IN (0, 1)),
     adding_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (assigned_category_id) REFERENCES categories(category_id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS settings (
+    setting_id INTEGER PRIMARY KEY,
+    list_already_purchased BOOLEAN NOT NULL CHECK (list_already_purchased IN (0, 1)), 
+    notify_about_products BOOLEAN NOT NULL CHECK (notify_about_products IN (0, 1)),
+    notify_about_inviting BOOLEAN NOT NULL CHECK (notify_about_inviting IN (0, 1)),
+    FOREIGN KEY (setting_id) REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE
 );"
 
 # 'dnf in sqlite -y' for sqlite3 command

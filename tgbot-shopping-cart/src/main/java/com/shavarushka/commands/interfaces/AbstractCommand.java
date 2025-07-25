@@ -12,6 +12,7 @@ import com.shavarushka.commands.MessageSender;
 import com.shavarushka.commands.keyboard.KeyboardsFabrics;
 import com.shavarushka.database.SQLiteConnection;
 import com.shavarushka.database.entities.Products;
+import com.shavarushka.database.entities.Settings;
 
 public abstract class AbstractCommand implements BotCommand {
     protected final MessageSender sender;
@@ -48,6 +49,19 @@ public abstract class AbstractCommand implements BotCommand {
         buttons.put("/purchasestatus_" + product.productId(), product.productPurchaseStatusAsString());
         buttons.put("/changecategoryfor_" + product.productId(), "🔄 Сменить категорию");
         return KeyboardsFabrics.createKeyboard(buttons, 2, InlineKeyboardMarkup.class);
+    }
+
+    protected InlineKeyboardMarkup getSettingsKeyboard(Settings settings) {
+        Map<String, String> buttons = new LinkedHashMap<>();
+        String mark;
+        mark = settings.listAlreadyPurchased().equals(true) ? "✅ " : "";
+        buttons.put("/listalreadypurchased", mark + "Показывать купленные товары 💚 💛");
+        mark = settings.notifyAboutProducts().equals(true) ? "✅ " : "";
+        buttons.put("/notifyaboutproducts", mark + "Уведомлять о действиях с товарами других пользователей 🔔");
+        mark = settings.notifyAboutInviting().equals(true) ? "✅ " : "";
+        buttons.put("/notifyaboutinviting", mark + "Уведомлять о приглашениях в корзины 🔔");
+        buttons.put("/close", "✖ Закрыть");
+        return KeyboardsFabrics.createKeyboard(buttons, 1, InlineKeyboardMarkup.class);
     }
 
     // base check ups

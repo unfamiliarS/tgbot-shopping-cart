@@ -10,6 +10,21 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import com.shavarushka.commands.callbackhandlers.*;
+import com.shavarushka.commands.callbackhandlers.cancelCallbacks.CancelCartDeletionCallback;
+import com.shavarushka.commands.callbackhandlers.cancelCallbacks.CancelCategoryDeletionCallback;
+import com.shavarushka.commands.callbackhandlers.cancelCallbacks.CancelCreatingCartCallback;
+import com.shavarushka.commands.callbackhandlers.cancelCallbacks.CancelCreatingCategoryCallback;
+import com.shavarushka.commands.callbackhandlers.cancelCallbacks.CancelInvitingUserCallback;
+import com.shavarushka.commands.callbackhandlers.cancelCallbacks.CancelProductDeletionCallback;
+import com.shavarushka.commands.callbackhandlers.confirmCallbacks.ConfirmCartCreationCallback;
+import com.shavarushka.commands.callbackhandlers.confirmCallbacks.ConfirmCartDeletionCallback;
+import com.shavarushka.commands.callbackhandlers.confirmCallbacks.ConfirmCategoryCreationCallback;
+import com.shavarushka.commands.callbackhandlers.confirmCallbacks.ConfirmCategoryDeletionCallback;
+import com.shavarushka.commands.callbackhandlers.confirmCallbacks.ConfirmInvitingCallback;
+import com.shavarushka.commands.callbackhandlers.confirmCallbacks.ConfirmProductDeletionCallback;
+import com.shavarushka.commands.callbackhandlers.deleteCallbacks.DeleteCartCallback;
+import com.shavarushka.commands.callbackhandlers.deleteCallbacks.DeleteCategoryCallback;
+import com.shavarushka.commands.callbackhandlers.deleteCallbacks.DeleteProductCallback;
 import com.shavarushka.commands.commandhandlers.*;
 import com.shavarushka.commands.interfaces.BotCommand;
 import com.shavarushka.commands.keyboard.CartSelectionListener;
@@ -46,6 +61,7 @@ public class CommandManager {
         registerCommand(new ConfirmCategoryCreationCallback(sender, userStates, connection, tempNewNames, selectedCartsListeners));
         registerCommand(new CancelCreatingCategoryCallback(sender, userStates, connection));
         registerCommand(new DeleteCategoryCommand(sender, userStates, connection));
+        registerCommand(new SettingsCommand(sender, userStates, connection));
 
         // register callbacks
         registerCommand(new CancelCreatingCartCallback(sender, userStates, connection));

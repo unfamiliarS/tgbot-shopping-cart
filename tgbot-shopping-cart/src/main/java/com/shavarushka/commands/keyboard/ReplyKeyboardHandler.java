@@ -1,6 +1,5 @@
 package com.shavarushka.commands.keyboard;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -26,15 +25,11 @@ public class ReplyKeyboardHandler implements CartSelectionListener {
     }
 
     @Override
-    public void onCartSelected(Long userId, Long cartId) {
-        try {
-            Long chatId = getChatIdByUserId(userId);
+    public void onCartSelected(Long userId, Long cartId) throws TelegramApiException {
+        Long chatId = getChatIdByUserId(userId);
             
-            if (chatId != null) {
-                updateKeyboard(cartId, chatId, (cartId != null && cartId != 0));
-            }
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
+        if (chatId != null) {
+            updateKeyboard(cartId, chatId, (cartId != null && cartId != 0));
         }
     }
 

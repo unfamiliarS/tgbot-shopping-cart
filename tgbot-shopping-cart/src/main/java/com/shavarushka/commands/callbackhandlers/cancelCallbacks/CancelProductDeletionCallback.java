@@ -1,4 +1,4 @@
-package com.shavarushka.commands.callbackhandlers;
+package com.shavarushka.commands.callbackhandlers.cancelCallbacks;
 
 import java.util.Map;
 
@@ -9,16 +9,16 @@ import com.shavarushka.commands.BotState;
 import com.shavarushka.commands.MessageSender;
 import com.shavarushka.commands.callbackhandlers.interfaces.AbstractCancelCallback;
 import com.shavarushka.database.SQLiteConnection;
+import com.shavarushka.database.entities.Products;
 
-public class CancelCategoryDeletionCallback extends AbstractCancelCallback {
-
-    public CancelCategoryDeletionCallback(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
+public class CancelProductDeletionCallback extends AbstractCancelCallback {
+    public CancelProductDeletionCallback(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
         super(sender, userStates, connection);
     }
-
+    
     @Override
     public String getCommand() {
-        return "/cancelcategorydeletion_";
+        return "/cancelproductdeletion_";
     }
 
     @Override
@@ -31,12 +31,17 @@ public class CancelCategoryDeletionCallback extends AbstractCancelCallback {
 
         return message.startsWith(getCommand().strip()) &&
                userStates.containsKey(chatId) &&
-               userStates.get(chatId).equals(BotState.CONFIRMING_CATEGORY_DELETION);
+               userStates.get(chatId).equals(BotState.CONFIRMING_PRODUCT_DELETION);
     }
 
     @Override
     public void execute(Update update) throws TelegramApiException {
-        String message = "❌ Отменяю удаление категории...";
-        processCanceling(update, message);
+        String message;
+        Long productId = extractIdFromMessage(update.getCallbackQuery().getData());
+        Products product = connection.getProductById(productId);
+        message = connection.getProductById(productId).fullURL();
+        var keyboard = getProductKeyboard(product);
+
+        processCanceling(update, message, keyboard);
     }
 }

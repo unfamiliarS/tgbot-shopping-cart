@@ -1,4 +1,4 @@
-package com.shavarushka.commands.callbackhandlers;
+package com.shavarushka.commands.callbackhandlers.cancelCallbacks;
 
 import java.util.Map;
 
@@ -10,14 +10,15 @@ import com.shavarushka.commands.MessageSender;
 import com.shavarushka.commands.callbackhandlers.interfaces.AbstractCancelCallback;
 import com.shavarushka.database.SQLiteConnection;
 
-public class CancelCreatingCategoryCallback extends AbstractCancelCallback {
-    public CancelCreatingCategoryCallback(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
+public class CancelCategoryDeletionCallback extends AbstractCancelCallback {
+
+    public CancelCategoryDeletionCallback(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
         super(sender, userStates, connection);
     }
-    
+
     @Override
     public String getCommand() {
-        return "/cancelcreatingcategory";
+        return "/cancelcategorydeletion_";
     }
 
     @Override
@@ -30,13 +31,12 @@ public class CancelCreatingCategoryCallback extends AbstractCancelCallback {
 
         return message.startsWith(getCommand().strip()) &&
                userStates.containsKey(chatId) &&
-               (userStates.get(chatId).equals(BotState.WAITING_FOR_CATEGORY_NAME) ||
-               userStates.get(chatId).equals(BotState.CONFIRMING_CATEGORY_CREATION));
+               userStates.get(chatId).equals(BotState.CONFIRMING_CATEGORY_DELETION);
     }
 
     @Override
     public void execute(Update update) throws TelegramApiException {
-        String message = "❌ Отменяю создание категории...";
+        String message = "❌ Отменяю удаление категории...";
         processCanceling(update, message);
     }
 }

@@ -3,6 +3,8 @@ package com.shavarushka.commands.commandhandlers.interfaces;
 import java.util.List;
 import java.util.Map;
 
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
 import com.shavarushka.commands.BotState;
 import com.shavarushka.commands.MessageSender;
 import com.shavarushka.commands.interfaces.SelectedCartNotifier;
@@ -26,7 +28,7 @@ public abstract class SelectedCartNotifierCommand extends AbstractTextCommand im
         cartSelectionListeners.remove(listener);
     }
 
-    public void notifyCartSelectionListeners(Long userId, Long cartId) {
+    public void notifyCartSelectionListeners(Long userId, Long cartId) throws TelegramApiException {
         for (CartSelectionListener listener : cartSelectionListeners) {
             listener.onCartSelected(userId, cartId);
         }
