@@ -447,6 +447,31 @@ final public class SQLiteConnection implements DBConnection {
         }
     }
 
+    public boolean updateListAlreadyPurchasedSetting(Long settingId, Boolean settingVal) {
+        return updateSetting(settingId, settingVal, "list_already_purchased");
+    }
+
+    public boolean updateNotifyAboutProductsSetting(Long settingId, Boolean settingVal) {
+        return updateSetting(settingId, settingVal, "notify_about_products");
+    }
+
+    public boolean updateNotifyAboutInvitingSetting(Long settingId, Boolean settingVal) {
+        return updateSetting(settingId, settingVal, "notify_about_inviting");
+    }
+
+    private boolean updateSetting(Long settingId, Boolean settingVal, String rowName) {
+        String query = "UPDATE OR IGNORE settings SET " + rowName + " = ? WHERE setting_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setBoolean(1, settingVal);
+            statement.setLong(2, settingId);
+            int affectedRows = statement.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }        
+    }
+
     // Delete---------------------------------------------------------------------------------------------------
 
     public boolean deleteCart(Long cartId) {
