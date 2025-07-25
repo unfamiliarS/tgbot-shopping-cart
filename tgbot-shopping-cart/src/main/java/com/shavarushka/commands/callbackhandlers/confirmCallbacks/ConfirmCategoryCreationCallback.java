@@ -9,6 +9,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import com.shavarushka.commands.BotState;
 import com.shavarushka.commands.MessageSender;
 import com.shavarushka.commands.callbackhandlers.interfaces.SelectedCartNotifierCallback;
+import com.shavarushka.commands.interfaces.SettingNotifyHandler;
 import com.shavarushka.commands.keyboard.CartSelectionListener;
 import com.shavarushka.database.SQLiteConnection;
 import com.shavarushka.database.entities.Categories;
@@ -62,6 +63,9 @@ public class ConfirmCategoryCreationCallback extends SelectedCartNotifierCallbac
             userStates.remove(chatId);
             message = "✅ Категория *" + MessageSender.escapeMarkdownV2(categoryName) + "* создана😎";
             sender.editMessage(chatId, messageId, message, true);
+
+            message = "создал(а) новую категорию '" + categoryName + "'";
+            notifyAllIfEnabled(user.userId(), user.selectedCartId(), SettingNotifyHandler.NotificationType.CATEGORY_ADDED, message);
         }
     }
 }

@@ -10,6 +10,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import com.shavarushka.commands.BotState;
 import com.shavarushka.commands.MessageSender;
 import com.shavarushka.commands.callbackhandlers.interfaces.SelectedCartNotifierCallback;
+import com.shavarushka.commands.interfaces.SettingNotifyHandler;
 import com.shavarushka.commands.keyboard.CartSelectionListener;
 import com.shavarushka.database.SQLiteConnection;
 import com.shavarushka.database.entities.Products;
@@ -60,6 +61,9 @@ public class ConfirmCategoryDeletionCallback extends SelectedCartNotifierCallbac
 
         message = "✅ Категория *" + MessageSender.escapeMarkdownV2(categoryName) + "* удалена😎";
         sender.editMessage(chatId, messageId, message, true);
+
+        message = "удалил(а) категорию '" + categoryName + "'";
+        notifyAllIfEnabled(user.userId(), user.selectedCartId(), SettingNotifyHandler.NotificationType.CATEGORY_DELETED, message);
     }
 
     private boolean isCategoryExist(Long categoryId) {

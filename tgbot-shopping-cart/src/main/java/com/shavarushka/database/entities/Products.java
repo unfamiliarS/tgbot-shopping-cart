@@ -11,7 +11,6 @@ public record Products(
     Boolean productPurchaseStatus,
     Timestamp addingTime
 ) {
-
     public String productPurchaseStatusAsString() {
         return productPurchaseStatus() ? "💚" : "💛";
     }

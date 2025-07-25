@@ -8,7 +8,10 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import com.shavarushka.commands.BotState;
 import com.shavarushka.commands.MessageSender;
 import com.shavarushka.commands.callbackhandlers.interfaces.AbstractCallbackCommand;
+import com.shavarushka.commands.interfaces.SettingNotifyHandler;
 import com.shavarushka.database.SQLiteConnection;
+import com.shavarushka.database.entities.Products;
+import com.shavarushka.database.entities.Users;
 
 public class ConfirmProductDeletionCallback extends AbstractCallbackCommand {
     public ConfirmProductDeletionCallback(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
@@ -33,15 +36,22 @@ public class ConfirmProductDeletionCallback extends AbstractCallbackCommand {
 
     @Override
     public void execute(Update update) throws TelegramApiException {
+        Long userId = update.getCallbackQuery().getFrom().getId();
         Long chatId = update.getCallbackQuery().getMessage().getChatId();
         Long productId = extractIdFromMessage(update.getCallbackQuery().getData());
         Integer messageId = update.getCallbackQuery().getMessage().getMessageId();
-        
+        Users user = connection.getUserById(userId);
+        Products product = connection.getProductById(productId);
+        String message;
+
         if (isProductExist(productId)) {
             connection.deleteProduct(productId);
         }
         sender.deleteMessage(chatId, messageId);
         userStates.remove(chatId);
+
+        message = "удалил(а) товар\n" + product.fullURL();
+        notifyAllIfEnabled(user.userId(), user.selectedCartId(), SettingNotifyHandler.NotificationType.PRODUCT_DELETED, message);
     }
 
     private boolean isProductExist(Long productId) {

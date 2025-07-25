@@ -10,14 +10,15 @@ import com.shavarushka.commands.MessageSender;
 import com.shavarushka.commands.callbackhandlers.interfaces.AbstractSettingCallback;
 import com.shavarushka.database.SQLiteConnection;
 
-public class SettingListAlreadyPurchasedCallback extends AbstractSettingCallback {
-    public SettingListAlreadyPurchasedCallback(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
+public class SettingNotifyAboutInvitingCallback extends AbstractSettingCallback {
+    public SettingNotifyAboutInvitingCallback(MessageSender sender, Map<Long, BotState> userStates,
+            SQLiteConnection connection) {
         super(sender, userStates, connection);
     }
 
     @Override
     public String getCommand() {
-        return "/listalreadypurchased";
+        return "/notifyaboutinviting";
     }
 
     @Override

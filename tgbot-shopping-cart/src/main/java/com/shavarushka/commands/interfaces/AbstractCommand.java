@@ -2,6 +2,7 @@ package com.shavarushka.commands.interfaces;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -13,8 +14,9 @@ import com.shavarushka.commands.keyboard.KeyboardsFabrics;
 import com.shavarushka.database.SQLiteConnection;
 import com.shavarushka.database.entities.Products;
 import com.shavarushka.database.entities.Settings;
+import com.shavarushka.database.entities.Users;
 
-public abstract class AbstractCommand implements BotCommand {
+public abstract class AbstractCommand implements BotCommand, SettingNotifyHandler {
     protected final MessageSender sender;
     protected final Map<Long, BotState> userStates;
     protected final SQLiteConnection connection;
@@ -43,6 +45,7 @@ public abstract class AbstractCommand implements BotCommand {
                 message.startsWith(getCommand().strip());
     }
 
+    // keyboards
     protected InlineKeyboardMarkup getProductKeyboard(Products product) {
         Map<String, String> buttons = new LinkedHashMap<>();
         buttons.put("/deleteproduct_" + product.productId(), "🗑 Удалить");
@@ -57,9 +60,9 @@ public abstract class AbstractCommand implements BotCommand {
         mark = settings.listAlreadyPurchased().equals(true) ? "✅ " : "";
         buttons.put("/listalreadypurchased", mark + "Показывать купленные товары 💚 💛");
         mark = settings.notifyAboutProducts().equals(true) ? "✅ " : "";
-        buttons.put("/notifyaboutproducts", mark + "Уведомлять о действиях с товарами других пользователей 🔔");
-        mark = settings.notifyAboutInviting().equals(true) ? "✅ " : "";
-        buttons.put("/notifyaboutinviting", mark + "Уведомлять о приглашениях в корзины 🔔");
+        buttons.put("/notifyaboutproducts", mark + "Уведомлять о действиях с товарами 🔔");
+        // mark = settings.notifyAboutInviting().equals(true) ? "✅ " : "";
+        // buttons.put("/notifyaboutinviting", mark + "Уведомлять о приглашениях в корзины 🔔");
         buttons.put("/close", "✖ Закрыть");
         return KeyboardsFabrics.createKeyboard(buttons, 1, InlineKeyboardMarkup.class);
     }
@@ -91,5 +94,38 @@ public abstract class AbstractCommand implements BotCommand {
             return false;
         }
         return true;
+    }
+
+    // settings notification
+    @Override
+    public void notifyAllIfEnabled(Long userNotifier, Long cartId, NotificationType type, String message) throws TelegramApiException {
+        for (Users user : connection.getUsersAssignedToCart(cartId)) {
+            if (!user.userId().equals(userNotifier) && shouldNotify(user.userId(), type)) {
+                sendNotification(userNotifier, user.userId(), message);
+            }
+        }
+    }
+    
+    @Override
+    public boolean shouldNotify(Long userId, NotificationType type) {
+        var settings = connection.getSettingsById(userId);
+        return switch (type) {
+            case PRODUCT_ADDED, CATEGORY_ADDED,
+                 PRODUCT_DELETED, CATEGORY_DELETED
+                    -> settings.notifyAboutProducts();
+        };
+    }
+
+    @Override
+    public void sendNotification(Long userNotifierId, Long userId, String message) throws TelegramApiException {
+        Users userNotifier = connection.getUserById(userNotifierId);
+        Users user = connection.getUserById(userId);
+        String userNotifierName = userNotifier.username() != null
+            ? "@" + userNotifier.username()
+            : userNotifier.firstname()
+            + " ";
+        if (user.chatId() != null) {
+            sender.sendMessage(user.chatId(), "🔔 " + userNotifierName + " " + message, false);
+        }
     }
 }

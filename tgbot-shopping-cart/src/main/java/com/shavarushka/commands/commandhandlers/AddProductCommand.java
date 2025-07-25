@@ -12,6 +12,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import com.shavarushka.commands.BotState;
 import com.shavarushka.commands.MessageSender;
 import com.shavarushka.commands.commandhandlers.interfaces.SelectedCartNotifierCommand;
+import com.shavarushka.commands.interfaces.SettingNotifyHandler;
 import com.shavarushka.commands.keyboard.CartSelectionListener;
 import com.shavarushka.database.SQLiteConnection;
 import com.shavarushka.database.entities.Categories;
@@ -57,7 +58,7 @@ public class AddProductCommand extends SelectedCartNotifierCommand {
 
         String productURL = extractUrlFromMessage(update.getMessage().getText().strip());
         Users user = connection.getUserById(userId);
-        boolean isNeedToNotify = false;
+        boolean isNeedToNotifyKeyboardUpdate = false;
         
         Long cartId = user.selectedCartId();
         if (productURL.isEmpty()) {
@@ -85,7 +86,7 @@ public class AddProductCommand extends SelectedCartNotifierCommand {
                                                                                 "Прочее",
                                                                                 null)
                 );
-                isNeedToNotify = true;
+                isNeedToNotifyKeyboardUpdate = true;
             } else {
                 defaultCategoryId = defaultCategory.categoryId();
             }
@@ -101,14 +102,17 @@ public class AddProductCommand extends SelectedCartNotifierCommand {
             );
             Long productId = connection.addProduct(product);
 
-            if (isNeedToNotify)
+            if (isNeedToNotifyKeyboardUpdate)
                 notifyCartSelectionListeners(userId, cartId);
 
             if (productId != null) {
                 product = connection.getProductById(productId);
                 message = "Товар успешно добавлен в категорию *Прочее* 😎\n" + MessageSender.escapeMarkdownV2(productURL);
-                InlineKeyboardMarkup keyboard = getProductKeyboard(product);
+                var keyboard = getProductKeyboard(product);
                 sender.sendMessage(chatId, message, keyboard, true);
+
+                message = "добавил(а) новый товар\n" + productURL;
+                notifyAllIfEnabled(user.userId(), cartId, SettingNotifyHandler.NotificationType.PRODUCT_ADDED, message);
             } else {
                 sender.sendMessage(chatId, "Ошибка при добавлении товара", false);
             }

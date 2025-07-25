@@ -1,7 +1,10 @@
 package com.shavarushka.commands.commandhandlers;
 
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -12,6 +15,7 @@ import com.shavarushka.commands.commandhandlers.interfaces.AbstractTextCommand;
 import com.shavarushka.database.SQLiteConnection;
 import com.shavarushka.database.entities.Categories;
 import com.shavarushka.database.entities.Products;
+import com.shavarushka.database.entities.Settings;
 import com.shavarushka.database.entities.Users;
 
 public class ListProductsOfCategoryCommand extends AbstractTextCommand {
@@ -51,17 +55,16 @@ public class ListProductsOfCategoryCommand extends AbstractTextCommand {
 
         String categoryName = update.getMessage().getText();
         Users user = connection.getUserById(userId);
+        Settings setting = connection.getSettingsById(userId);
 
         Long categoryId = connection.getCategoryByAssignedCartIdAndName(user.selectedCartId(), categoryName).categoryId();
         Set<Products> products = connection.getProductsByCategoryId(categoryId);
         if (!products.isEmpty()) {
-            for (Products product : products) {
-                var keyboard = getProductKeyboard(product);
-                sender.sendMessage(chatId, product.fullURL(), keyboard, false);
+            if (listProducts(chatId, products, setting.listAlreadyPurchased()) != 0) {
+                return;
             }
-        } else {
-            sender.sendMessage(chatId, "Категория пуста", true);
         }
+        sender.sendMessage(chatId, "Категория пуста", true);
     }
 
     private boolean isCommandContainsCategoryName(Long userId, String categoryName) {
@@ -73,5 +76,21 @@ public class ListProductsOfCategoryCommand extends AbstractTextCommand {
             }
         }
         return false;
+    }
+
+    private int listProducts(Long chatId, Set<Products> products, boolean listAlreadyPurchased) throws TelegramApiException {
+        int cnt = 0;
+        List<Products> sortedProducts = products.stream()
+            .sorted(Comparator.comparing(Products::addingTime))
+            .collect(Collectors.toList());
+        for (Products product : sortedProducts) {
+            if (!listAlreadyPurchased && product.productPurchaseStatus()) {
+                    continue;
+            }
+            var keyboard = getProductKeyboard(product);
+            sender.sendMessage(chatId, product.fullURL(), keyboard, false);
+            cnt++;
+        }
+        return cnt;
     }
 }

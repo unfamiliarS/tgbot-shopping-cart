@@ -120,7 +120,7 @@ public class InviteUserCommand extends AbstractTextCommand {
         }
 
         private boolean isCorrectUsername(String username) {
-            return username.toLowerCase().matches("@[a-z0-9_]+");  
+            return username.toLowerCase().matches("@[a-z0-9_]+");
         }
 
         private boolean isItMe(String myUsername, String usernameToInvite) {
