@@ -91,7 +91,7 @@ public class InviteUserCommand extends AbstractTextCommand {
             }
 
             if (isItMe(currentUsername, usernameToInvite.substring(1))) {
-                message = "Хулиганишь🙃";
+                message = "Хулиганишь 🙃";
                 sender.sendMessage(chatId, message, false);
                 userStates.remove(chatId);
                 return;
@@ -99,14 +99,14 @@ public class InviteUserCommand extends AbstractTextCommand {
 
             Users invitedUser = connection.getUserByUsername(usernameToInvite.substring(1));
             if (invitedUser == null) {
-                message = "Не могу найти пользователя в своей базе😔 Отменяю приглашение...";
+                message = "Не могу найти пользователя в своей базе 😔\n❌ Отменяю приглашение...";
                 sender.sendMessage(chatId, message, false);
                 userStates.remove(chatId);
                 return;
             }
 
             if (isUserAlreadyHaveThisCart(invitedUser.userId(), invitedCartId)) {
-                message = usernameToInvite + " уже состоит в этой корзине😋";
+                message = usernameToInvite + " уже состоит в этой корзине 😋";
                 sender.sendMessage(chatId, message, false);
                 userStates.remove(chatId);
                 return;
