@@ -35,7 +35,7 @@ public class ChangePurchaseStatusCallback extends AbstractCallbackCommand {
         Long productId = extractIdFromMessage(update.getCallbackQuery().getData());
         Products product;
 
-        if (!checkForProductExisting(chatId, messageId, productId))
+        if (!checkForProductExisting(chatId, messageId, productId) || checkIfProductInCurrentUserCart(chatId, messageId, userId, productId))
             return;
 
         product = connection.getProductById(productId);

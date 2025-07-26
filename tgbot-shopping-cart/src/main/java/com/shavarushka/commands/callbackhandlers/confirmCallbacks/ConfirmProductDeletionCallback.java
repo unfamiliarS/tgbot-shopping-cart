@@ -44,17 +44,14 @@ public class ConfirmProductDeletionCallback extends AbstractCallbackCommand {
         Products product = connection.getProductById(productId);
         String message;
 
-        if (isProductExist(productId)) {
-            connection.deleteProduct(productId);
-        }
+        if (!checkForProductExisting(chatId, messageId, productId) || !checkIfProductInCurrentUserCart(chatId, messageId, userId, productId))
+            return;
+            
+        connection.deleteProduct(productId);
         sender.deleteMessage(chatId, messageId);
         userStates.remove(chatId);
 
         message = "удалил(а) товар\n" + product.fullURL();
         notifyAllIfEnabled(user.userId(), user.selectedCartId(), SettingsDependantNotifier.NotificationType.PRODUCT_DELETED, message);
-    }
-
-    private boolean isProductExist(Long productId) {
-        return connection.getProductById(productId) != null;
     }
 }

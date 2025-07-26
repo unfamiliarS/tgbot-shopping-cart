@@ -43,7 +43,7 @@ public class ChangeCategoryCallback extends AbstractCallbackCommand {
         Long productId = extractIdFromMessage(update.getCallbackQuery().getData());
         Products product;
         
-        if (!checkForProductExisting(chatId, messageId, productId))
+        if (!checkForProductExisting(chatId, messageId, productId) || !checkIfProductInCurrentUserCart(chatId, messageId, userId, productId))
             return;
 
         product = connection.getProductById(productId);
@@ -96,17 +96,17 @@ public class ChangeCategoryCallback extends AbstractCallbackCommand {
             Products product = connection.getProductById(productId);
             Integer messageId = update.getCallbackQuery().getMessage().getMessageId();
 
-            if (product != null && connection.getCategoryById(categoryId) != null) {
-                if (categoryId.equals(product.assignedCategoryId())) {
-                    message = product.fullURL();
-                    var keyboard = getProductKeyboard(product);
-                    sender.editMessage(chatId, messageId, message, keyboard, false);
-                } else if (connection.updateCategoryForProduct(productId, categoryId)) {
-                    sender.deleteMessage(chatId, messageId);
-                }                
-            } else {
+            if (!checkForProductExisting(chatId, messageId, productId) || !checkForCategoryExisting(chatId, messageId, categoryId)
+                || !checkIfProductInCurrentUserCart(chatId, messageId, userId, productId))
+                return;
+
+            if (categoryId.equals(product.assignedCategoryId())) {
+                message = product.fullURL();
+                var keyboard = getProductKeyboard(product);
+                sender.editMessage(chatId, messageId, message, keyboard, false);
+            } else if (connection.updateCategoryForProduct(productId, categoryId)) {
                 sender.deleteMessage(chatId, messageId);
-            }
+            }                
         }
     }
 }

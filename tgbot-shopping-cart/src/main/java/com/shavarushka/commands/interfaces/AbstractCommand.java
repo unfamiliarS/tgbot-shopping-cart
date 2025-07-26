@@ -17,6 +17,7 @@ import com.shavarushka.database.SQLiteConnection;
 import com.shavarushka.database.entities.Categories;
 import com.shavarushka.database.entities.Products;
 import com.shavarushka.database.entities.Settings;
+import com.shavarushka.database.entities.ShoppingCarts;
 import com.shavarushka.database.entities.Users;
 
 public abstract class AbstractCommand implements BotCommand, SettingsDependantNotifier, ReplyKeyboardUpdater {
@@ -95,12 +96,40 @@ public abstract class AbstractCommand implements BotCommand, SettingsDependantNo
         return true;
     }
 
+    protected boolean checkForCategoryExisting(Long chatId, Integer messageId, Long categoryId) throws TelegramApiException {
+        if (connection.getCategoryById(categoryId) == null) {
+            sender.deleteMessage(chatId, messageId);
+            return false;
+        }
+        return true;
+    }
+
     protected boolean checkForProductExisting(Long chatId, Integer messageId, Long productId) throws TelegramApiException {
         if (connection.getProductById(productId) == null) {
             sender.deleteMessage(chatId, messageId);
             return false;
         }
         return true;
+    }
+
+    protected boolean checkIfProductInCurrentUserCart(Long chatId, Integer messageId, Long userId, Long productId) throws TelegramApiException {
+        Long currentlySelectedCart = connection.getUserById(userId).selectedCartId();
+        Long productCart;
+
+        Products product = connection.getProductById(productId);
+        if (product != null) {
+            Categories category = connection.getCategoryById(product.assignedCategoryId());
+            if (category != null) {
+                ShoppingCarts cart = connection.getCartById(category.assignedCartId());
+                if (cart != null) {
+                    productCart = cart.cartId();
+                    if (currentlySelectedCart.equals(productCart))
+                        return true;
+                }
+            }
+        }
+        sender.deleteMessage(chatId, messageId);
+        return false;
     }
 
     /* 
