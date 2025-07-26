@@ -1,5 +1,6 @@
 package com.shavarushka.commands.commandhandlers;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -137,11 +138,10 @@ public class InviteUserCommand extends AbstractTextCommand {
             String invitedCart = connection.getCartById(invitedCartId).cartName();
             String invitingMessage = "@" + MessageSender.escapeMarkdownV2(currentUsername) +
                                     " приглашает в корзину *" + MessageSender.escapeMarkdownV2(invitedCart) + "*";
-            var keyboard = KeyboardsFabrics.createKeyboard(
-                                Map.of(
-                                    "/confirminviting_" + invitedCartId, "✅ Вступить",
-                                    "/refuseinviting_" + currentUserId, "❌ Отказаться"
-                                    ), 1, InlineKeyboardMarkup.class);
+            Map<String, String> buttons = new LinkedHashMap<>();
+            buttons.put("/confirminviting_" + invitedCartId, "✅ Вступить");
+            buttons.put("/refuseinviting_" + currentUserId, "❌ Отказаться");
+            var keyboard = KeyboardsFabrics.createKeyboard(buttons, 1, InlineKeyboardMarkup.class);
             sender.sendMessage(invitedChatId, invitingMessage, keyboard, true);
         }
         
