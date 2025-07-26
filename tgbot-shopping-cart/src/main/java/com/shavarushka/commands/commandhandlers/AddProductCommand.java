@@ -1,28 +1,24 @@
 package com.shavarushka.commands.commandhandlers;
 
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.shavarushka.commands.BotState;
 import com.shavarushka.commands.MessageSender;
-import com.shavarushka.commands.commandhandlers.interfaces.SelectedCartNotifierCommand;
-import com.shavarushka.commands.interfaces.SettingNotifyHandler;
-import com.shavarushka.commands.keyboard.CartSelectionListener;
+import com.shavarushka.commands.commandhandlers.interfaces.AbstractTextCommand;
+import com.shavarushka.commands.interfaces.SettingsDependantNotifier;
 import com.shavarushka.database.SQLiteConnection;
 import com.shavarushka.database.entities.Categories;
 import com.shavarushka.database.entities.Products;
 import com.shavarushka.database.entities.Users;
 
-public class AddProductCommand extends SelectedCartNotifierCommand {
-    public AddProductCommand(MessageSender sender, Map<Long, BotState> userStates,
-                            List<CartSelectionListener> listeners, SQLiteConnection connection) {
-        super(sender, userStates, connection, listeners);
+public class AddProductCommand extends AbstractTextCommand {
+    public AddProductCommand(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
+        super(sender, userStates, connection);
     }
 
     @Override
@@ -103,7 +99,7 @@ public class AddProductCommand extends SelectedCartNotifierCommand {
             Long productId = connection.addProduct(product);
 
             if (isNeedToNotifyKeyboardUpdate)
-                notifyCartSelectionListeners(userId, cartId);
+                updateReplyKeyboardOnDataChanges(userId, cartId);
 
             if (productId != null) {
                 product = connection.getProductById(productId);
@@ -112,7 +108,7 @@ public class AddProductCommand extends SelectedCartNotifierCommand {
                 sender.sendMessage(chatId, message, keyboard, true);
 
                 message = "добавил(а) новый товар\n" + productURL;
-                notifyAllIfEnabled(user.userId(), cartId, SettingNotifyHandler.NotificationType.PRODUCT_ADDED, message);
+                notifyAllIfEnabled(user.userId(), cartId, SettingsDependantNotifier.NotificationType.PRODUCT_ADDED, message);
             } else {
                 sender.sendMessage(chatId, "Ошибка при добавлении товара", false);
             }

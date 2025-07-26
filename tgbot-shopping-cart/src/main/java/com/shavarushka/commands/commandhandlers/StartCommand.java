@@ -1,6 +1,5 @@
 package com.shavarushka.commands.commandhandlers;
 
-import java.util.List;
 import java.util.Map;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -8,15 +7,13 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.shavarushka.commands.BotState;
 import com.shavarushka.commands.MessageSender;
-import com.shavarushka.commands.commandhandlers.interfaces.SelectedCartNotifierCommand;
-import com.shavarushka.commands.keyboard.CartSelectionListener;
+import com.shavarushka.commands.commandhandlers.interfaces.AbstractTextCommand;
 import com.shavarushka.database.SQLiteConnection;
 import com.shavarushka.database.entities.Users;
 
-public class StartCommand extends SelectedCartNotifierCommand {
-    public StartCommand(MessageSender sender, Map<Long, BotState> userStates,
-                    SQLiteConnection connection, List<CartSelectionListener> listeners) {
-        super(sender, userStates, connection, listeners);
+public class StartCommand extends AbstractTextCommand {
+    public StartCommand(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
+        super(sender, userStates, connection);
     }
 
     @Override
@@ -54,8 +51,8 @@ public class StartCommand extends SelectedCartNotifierCommand {
         if (chatId != user.chatId()) {
             // TODO: logic to update chatId
         }
-        // update keyboard if needed
-        notifyCartSelectionListeners(userId, user.selectedCartId());
+
+        updateReplyKeyboardOnDataChanges(userId, user.selectedCartId());
     }
 
 }

@@ -1,6 +1,5 @@
 package com.shavarushka.commands.callbackhandlers.confirmCallbacks;
 
-import java.util.List;
 import java.util.Map;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -8,20 +7,18 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.shavarushka.commands.BotState;
 import com.shavarushka.commands.MessageSender;
-import com.shavarushka.commands.callbackhandlers.interfaces.SelectedCartNotifierCallback;
-import com.shavarushka.commands.interfaces.SettingNotifyHandler;
-import com.shavarushka.commands.keyboard.CartSelectionListener;
+import com.shavarushka.commands.callbackhandlers.interfaces.AbstractCallbackCommand;
+import com.shavarushka.commands.interfaces.SettingsDependantNotifier;
 import com.shavarushka.database.SQLiteConnection;
 import com.shavarushka.database.entities.Categories;
 import com.shavarushka.database.entities.Users;
 
-public class ConfirmCategoryCreationCallback extends SelectedCartNotifierCallback {
+public class ConfirmCategoryCreationCallback extends AbstractCallbackCommand {
     private final Map<Long, String> categoryNames;
 
     public ConfirmCategoryCreationCallback(MessageSender sender, Map<Long, BotState> userStates,
-                                    SQLiteConnection connection, Map<Long, String> categoryNames,
-                                    List<CartSelectionListener> listeners) {
-        super(sender, userStates, connection, listeners);
+                                    SQLiteConnection connection, Map<Long, String> categoryNames) {
+        super(sender, userStates, connection);
         this.categoryNames = categoryNames;
     }
 
@@ -58,14 +55,14 @@ public class ConfirmCategoryCreationCallback extends SelectedCartNotifierCallbac
     
             // notify to update keyboard on added category
             user = connection.getUserById(user.userId());            
-            notifyCartSelectionListeners(user.userId(), user.selectedCartId());
+            updateReplyKeyboardOnDataChanges(user.userId(), user.selectedCartId());
             
             userStates.remove(chatId);
             message = "✅ Категория *" + MessageSender.escapeMarkdownV2(categoryName) + "* создана😎";
             sender.editMessage(chatId, messageId, message, true);
 
             message = "создал(а) новую категорию '" + categoryName + "'";
-            notifyAllIfEnabled(user.userId(), user.selectedCartId(), SettingNotifyHandler.NotificationType.CATEGORY_ADDED, message);
+            notifyAllIfEnabled(user.userId(), user.selectedCartId(), SettingsDependantNotifier.NotificationType.CATEGORY_ADDED, message);
         }
     }
 }

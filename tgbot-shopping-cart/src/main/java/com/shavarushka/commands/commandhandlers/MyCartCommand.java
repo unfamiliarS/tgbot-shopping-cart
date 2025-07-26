@@ -2,7 +2,6 @@ package com.shavarushka.commands.commandhandlers;
 
 import java.util.Comparator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -12,10 +11,9 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.shavarushka.commands.BotState;
 import com.shavarushka.commands.MessageSender;
-import com.shavarushka.commands.callbackhandlers.interfaces.SelectedCartNotifierCallback;
+import com.shavarushka.commands.callbackhandlers.interfaces.AbstractCallbackCommand;
 import com.shavarushka.commands.commandhandlers.interfaces.AbstractTextCommand;
-import com.shavarushka.commands.keyboard.CartSelectionListener;
-import com.shavarushka.commands.keyboard.KeyboardsFabrics;
+import com.shavarushka.commands.keyboards.KeyboardsFabrics;
 import com.shavarushka.database.SQLiteConnection;
 import com.shavarushka.database.entities.ShoppingCarts;
 
@@ -52,10 +50,9 @@ public class MyCartCommand extends AbstractTextCommand {
         sender.sendMessage(chatId, message, keyboard, false);
     }
 
-    public class SetCartCallback extends SelectedCartNotifierCallback {
-        public SetCartCallback(MessageSender sender, Map<Long, BotState> userStates,
-                            SQLiteConnection connection, List<CartSelectionListener> listeners) {
-            super(sender, userStates, connection, listeners);
+    public class SetCartCallback extends AbstractCallbackCommand {
+        public SetCartCallback(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
+            super(sender, userStates, connection);
         }
 
         @Override
@@ -83,8 +80,7 @@ public class MyCartCommand extends AbstractTextCommand {
                 // skip
             } else {
                 connection.updateSelectedCartForUser(userId, newSelectedCartId);
-                // notify to update keyboard on new selected cart
-                notifyCartSelectionListeners(userId, newSelectedCartId);
+                updateReplyKeyboardOnDataChanges(userId, newSelectedCartId);
             }
 
             newSelectedCartId = connection.getUserById(userId).selectedCartId();

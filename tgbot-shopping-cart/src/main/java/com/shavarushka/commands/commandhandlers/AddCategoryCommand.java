@@ -1,6 +1,5 @@
 package com.shavarushka.commands.commandhandlers;
 
-import java.util.List;
 import java.util.Map;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -11,20 +10,18 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import com.shavarushka.commands.BotState;
 import com.shavarushka.commands.MessageSender;
 import com.shavarushka.commands.commandhandlers.interfaces.AbstractTextCommand;
-import com.shavarushka.commands.commandhandlers.interfaces.SelectedCartNotifierCommand;
-import com.shavarushka.commands.keyboard.CartSelectionListener;
-import com.shavarushka.commands.keyboard.KeyboardsFabrics;
+import com.shavarushka.commands.keyboards.KeyboardsFabrics;
 import com.shavarushka.database.SQLiteConnection;
 import com.shavarushka.database.entities.Categories;
 import com.vdurmont.emoji.EmojiManager;
 import com.vdurmont.emoji.EmojiParser;
 
-public class AddCategoryCommand extends SelectedCartNotifierCommand {
+public class AddCategoryCommand extends AbstractTextCommand {
     private final Map<Long, String> categoryNames;
 
     public AddCategoryCommand(MessageSender sender, Map<Long, BotState> userStates,
-                            SQLiteConnection connection, Map<Long, String> categoryNames, List<CartSelectionListener> listeners) {
-        super(sender, userStates, connection, listeners);
+                            SQLiteConnection connection, Map<Long, String> categoryNames) {
+        super(sender, userStates, connection);
         this.categoryNames = categoryNames;
     }
 

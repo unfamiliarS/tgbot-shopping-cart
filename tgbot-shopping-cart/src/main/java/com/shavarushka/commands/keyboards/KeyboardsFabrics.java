@@ -1,4 +1,4 @@
-package com.shavarushka.commands.keyboard;
+package com.shavarushka.commands.keyboards;
 
 import java.util.ArrayList;
 import java.util.List;

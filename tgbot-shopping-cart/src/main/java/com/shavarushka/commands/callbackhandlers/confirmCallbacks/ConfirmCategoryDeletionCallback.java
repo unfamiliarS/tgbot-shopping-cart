@@ -1,6 +1,5 @@
 package com.shavarushka.commands.callbackhandlers.confirmCallbacks;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -9,17 +8,16 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.shavarushka.commands.BotState;
 import com.shavarushka.commands.MessageSender;
-import com.shavarushka.commands.callbackhandlers.interfaces.SelectedCartNotifierCallback;
-import com.shavarushka.commands.interfaces.SettingNotifyHandler;
-import com.shavarushka.commands.keyboard.CartSelectionListener;
+import com.shavarushka.commands.callbackhandlers.interfaces.AbstractCallbackCommand;
+import com.shavarushka.commands.interfaces.SettingsDependantNotifier;
 import com.shavarushka.database.SQLiteConnection;
 import com.shavarushka.database.entities.Products;
 import com.shavarushka.database.entities.Users;
 
-public class ConfirmCategoryDeletionCallback extends SelectedCartNotifierCallback {
+public class ConfirmCategoryDeletionCallback extends AbstractCallbackCommand {
     public ConfirmCategoryDeletionCallback(MessageSender sender, Map<Long, BotState> userStates,
-                    SQLiteConnection connection, List<CartSelectionListener> listeners) {
-        super(sender, userStates, connection, listeners);
+                    SQLiteConnection connection) {
+        super(sender, userStates, connection);
     }
 
     @Override
@@ -57,13 +55,13 @@ public class ConfirmCategoryDeletionCallback extends SelectedCartNotifierCallbac
         deleteCategoryAndTheyProducts(categoryForDeletionId);
         userStates.remove(chatId);
 
-        notifyCartSelectionListeners(userId, user.selectedCartId());
+        updateReplyKeyboardOnDataChanges(userId, user.selectedCartId());
 
         message = "✅ Категория *" + MessageSender.escapeMarkdownV2(categoryName) + "* удалена😎";
         sender.editMessage(chatId, messageId, message, true);
 
         message = "удалил(а) категорию '" + categoryName + "'";
-        notifyAllIfEnabled(user.userId(), user.selectedCartId(), SettingNotifyHandler.NotificationType.CATEGORY_DELETED, message);
+        notifyAllIfEnabled(user.userId(), user.selectedCartId(), SettingsDependantNotifier.NotificationType.CATEGORY_DELETED, message);
     }
 
     private boolean isCategoryExist(Long categoryId) {

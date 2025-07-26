@@ -1,6 +1,5 @@
 package com.shavarushka.commands.callbackhandlers.confirmCallbacks;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -9,16 +8,14 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.shavarushka.commands.BotState;
 import com.shavarushka.commands.MessageSender;
-import com.shavarushka.commands.callbackhandlers.interfaces.SelectedCartNotifierCallback;
-import com.shavarushka.commands.keyboard.CartSelectionListener;
+import com.shavarushka.commands.callbackhandlers.interfaces.AbstractCallbackCommand;
 import com.shavarushka.database.SQLiteConnection;
 import com.shavarushka.database.entities.ShoppingCarts;
 import com.shavarushka.database.entities.Users;
 
-public class ConfirmInvitingCallback extends SelectedCartNotifierCallback {
-    public ConfirmInvitingCallback(MessageSender sender, Map<Long, BotState> userStates,
-                                SQLiteConnection connection, List<CartSelectionListener> listeners) {
-        super(sender, userStates, connection, listeners);
+public class ConfirmInvitingCallback extends AbstractCallbackCommand {
+    public ConfirmInvitingCallback(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
+        super(sender, userStates, connection);
     }
 
     @Override
@@ -50,8 +47,7 @@ public class ConfirmInvitingCallback extends SelectedCartNotifierCallback {
 
         connection.addUserToCartIntermediate(userId, cartId);
         connection.updateSelectedCartForUser(userId, cartId);
-        // notify to update keyboard on new selected cart
-        notifyCartSelectionListeners(userId, cartId);
+        updateReplyKeyboardOnDataChanges(userId, cartId);
 
         notifyUsersForInviteConfirmation(update, cartId);
 

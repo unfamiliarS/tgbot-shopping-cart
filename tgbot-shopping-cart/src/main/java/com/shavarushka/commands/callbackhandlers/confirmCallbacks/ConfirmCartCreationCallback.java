@@ -1,6 +1,5 @@
 package com.shavarushka.commands.callbackhandlers.confirmCallbacks;
 
-import java.util.List;
 import java.util.Map;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -8,19 +7,17 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.shavarushka.commands.BotState;
 import com.shavarushka.commands.MessageSender;
-import com.shavarushka.commands.callbackhandlers.interfaces.SelectedCartNotifierCallback;
-import com.shavarushka.commands.keyboard.CartSelectionListener;
+import com.shavarushka.commands.callbackhandlers.interfaces.AbstractCallbackCommand;
 import com.shavarushka.database.SQLiteConnection;
 import com.shavarushka.database.entities.ShoppingCarts;
 import com.shavarushka.database.entities.Users;
 
-public class ConfirmCartCreationCallback extends SelectedCartNotifierCallback {
+public class ConfirmCartCreationCallback extends AbstractCallbackCommand {
     private final Map<Long, String> cartNames;
 
     public ConfirmCartCreationCallback(MessageSender sender, Map<Long, BotState> userStates,
-                                    SQLiteConnection connection, Map<Long, String> cartNames,
-                                    List<CartSelectionListener> listeners) {
-        super(sender, userStates, connection, listeners);
+                                    SQLiteConnection connection, Map<Long, String> cartNames) {
+        super(sender, userStates, connection);
         this.cartNames = cartNames;
     }
 
@@ -53,9 +50,8 @@ public class ConfirmCartCreationCallback extends SelectedCartNotifierCallback {
             ShoppingCarts cart = new ShoppingCarts(null, cartName, null);
             connection.addCart(cart, user.userId());
     
-            // notify to update keyboard on new selected cart
             user = connection.getUserById(user.userId());            
-            notifyCartSelectionListeners(user.userId(), user.selectedCartId());
+            updateReplyKeyboardOnDataChanges(user.userId(), user.selectedCartId());
             
             userStates.remove(chatId);
             sender.deleteMessage(chatId, messageId);

@@ -2,21 +2,24 @@ package com.shavarushka.commands.interfaces;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.shavarushka.commands.BotState;
 import com.shavarushka.commands.MessageSender;
-import com.shavarushka.commands.keyboard.KeyboardsFabrics;
+import com.shavarushka.commands.keyboards.KeyboardsFabrics;
 import com.shavarushka.database.SQLiteConnection;
+import com.shavarushka.database.entities.Categories;
 import com.shavarushka.database.entities.Products;
 import com.shavarushka.database.entities.Settings;
 import com.shavarushka.database.entities.Users;
 
-public abstract class AbstractCommand implements BotCommand, SettingNotifyHandler {
+public abstract class AbstractCommand implements BotCommand, SettingsDependantNotifier, ReplyKeyboardUpdater {
     protected final MessageSender sender;
     protected final Map<Long, BotState> userStates;
     protected final SQLiteConnection connection;
@@ -45,7 +48,9 @@ public abstract class AbstractCommand implements BotCommand, SettingNotifyHandle
                 message.startsWith(getCommand().strip());
     }
 
-    // keyboards
+    /* 
+     * Inline keyboards
+     */
     protected InlineKeyboardMarkup getProductKeyboard(Products product) {
         Map<String, String> buttons = new LinkedHashMap<>();
         buttons.put("/deleteproduct_" + product.productId(), "🗑 Удалить");
@@ -67,7 +72,9 @@ public abstract class AbstractCommand implements BotCommand, SettingNotifyHandle
         return KeyboardsFabrics.createKeyboard(buttons, 1, InlineKeyboardMarkup.class);
     }
 
-    // base check ups
+    /* 
+     * Base checkups for data existing
+     */
     protected boolean checkForUserExisting(Long chatId, Long userId) throws TelegramApiException {
         String message;
         if (connection.getUserById(userId) == null) {
@@ -96,8 +103,9 @@ public abstract class AbstractCommand implements BotCommand, SettingNotifyHandle
         return true;
     }
 
-    // settings notification
-    @Override
+    /* 
+     * Settings notification
+     */
     public void notifyAllIfEnabled(Long userNotifier, Long cartId, NotificationType type, String message) throws TelegramApiException {
         for (Users user : connection.getUsersAssignedToCart(cartId)) {
             if (!user.userId().equals(userNotifier) && shouldNotify(user.userId(), type)) {
@@ -127,5 +135,63 @@ public abstract class AbstractCommand implements BotCommand, SettingNotifyHandle
         if (user.chatId() != null) {
             sender.sendMessage(user.chatId(), "🔔 " + userNotifierName + " " + message, false);
         }
+    }
+
+    /* 
+     * Reply Keyboard update methods
+     */
+    @Override
+    public void updateReplyKeyboardOnDataChanges(Long userId, Long cartId) throws TelegramApiException {
+        Users user = connection.getUserById(userId);
+        Long chatId = user != null ? user.chatId() : null;
+            
+        if (chatId != null) {
+            updateKeyboard(cartId, chatId, cartId != null);
+        }
+    }
+
+    private void updateKeyboard(Long cartId, Long chatId, boolean hasCart) throws TelegramApiException {
+        ReplyKeyboard keyboard;
+        String message;
+
+        if (hasCart) {
+            String cartName = connection.getCartById(cartId).cartName();
+            keyboard = KeyboardsFabrics.createKeyboard(
+                getCategoriesWithCreateNewAndDelete(cartId),2, ReplyKeyboardMarkup.class
+            );
+            message = "Корзина: *" + MessageSender.escapeMarkdownV2(cartName) + "*";
+        } else {
+            keyboard = new ReplyKeyboardRemove(true);
+            message = "Ты не состоишь не в одной корзине";
+        }
+        sender.sendMessage(chatId, message, keyboard, true);
+    }
+
+    private Map<String, String> getCategories(Long cartId) {
+        Map<String, String> result = new LinkedHashMap<>();
+        int cntr = 0;
+        Categories defCategory = null;
+        for (Categories category : connection.getCategoriesByCartId(cartId)) {
+            if (category.categoryName().equals("Прочее")) {
+                defCategory = category;
+                continue;
+            }
+            result.put("category" + ++cntr, category.categoryName());
+        }
+        if (defCategory != null)
+            result.put("category" + ++cntr, defCategory.categoryName());
+        return result;
+    }
+
+    private Map<String, String> getCategoriesWithDelete(Long cartId) {
+        Map<String, String> categories = getCategories(cartId);
+        categories.put("delete_category", "Удалить категорию");
+        return categories;
+    }
+
+    private Map<String, String> getCategoriesWithCreateNewAndDelete(Long cartId) {
+        Map<String, String> categories = getCategoriesWithDelete(cartId);
+        categories.put("create_new_category", "Создать категорию");
+        return categories;
     }
 }

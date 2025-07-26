@@ -1,8 +1,6 @@
 package com.shavarushka.commands;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -16,15 +14,12 @@ import com.shavarushka.commands.callbackhandlers.deleteCallbacks.*;
 import com.shavarushka.commands.callbackhandlers.settingCallbacks.*;
 import com.shavarushka.commands.commandhandlers.*;
 import com.shavarushka.commands.interfaces.BotCommand;
-import com.shavarushka.commands.keyboard.CartSelectionListener;
-import com.shavarushka.commands.keyboard.ReplyKeyboardHandler;
 import com.shavarushka.database.SQLiteConnection;
 
 public class CommandManager {
     private final Map<String, BotCommand> commands = new HashMap<>();
     private final Map<Long, BotState> userStates = new HashMap<>();
     private final Map<Long, String> tempNewNames = new HashMap<>();
-    private final List<CartSelectionListener> selectedCartsListeners = new ArrayList<>();
     private final MessageSender sender;
     private final SQLiteConnection connection;
 
@@ -33,7 +28,7 @@ public class CommandManager {
         connection = new SQLiteConnection(System.getenv("DB_URL"));
 
         // register commands
-        registerCommand(new StartCommand(sender, userStates, connection, selectedCartsListeners));
+        registerCommand(new StartCommand(sender, userStates, connection));
         var createCartCommand = new CreateCartCommand(sender, userStates, connection, tempNewNames);
         registerCommand(createCartCommand);
         registerCommand(createCartCommand.new NameInputHandler(sender, userStates, connection));
@@ -42,22 +37,22 @@ public class CommandManager {
         var inviteUserCommand = new InviteUserCommand(sender, userStates, connection);
         registerCommand(inviteUserCommand);
         registerCommand(inviteUserCommand.new UsernameInputHandler(sender, userStates, connection));
-        registerCommand(new AddProductCommand(sender, userStates, selectedCartsListeners, connection));
+        registerCommand(new AddProductCommand(sender, userStates, connection));
         registerCommand(new ListProductsOfCategoryCommand(sender, userStates, connection));
-        var addCategoryCommand = new AddCategoryCommand(sender, userStates, connection, tempNewNames, selectedCartsListeners);
+        var addCategoryCommand = new AddCategoryCommand(sender, userStates, connection, tempNewNames);
         registerCommand(addCategoryCommand);
         registerCommand(addCategoryCommand.new CategoryNameInputHandler(sender, userStates, connection));
-        registerCommand(new ConfirmCategoryCreationCallback(sender, userStates, connection, tempNewNames, selectedCartsListeners));
+        registerCommand(new ConfirmCategoryCreationCallback(sender, userStates, connection, tempNewNames));
         registerCommand(new CancelCreatingCategoryCallback(sender, userStates, connection));
         registerCommand(new DeleteCategoryCommand(sender, userStates, connection));
         registerCommand(new SettingsCommand(sender, userStates, connection));
 
         // register callbacks
         registerCommand(new CancelCreatingCartCallback(sender, userStates, connection));
-        registerCommand(new ConfirmCartCreationCallback(sender, userStates, connection, tempNewNames, selectedCartsListeners));
-        registerCommand(mycartCommand.new SetCartCallback(sender, userStates, connection, selectedCartsListeners));
+        registerCommand(new ConfirmCartCreationCallback(sender, userStates, connection, tempNewNames));
+        registerCommand(mycartCommand.new SetCartCallback(sender, userStates, connection));
         registerCommand(new CancelInvitingUserCallback(sender, userStates, connection));
-        var confirmInvitingCallback = new ConfirmInvitingCallback(sender, userStates, connection, selectedCartsListeners);
+        var confirmInvitingCallback = new ConfirmInvitingCallback(sender, userStates, connection);
         registerCommand(confirmInvitingCallback);
         registerCommand(new DeleteCartCallback(sender, userStates, connection));
         registerCommand(new CancelCartDeletionCallback(sender, userStates, connection));
@@ -66,7 +61,7 @@ public class CommandManager {
         registerCommand(new ConfirmProductDeletionCallback(sender, userStates, connection));
         registerCommand(new CancelProductDeletionCallback(sender, userStates, connection));
         registerCommand(new DeleteCategoryCallback(sender, userStates, connection));
-        registerCommand(new ConfirmCategoryDeletionCallback(sender, userStates, connection, selectedCartsListeners));
+        registerCommand(new ConfirmCategoryDeletionCallback(sender, userStates, connection));
         registerCommand(new CancelCategoryDeletionCallback(sender, userStates, connection));
         var changecategory = new ChangeCategoryCallback(sender, userStates, connection);
         registerCommand(changecategory);
@@ -77,9 +72,6 @@ public class CommandManager {
         registerCommand(new SettingListAlreadyPurchasedCallback(sender, userStates, connection));
         registerCommand(new SettingNotifyAboutProductsCallback(sender, userStates, connection));
         // registerCommand(new SettingNotifyAboutInvitingCallback(sender, userStates, connection));
-
-        // create a ReplyKeyboardHandler for correct updating keyboard on cart changes
-        new ReplyKeyboardHandler(sender, connection, confirmInvitingCallback);
     }
 
     public void registerCommand(BotCommand command) {

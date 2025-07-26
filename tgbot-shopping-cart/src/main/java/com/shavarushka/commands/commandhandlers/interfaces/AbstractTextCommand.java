@@ -16,7 +16,6 @@ public abstract class AbstractTextCommand extends AbstractCommand {
 
     abstract public String getDescription();
 
-    // should override if need to check BotState 
     @Override
     public boolean shouldProcess(Update update) {
         if (!update.hasMessage() || !update.getMessage().hasText())

@@ -8,7 +8,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import com.shavarushka.commands.BotState;
 import com.shavarushka.commands.MessageSender;
 import com.shavarushka.commands.callbackhandlers.interfaces.AbstractCallbackCommand;
-import com.shavarushka.commands.interfaces.SettingNotifyHandler;
+import com.shavarushka.commands.interfaces.SettingsDependantNotifier;
 import com.shavarushka.database.SQLiteConnection;
 import com.shavarushka.database.entities.Products;
 import com.shavarushka.database.entities.Users;
@@ -51,7 +51,7 @@ public class ConfirmProductDeletionCallback extends AbstractCallbackCommand {
         userStates.remove(chatId);
 
         message = "удалил(а) товар\n" + product.fullURL();
-        notifyAllIfEnabled(user.userId(), user.selectedCartId(), SettingNotifyHandler.NotificationType.PRODUCT_DELETED, message);
+        notifyAllIfEnabled(user.userId(), user.selectedCartId(), SettingsDependantNotifier.NotificationType.PRODUCT_DELETED, message);
     }
 
     private boolean isProductExist(Long productId) {
