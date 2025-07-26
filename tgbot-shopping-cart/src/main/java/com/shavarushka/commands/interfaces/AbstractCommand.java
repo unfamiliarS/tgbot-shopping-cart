@@ -66,8 +66,8 @@ public abstract class AbstractCommand implements BotCommand, SettingsDependantNo
         buttons.put("/listalreadypurchased", mark + "Показывать купленные товары 💚 💛");
         mark = settings.notifyAboutProducts().equals(true) ? "✅ " : "";
         buttons.put("/notifyaboutproducts", mark + "Уведомлять о действиях с товарами 🔔");
-        // mark = settings.notifyAboutInviting().equals(true) ? "✅ " : "";
-        // buttons.put("/notifyaboutinviting", mark + "Уведомлять о приглашениях в корзины 🔔");
+        mark = settings.notifyAboutInviting().equals(true) ? "✅ " : "";
+        buttons.put("/notifyaboutinviting", mark + "Уведомлять о cостоянии приглашения в корзину 🔔");
         buttons.put("/close", "✖ Закрыть");
         return KeyboardsFabrics.createKeyboard(buttons, 1, InlineKeyboardMarkup.class);
     }
@@ -108,11 +108,9 @@ public abstract class AbstractCommand implements BotCommand, SettingsDependantNo
      */
     public void notifyAllIfEnabled(Long userNotifier, Long cartId, NotificationType type, String message) throws TelegramApiException {
         for (Users user : connection.getUsersAssignedToCart(cartId)) {
-            if (!user.userId().equals(userNotifier) && shouldNotify(user.userId(), type)) {
-                sendNotification(userNotifier, user.userId(), message);
-            }
+            notifyIfEnabled(userNotifier, user.userId(), message, type);
         }
-    }
+    }   
     
     @Override
     public boolean shouldNotify(Long userId, NotificationType type) {
@@ -121,6 +119,9 @@ public abstract class AbstractCommand implements BotCommand, SettingsDependantNo
             case PRODUCT_ADDED, CATEGORY_ADDED,
                  PRODUCT_DELETED, CATEGORY_DELETED
                     -> settings.notifyAboutProducts();
+            case CONFIRMATION_OF_JOINING_THE_CART,
+                 REFUSING_OF_JOINING_THE_CART
+                    -> settings.notifyAboutInviting();
         };
     }
 

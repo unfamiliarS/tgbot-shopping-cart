@@ -27,7 +27,7 @@ public class CommandManager {
         sender = new MessageSender(telegramClient);
         connection = new SQLiteConnection(System.getenv("DB_URL"));
 
-        // register commands
+        // Register commands
         registerCommand(new StartCommand(sender, userStates, connection));
         var createCartCommand = new CreateCartCommand(sender, userStates, connection, tempNewNames);
         registerCommand(createCartCommand);
@@ -47,13 +47,12 @@ public class CommandManager {
         registerCommand(new DeleteCategoryCommand(sender, userStates, connection));
         registerCommand(new SettingsCommand(sender, userStates, connection));
 
-        // register callbacks
+        // Register callbacks
         registerCommand(new CancelCreatingCartCallback(sender, userStates, connection));
         registerCommand(new ConfirmCartCreationCallback(sender, userStates, connection, tempNewNames));
         registerCommand(mycartCommand.new SetCartCallback(sender, userStates, connection));
         registerCommand(new CancelInvitingUserCallback(sender, userStates, connection));
-        var confirmInvitingCallback = new ConfirmInvitingCallback(sender, userStates, connection);
-        registerCommand(confirmInvitingCallback);
+        registerCommand(new ConfirmInvitingCallback(sender, userStates, connection));
         registerCommand(new DeleteCartCallback(sender, userStates, connection));
         registerCommand(new CancelCartDeletionCallback(sender, userStates, connection));
         registerCommand(new ConfirmCartDeletionCallback(sender, userStates, connection));
@@ -68,10 +67,11 @@ public class CommandManager {
         registerCommand(changecategory.new ConfirmCategoryChangingCallback(sender, userStates, connection));
         registerCommand(new ChangePurchaseStatusCallback(sender, userStates, connection));
         registerCommand(new CloseCallback(sender, userStates, connection));
-        // settings
+        // settings callbacks
         registerCommand(new SettingListAlreadyPurchasedCallback(sender, userStates, connection));
         registerCommand(new SettingNotifyAboutProductsCallback(sender, userStates, connection));
-        // registerCommand(new SettingNotifyAboutInvitingCallback(sender, userStates, connection));
+        registerCommand(new SettingNotifyAboutInvitingCallback(sender, userStates, connection));
+        registerCommand(new RefuseInvitingCallback(sender, userStates, connection));
     }
 
     public void registerCommand(BotCommand command) {

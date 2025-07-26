@@ -421,6 +421,45 @@ final public class SQLiteConnection implements DBConnection {
         }
     }
 
+    public boolean updateChatIdForUser(Long userId, Long chatId) {
+        String query = "UPDATE OR IGNORE users SET chat_id = ? WHERE user_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, chatId);
+            statement.setLong(2, userId);
+            int affectedRows = statement.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    public boolean updateFirstNameForUser(Long userId, String firstname) {
+        String query = "UPDATE OR IGNORE users SET user_firstname = ? WHERE user_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, firstname);
+            statement.setLong(2, userId);
+            int affectedRows = statement.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    public boolean updateUserNameForUser(Long userId, String username) {
+        String query = "UPDATE OR IGNORE users SET username = ? WHERE user_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, username);
+            statement.setLong(2, userId);
+            int affectedRows = statement.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public boolean updateCategoryForProduct(Long productId, Long categoryId) {
         String query = "UPDATE OR IGNORE products SET assigned_category_id = ? WHERE product_id = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {

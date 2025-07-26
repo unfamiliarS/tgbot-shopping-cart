@@ -9,9 +9,9 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import com.shavarushka.commands.BotState;
 import com.shavarushka.commands.MessageSender;
 import com.shavarushka.commands.callbackhandlers.interfaces.AbstractCallbackCommand;
+import com.shavarushka.commands.interfaces.SettingsDependantNotifier;
 import com.shavarushka.database.SQLiteConnection;
 import com.shavarushka.database.entities.ShoppingCarts;
-import com.shavarushka.database.entities.Users;
 
 public class ConfirmInvitingCallback extends AbstractCallbackCommand {
     public ConfirmInvitingCallback(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
@@ -49,25 +49,13 @@ public class ConfirmInvitingCallback extends AbstractCallbackCommand {
         connection.updateSelectedCartForUser(userId, cartId);
         updateReplyKeyboardOnDataChanges(userId, cartId);
 
-        notifyUsersForInviteConfirmation(update, cartId);
-
+        String cartName = connection.getCartById(cartId).cartName();
         message = "✅ Приглашение принято\\. Добро пожаловать в " 
-                        + MessageSender.escapeMarkdownV2(connection.getCartById(cartId).cartName() + "!");
+        + MessageSender.escapeMarkdownV2(cartName + " !");
         sender.editMessage(chatId, messageId, message, true);
-    }
-
-    private void notifyUsersForInviteConfirmation(Update update, Long cartId) throws TelegramApiException {
-        Set<Users> users;
-        if ((users = connection.getUsersAssignedToCart(cartId)).isEmpty())
-            return;
-        for (Users user : users) {
-            if (user.userId().equals(update.getCallbackQuery().getFrom().getId()))
-                continue;
-            String name = update.getCallbackQuery().getFrom().getUserName();
-            if (name.isEmpty() || name == null)
-                name = update.getCallbackQuery().getFrom().getFirstName();
-            sender.sendMessage(user.chatId(), "@" +  name + " вступил в корзину!", false);
-        }
+        
+        message = "вступил(а) в корзину '" + cartName + "'";
+        notifyAllIfEnabled(userId, cartId, SettingsDependantNotifier.NotificationType.CONFIRMATION_OF_JOINING_THE_CART, message);
     }
 
     private boolean isCartExist(Long cartId) {

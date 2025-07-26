@@ -82,18 +82,14 @@ public class InviteUserCommand extends AbstractTextCommand {
             String message;
 
             if (!isCorrectUsername(usernameToInvite)) {
-                message = "Некорректное имя пользователя.\nПопробуй ещё раз.";
-                sender.sendMessage(chatId, message,
-                    KeyboardsFabrics.createKeyboard(
-                        Map.of("/cancelinvitinguser", "Отменить ввод"),
-                        1, InlineKeyboardMarkup.class), false);
+                message = "Некорректное имя пользователя.\nПопробуй ещё раз 🔄";
+                sender.sendMessage(chatId, message, false);
                 return;
             }
 
             if (isItMe(currentUsername, usernameToInvite.substring(1))) {
                 message = "Хулиганишь 🙃";
                 sender.sendMessage(chatId, message, false);
-                userStates.remove(chatId);
                 return;
             }
 
@@ -106,7 +102,7 @@ public class InviteUserCommand extends AbstractTextCommand {
             }
 
             if (isUserAlreadyHaveThisCart(invitedUser.userId(), invitedCartId)) {
-                message = usernameToInvite + " уже состоит в этой корзине 😋";
+                message = usernameToInvite + " уже состоит в этой корзине 😋\n❌ Отменяю приглашение...";
                 sender.sendMessage(chatId, message, false);
                 userStates.remove(chatId);
                 return;
@@ -120,7 +116,7 @@ public class InviteUserCommand extends AbstractTextCommand {
         }
 
         private boolean isCorrectUsername(String username) {
-            return username.toLowerCase().matches("@[a-z0-9_]+");
+            return username.toLowerCase().matches("@[a-z0-9_]{4,32}") && !username.toLowerCase().equals("@null");
         }
 
         private boolean isItMe(String myUsername, String usernameToInvite) {
@@ -142,7 +138,9 @@ public class InviteUserCommand extends AbstractTextCommand {
             String invitingMessage = "@" + MessageSender.escapeMarkdownV2(currentUsername) +
                                     " приглашает в корзину *" + MessageSender.escapeMarkdownV2(invitedCart) + "*";
             var keyboard = KeyboardsFabrics.createKeyboard(
-                                Map.of("/confirminviting_" + invitedCartId, "✅ Вступить"
+                                Map.of(
+                                    "/confirminviting_" + invitedCartId, "✅ Вступить",
+                                    "/refuseinviting_" + currentUserId, "❌ Отказаться"
                                     ), 1, InlineKeyboardMarkup.class);
             sender.sendMessage(invitedChatId, invitingMessage, keyboard, true);
         }

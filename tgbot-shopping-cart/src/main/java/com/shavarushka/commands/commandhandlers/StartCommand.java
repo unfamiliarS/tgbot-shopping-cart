@@ -3,6 +3,7 @@ package com.shavarushka.commands.commandhandlers;
 import java.util.Map;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.shavarushka.commands.BotState;
@@ -29,30 +30,40 @@ public class StartCommand extends AbstractTextCommand {
     @Override
     public void execute(Update update) throws TelegramApiException {
         Long chatId = update.getMessage().getChatId();
-        Long userId = update.getMessage().getFrom().getId();
-        String firstname = update.getMessage().getFrom().getFirstName();
+        User tgUser = update.getMessage().getFrom();
+        Long userId = tgUser.getId();
+        String firstname = tgUser.getFirstName();
 
         Users user = connection.getUserById(userId);
         // register new user if needed
         if (user == null) {
-            user = new Users(userId,
-                            chatId,
-                            firstname,
-                            update.getMessage().getFrom().getUserName(),
-                            null, // adding later
-                            null // db will figure it out itself
-        );
+            user = new Users(
+                userId,
+                chatId,
+                firstname,
+                update.getMessage().getFrom().getUserName(),
+                null, // adding later
+                null // db will figure it out itself
+            );
             connection.addUser(user);
         }
         
         sender.sendMessage(chatId, "Привет *" + firstname + "*\\!", true);
         
-        // update chatId if needed
+        // update user info if needed
         if (chatId != user.chatId()) {
-            // TODO: logic to update chatId
+            connection.updateChatIdForUser(user.userId(), chatId);
+        }
+        if (!tgUser.getFirstName().equals(user.firstname())) {
+            connection.updateFirstNameForUser(user.userId(), tgUser.getFirstName());
+        }
+        if ((tgUser.getUserName() != null && user.username() != null) && !tgUser.getUserName().equals(user.username()) ||
+             tgUser.getUserName() != null && user.username() == null ||
+             tgUser.getUserName() == null && user.username() != null   
+        ) {
+            connection.updateUserNameForUser(user.userId(), tgUser.getUserName());
         }
 
         updateReplyKeyboardOnDataChanges(userId, user.selectedCartId());
     }
-
 }

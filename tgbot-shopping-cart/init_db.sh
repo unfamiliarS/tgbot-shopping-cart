@@ -3,14 +3,14 @@
 # set echo
 set -x
 
-DB_FILE=test.db
+DB_FILE=testt.db
 rm -f "$DB_FILE"
 
 sql_query="CREATE TABLE IF NOT EXISTS users (
     user_id INTEGER PRIMARY KEY,
     chat_id INTEGER NOT NULL,
     user_firstname TEXT NOT NULL,
-    username TEXT NOT NULL,
+    username TEXT,
     selected_cart_id INTEGER,
     registration_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
