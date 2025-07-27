@@ -36,20 +36,11 @@ public class SettingsCommand extends AbstractTextCommand {
         if (!checkForUserExisting(chatId, userId))
             return;   
 
-        var settings = initializeSettingsIfneeded(userId);
+        var settings = connection.getSettingsById(userId);
 
         message = "⚙️ Твои настройки";
         var keyboard = getSettingsKeyboard(settings);
         
         sender.sendMessage(chatId, message, keyboard, false);
-    }
-
-    private Settings initializeSettingsIfneeded(Long settingId) {
-        if (connection.getSettingsById(settingId) == null) {
-            connection.addSettings(
-                new Settings(settingId)
-            );
-        }
-        return connection.getSettingsById(settingId);
     }
 }

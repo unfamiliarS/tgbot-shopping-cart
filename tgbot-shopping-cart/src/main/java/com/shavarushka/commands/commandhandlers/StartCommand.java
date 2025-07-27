@@ -10,6 +10,7 @@ import com.shavarushka.commands.BotState;
 import com.shavarushka.commands.MessageSender;
 import com.shavarushka.commands.commandhandlers.interfaces.AbstractTextCommand;
 import com.shavarushka.database.SQLiteConnection;
+import com.shavarushka.database.entities.Settings;
 import com.shavarushka.database.entities.Users;
 
 public class StartCommand extends AbstractTextCommand {
@@ -36,6 +37,7 @@ public class StartCommand extends AbstractTextCommand {
         var dbUser = connection.getUserById(tgUser.getId());
 
         dbUser = registerUserIfNeeded(dbUser, tgUser, chatId);
+        initializeSettingsIfneeded(tgUser.getId());
         
         // update user info
         updateChatIdIfNeeded(dbUser, chatId);
@@ -53,6 +55,15 @@ public class StartCommand extends AbstractTextCommand {
             connection.addUser(dbUser);
         }
         return dbUser;
+    }
+
+    private Settings initializeSettingsIfneeded(Long settingId) {
+        if (connection.getSettingsById(settingId) == null) {
+            connection.addSettings(
+                new Settings(settingId)
+            );
+        }
+        return connection.getSettingsById(settingId);
     }
 
     private void updateChatIdIfNeeded(Users dbUser, Long chatId) {
@@ -75,5 +86,5 @@ public class StartCommand extends AbstractTextCommand {
             connection.updateUserNameForUser(dbUser.userId(), tgUser.getUserName());
         }
     }
-    
+   
 }
