@@ -9,7 +9,6 @@ import com.shavarushka.commands.BotState;
 import com.shavarushka.commands.MessageSender;
 import com.shavarushka.commands.commandhandlers.interfaces.AbstractTextCommand;
 import com.shavarushka.database.SQLiteConnection;
-import com.shavarushka.database.entities.Settings;
 
 public class SettingsCommand extends AbstractTextCommand {
 

@@ -14,9 +14,13 @@ Just create a cart, invite a friend to it, send links to the bot and it will sav
 In project root type:
 
 ```bash
+export SHOPPING_CART_BOT_TOKEN="your_bot_token"
+export PATH_TO_DB="path_to_your_db"
+export DB_URL="jdbc:sqlite:$PATH_TO_DB"
+
 # initialize db
-cd tgbot-shopping-cart && ./init_db.sh
+tgbot-shopping-cart/init_db.sh
 
 # build and run bot
-mvn clean package && java -jar target/tgbot-shopping-cart.jar
+mvn clean package && java -jar tgbot-shopping-cart/target/tgbot-shopping-cart.jar
 ```
