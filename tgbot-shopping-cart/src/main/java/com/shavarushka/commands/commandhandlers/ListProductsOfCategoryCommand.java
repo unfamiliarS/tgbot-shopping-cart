@@ -57,11 +57,13 @@ public class ListProductsOfCategoryCommand extends AbstractTextCommand {
         String categoryName = update.getMessage().getText();
         Users user = connection.getUserById(userId);
         Settings setting = connection.getSettingsById(userId);
-
         Long categoryId = connection.getCategoryByAssignedCartIdAndName(user.selectedCartId(), categoryName).categoryId();
         Set<Products> products = connection.getProductsByCategoryId(categoryId);
         if (!products.isEmpty()) {
-            if (listProducts(chatId, products, setting.listAlreadyPurchased()) != 0) {
+            int productsCnt = 0;
+            if ((productsCnt = listProducts(chatId, products, setting.listAlreadyPurchased())) != 0) {
+                String message = "Всего товаров: " + productsCnt;
+                sender.sendMessage(chatId, message, false);
                 return;
             }
         }
