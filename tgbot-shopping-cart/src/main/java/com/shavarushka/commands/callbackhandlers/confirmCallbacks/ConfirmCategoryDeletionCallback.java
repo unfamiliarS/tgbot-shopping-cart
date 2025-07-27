@@ -55,7 +55,7 @@ public class ConfirmCategoryDeletionCallback extends AbstractCallbackCommand {
         deleteCategoryAndTheyProducts(categoryForDeletionId);
         userStates.remove(chatId);
 
-        updateReplyKeyboardOnDataChanges(userId, user.selectedCartId());
+        updateReplyKeyboard(userId, user.selectedCartId());
 
         message = "✅ Категория *" + MessageSender.escapeMarkdownV2(categoryName) + "* удалена😎";
         sender.editMessage(chatId, messageId, message, true);

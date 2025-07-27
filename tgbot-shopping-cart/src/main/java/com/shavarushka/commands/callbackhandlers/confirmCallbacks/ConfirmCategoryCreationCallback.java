@@ -50,12 +50,12 @@ public class ConfirmCategoryCreationCallback extends AbstractCallbackCommand {
         
         if (categoryName != null) {
             // create category
-            Categories category = new Categories(null, user.selectedCartId(), categoryName, null);
+            Categories category = new Categories(user.selectedCartId(), categoryName);
             connection.addCategory(category);
     
             // notify to update keyboard on added category
             user = connection.getUserById(user.userId());            
-            updateReplyKeyboardOnDataChanges(user.userId(), user.selectedCartId());
+            updateReplyKeyboard(user.userId(), user.selectedCartId());
             
             userStates.remove(chatId);
             message = "✅ Категория *" + MessageSender.escapeMarkdownV2(categoryName) + "* создана😎";

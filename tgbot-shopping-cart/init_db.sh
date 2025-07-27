@@ -3,7 +3,7 @@
 # set echo
 set -x
 
-DB_FILE=testt.db
+DB_FILE=test.db
 rm -f "$DB_FILE"
 
 sql_query="CREATE TABLE IF NOT EXISTS users (

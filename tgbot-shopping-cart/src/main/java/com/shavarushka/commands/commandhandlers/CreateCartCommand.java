@@ -17,6 +17,7 @@ import com.vdurmont.emoji.EmojiManager;
 import com.vdurmont.emoji.EmojiParser;
 
 public class CreateCartCommand extends AbstractTextCommand {
+
     private final Map<Long, String> cartNames;
 
     public CreateCartCommand(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection, Map<Long, String> cartNames) {
@@ -44,10 +45,12 @@ public class CreateCartCommand extends AbstractTextCommand {
             return;
 
         message = getDescription() + "\n\nВведи название корзины:";
-        InlineKeyboardMarkup keyboard = KeyboardsFabrics.createKeyboard(
+        var keyboard = KeyboardsFabrics.createKeyboard(
             Map.of("/cancelcreatingnewcart", "Отменить создание"), 1, InlineKeyboardMarkup.class
         );
+
         sender.sendMessage(chatId, message, keyboard, false);
+
         userStates.put(chatId, BotState.WAITING_FOR_CART_NAME);
     }
 
@@ -79,6 +82,12 @@ public class CreateCartCommand extends AbstractTextCommand {
         public void execute(Update update) throws TelegramApiException {
             Long chatId = update.getMessage().getChatId();
             Long userId = update.getMessage().getFrom().getId();
+            
+            if (!checkForUserExisting(chatId, userId)) {
+                userStates.remove(chatId);
+                return;
+            }
+
             String cartName = update.getMessage().getText();
             String message;
             
@@ -93,12 +102,14 @@ public class CreateCartCommand extends AbstractTextCommand {
             }
 
             cartNames.put(chatId, cartName);
+            userStates.put(chatId, BotState.CONFIRMING_CART_CREATION);
+
             message = "Вы точно уверены\\, что хотите создать *" + MessageSender.escapeMarkdownV2(cartName) + "*\\?";
             ReplyKeyboard confirmationKeyboard = KeyboardsFabrics.createKeyboard(
                                             Map.of("/confirmcartcreation", "✅ Подтвердить",
                                                    "/cancelcreatingnewcart", "❌ Отменить"),
                                                    2, InlineKeyboardMarkup.class);
-            userStates.put(chatId, BotState.CONFIRMING_CART_CREATION);
+
             sender.sendMessage(chatId, message, confirmationKeyboard, true);
         }
 

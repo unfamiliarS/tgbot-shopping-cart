@@ -36,7 +36,7 @@ public class InviteUserCommand extends AbstractTextCommand {
         Long chatId = update.getMessage().getChatId();
         Long userId = update.getMessage().getFrom().getId();
     
-        if (!checkForUserExisting(chatId, userId) || !checkForCartExisting(chatId, userId))
+        if (!checkForUserExisting(chatId, userId) || !checkForAssignedCartExisting(chatId, userId))
             return;
 
         sender.sendMessage(chatId, 

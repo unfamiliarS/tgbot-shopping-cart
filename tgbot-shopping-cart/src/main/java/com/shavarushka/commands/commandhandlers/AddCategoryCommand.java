@@ -41,7 +41,7 @@ public class AddCategoryCommand extends AbstractTextCommand {
         Long userId = update.getMessage().getFrom().getId();
         String message;
     
-        if (!checkForUserExisting(chatId, userId) || !checkForCartExisting(chatId, userId))
+        if (!checkForUserExisting(chatId, userId) || !checkForAssignedCartExisting(chatId, userId))
             return;
 
         message = getDescription() + "\n\nВведи название категории:";

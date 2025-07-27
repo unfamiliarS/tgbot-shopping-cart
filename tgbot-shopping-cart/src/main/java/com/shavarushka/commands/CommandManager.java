@@ -32,8 +32,7 @@ public class CommandManager {
         var createCartCommand = new CreateCartCommand(sender, userStates, connection, tempNewNames);
         registerCommand(createCartCommand);
         registerCommand(createCartCommand.new NameInputHandler(sender, userStates, connection));
-        var mycartCommand = new MyCartCommand(sender, userStates, connection);
-        registerCommand(mycartCommand);
+        registerCommand(new MyCartsCommand(sender, userStates, connection));
         var inviteUserCommand = new InviteUserCommand(sender, userStates, connection);
         registerCommand(inviteUserCommand);
         registerCommand(inviteUserCommand.new UsernameInputHandler(sender, userStates, connection));
@@ -50,7 +49,7 @@ public class CommandManager {
         // Register callbacks
         registerCommand(new CancelCreatingCartCallback(sender, userStates, connection));
         registerCommand(new ConfirmCartCreationCallback(sender, userStates, connection, tempNewNames));
-        registerCommand(mycartCommand.new SetCartCallback(sender, userStates, connection));
+        registerCommand(new SetCartCallback(sender, userStates, connection));
         registerCommand(new CancelInvitingUserCallback(sender, userStates, connection));
         registerCommand(new ConfirmInvitingCallback(sender, userStates, connection));
         registerCommand(new DeleteCartCallback(sender, userStates, connection));

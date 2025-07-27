@@ -13,6 +13,7 @@ import com.shavarushka.database.SQLiteConnection;
 import com.shavarushka.database.entities.Users;
 
 public class StartCommand extends AbstractTextCommand {
+
     public StartCommand(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
         super(sender, userStates, connection);
     }
@@ -30,40 +31,49 @@ public class StartCommand extends AbstractTextCommand {
     @Override
     public void execute(Update update) throws TelegramApiException {
         Long chatId = update.getMessage().getChatId();
-        User tgUser = update.getMessage().getFrom();
-        Long userId = tgUser.getId();
-        String firstname = tgUser.getFirstName();
 
-        Users user = connection.getUserById(userId);
-        // register new user if needed
-        if (user == null) {
-            user = new Users(
-                userId,
-                chatId,
-                firstname,
-                update.getMessage().getFrom().getUserName(),
-                null, // adding later
-                null // db will figure it out itself
-            );
-            connection.addUser(user);
-        }
-        
-        sender.sendMessage(chatId, "Привет *" + firstname + "*\\!", true);
-        
-        // update user info if needed
-        if (chatId != user.chatId()) {
-            connection.updateChatIdForUser(user.userId(), chatId);
-        }
-        if (!tgUser.getFirstName().equals(user.firstname())) {
-            connection.updateFirstNameForUser(user.userId(), tgUser.getFirstName());
-        }
-        if ((tgUser.getUserName() != null && user.username() != null) && !tgUser.getUserName().equals(user.username()) ||
-             tgUser.getUserName() != null && user.username() == null ||
-             tgUser.getUserName() == null && user.username() != null   
-        ) {
-            connection.updateUserNameForUser(user.userId(), tgUser.getUserName());
-        }
+        var tgUser = update.getMessage().getFrom();
+        var dbUser = connection.getUserById(tgUser.getId());
 
-        updateReplyKeyboardOnDataChanges(userId, user.selectedCartId());
+        dbUser = registerUserIfNeeded(dbUser, tgUser, chatId);
+        
+        // update user info
+        updateChatIdIfNeeded(dbUser, chatId);
+        updateFirstNameIfNeeded(dbUser, tgUser);
+        updateUserNameIfNeeded(dbUser, tgUser);
+        
+        sender.sendMessage(chatId, "Привет *" + tgUser.getFirstName() + "*\\!", true);
+
+        updateReplyKeyboard(tgUser.getId(), dbUser.selectedCartId());
     }
+
+    private Users registerUserIfNeeded(Users dbUser, User tgUser, Long chatId) {
+        if (dbUser == null) {
+            dbUser = new Users(tgUser.getId(), chatId, tgUser.getFirstName(), tgUser.getUserName());
+            connection.addUser(dbUser);
+        }
+        return dbUser;
+    }
+
+    private void updateChatIdIfNeeded(Users dbUser, Long chatId) {
+        if (chatId != dbUser.chatId()) {
+            connection.updateChatIdForUser(dbUser.userId(), chatId);
+        }
+    }
+
+    private void updateFirstNameIfNeeded(Users dbUser, User tgUser) {
+        if (!tgUser.getFirstName().equals(dbUser.firstname())) {
+            connection.updateFirstNameForUser(dbUser.userId(), tgUser.getFirstName());
+        }
+    }
+
+    private void updateUserNameIfNeeded(Users dbUser, User tgUser) {
+        if ((tgUser.getUserName() != null && dbUser.username() != null) && !tgUser.getUserName().equals(dbUser.username()) ||
+             tgUser.getUserName() != null && dbUser.username() == null ||
+             tgUser.getUserName() == null && dbUser.username() != null   
+             ) {
+            connection.updateUserNameForUser(dbUser.userId(), tgUser.getUserName());
+        }
+    }
+    
 }

@@ -31,14 +31,14 @@ public class DeleteCartCallback extends AbstractCallbackCommand {
         Long userId = update.getCallbackQuery().getFrom().getId();
         String message;
     
-        if (!checkForUserExisting(chatId, userId) || !checkForCartExisting(chatId, userId))
+        if (!checkForUserExisting(chatId, userId) || !checkForAnyAssignedCartsExisting(chatId, userId) || !checkForAssignedCartExisting(chatId, userId))
             return;
 
         Long cartForDeletionId = extractIdFromMessage(update.getCallbackQuery().getData());
         ShoppingCarts cart = connection.getCartById(cartForDeletionId);
         Users user = connection.getUserById(update.getCallbackQuery().getFrom().getId());
         
-        if (connection.getCartById(cartForDeletionId) == null) {
+        if (!checkForCartExisting(cartForDeletionId)) {
             // skip if cart doesn't exist
         } else if (!isThisCartAssignedToUser(cartForDeletionId, user.userId())) {
             // skip if this cart isn't assigned to user

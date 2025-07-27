@@ -49,7 +49,7 @@ public class AddProductCommand extends AbstractTextCommand {
         Long userId = update.getMessage().getFrom().getId();
         String message;
     
-        if (!checkForUserExisting(chatId, userId) || !checkForCartExisting(chatId, userId))
+        if (!checkForUserExisting(chatId, userId) || !checkForAssignedCartExisting(chatId, userId))
             return;
 
         String productURL = extractUrlFromMessage(update.getMessage().getText().strip());
@@ -77,29 +77,17 @@ public class AddProductCommand extends AbstractTextCommand {
             Long defaultCategoryId;
             // if defaultCategory isn't create yet
             if (defaultCategory == null) {
-                defaultCategoryId = connection.addCategory(new Categories(null, 
-                                                                                cartId,
-                                                                                "Прочее",
-                                                                                null)
-                );
+                defaultCategoryId = connection.addCategory(new Categories(cartId, "Прочее"));
                 isNeedToNotifyKeyboardUpdate = true;
             } else {
                 defaultCategoryId = defaultCategory.categoryId();
             }
             
-            product = new Products(
-                                null,
-                                productURL,
-                                defaultCategoryId,
-                                null,
-                                null,
-                                false,
-                                null
-            );
+            product = new Products(productURL, defaultCategoryId);
             Long productId = connection.addProduct(product);
 
             if (isNeedToNotifyKeyboardUpdate)
-                updateReplyKeyboardOnDataChanges(userId, cartId);
+                updateReplyKeyboard(userId, cartId);
 
             if (productId != null) {
                 product = connection.getProductById(productId);

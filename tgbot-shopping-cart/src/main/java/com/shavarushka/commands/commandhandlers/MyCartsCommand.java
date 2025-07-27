@@ -1,6 +1,7 @@
 package com.shavarushka.commands.commandhandlers;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -9,22 +10,22 @@ import com.shavarushka.commands.BotState;
 import com.shavarushka.commands.MessageSender;
 import com.shavarushka.commands.commandhandlers.interfaces.AbstractTextCommand;
 import com.shavarushka.database.SQLiteConnection;
-import com.shavarushka.database.entities.Settings;
+import com.shavarushka.database.entities.ShoppingCarts;
 
-public class SettingsCommand extends AbstractTextCommand {
+public class MyCartsCommand extends AbstractTextCommand {
 
-    public SettingsCommand(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
+    public MyCartsCommand(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
         super(sender, userStates, connection);
     }
 
     @Override
     public String getCommand() {
-        return "/settings";
+        return "/mycarts";
     }
 
     @Override
     public String getDescription() {
-        return "Управление настройками бота";
+        return "Список твоих корзин";
     }
 
     @Override
@@ -32,24 +33,18 @@ public class SettingsCommand extends AbstractTextCommand {
         Long chatId = update.getMessage().getChatId();
         Long userId = update.getMessage().getFrom().getId();
         String message;
-    
-        if (!checkForUserExisting(chatId, userId))
-            return;   
+        
+        if (!checkForUserExisting(chatId, userId) || !checkForAnyAssignedCartsExisting(chatId, userId))
+            return;
+        
+        Set<ShoppingCarts> assignedCarts = connection.getCartsAssignedToUser(userId);
+        ShoppingCarts selectedCart = connection.getCartById(
+                                     connection.getUserById(userId).selectedCartId());
 
-        var settings = initializeSettingsIfneeded(userId);
-
-        message = "⚙️ Твои настройки";
-        var keyboard = getSettingsKeyboard(settings);
+        message = "Ваши корзины:";
+        var keyboard = getMyCartsKeyboard(assignedCarts, selectedCart.cartId());
         
         sender.sendMessage(chatId, message, keyboard, false);
     }
 
-    private Settings initializeSettingsIfneeded(Long settingId) {
-        if (connection.getSettingsById(settingId) == null) {
-            connection.addSettings(
-                new Settings(settingId)
-            );
-        }
-        return connection.getSettingsById(settingId);
-    }
 }

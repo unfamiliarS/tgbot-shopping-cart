@@ -47,7 +47,7 @@ public class ConfirmInvitingCallback extends AbstractCallbackCommand {
 
         connection.addUserToCartIntermediate(userId, cartId);
         connection.updateSelectedCartForUser(userId, cartId);
-        updateReplyKeyboardOnDataChanges(userId, cartId);
+        updateReplyKeyboard(userId, cartId);
 
         String cartName = connection.getCartById(cartId).cartName();
         message = "✅ Приглашение принято\\. Добро пожаловать в " 

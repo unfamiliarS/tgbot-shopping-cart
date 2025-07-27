@@ -30,7 +30,7 @@ public class DeleteCategoryCallback extends AbstractCallbackCommand {
         Long userId = update.getCallbackQuery().getFrom().getId();
         String message;
     
-        if (!checkForUserExisting(chatId, userId) || !checkForCartExisting(chatId, userId))
+        if (!checkForUserExisting(chatId, userId) || !checkForAssignedCartExisting(chatId, userId))
             return;
 
         Integer messageId = update.getCallbackQuery().getMessage().getMessageId();

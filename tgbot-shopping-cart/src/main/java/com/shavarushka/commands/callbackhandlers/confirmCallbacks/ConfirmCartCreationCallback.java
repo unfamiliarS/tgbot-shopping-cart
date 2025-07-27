@@ -47,14 +47,16 @@ public class ConfirmCartCreationCallback extends AbstractCallbackCommand {
         
         if (cartName != null) {
             // create shopping cart
-            ShoppingCarts cart = new ShoppingCarts(null, cartName, null);
+            ShoppingCarts cart = new ShoppingCarts(cartName);
             connection.addCart(cart, user.userId());
     
             user = connection.getUserById(user.userId());            
-            updateReplyKeyboardOnDataChanges(user.userId(), user.selectedCartId());
             
             userStates.remove(chatId);
+            
             sender.deleteMessage(chatId, messageId);
+            
+            updateReplyKeyboard(user.userId(), user.selectedCartId());
         }
     }
 }

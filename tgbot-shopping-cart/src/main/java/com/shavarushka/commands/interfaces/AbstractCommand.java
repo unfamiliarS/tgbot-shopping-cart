@@ -1,7 +1,9 @@
 package com.shavarushka.commands.interfaces;
 
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -73,6 +75,21 @@ public abstract class AbstractCommand implements BotCommand, SettingsDependantNo
         return KeyboardsFabrics.createKeyboard(buttons, 1, InlineKeyboardMarkup.class);
     }
 
+    protected InlineKeyboardMarkup getMyCartsKeyboard(Set<ShoppingCarts> carts, Long selectedCartId) {
+        Map<String, String> buttons = new LinkedHashMap<>();
+        carts.stream()
+            .sorted(Comparator.comparing(ShoppingCarts::creationTime))
+            .forEach(cart -> {
+                String cartName = cart.cartId().equals(selectedCartId) 
+                    ? "✅ " + cart.cartName() 
+                    : cart.cartName();
+                buttons.put("/setcart_" + cart.cartId(), cartName);
+                buttons.put("/deletecart_" + cart.cartId(), "🗑");
+            });
+            buttons.put("/close", "✖ Закрыть");
+        return KeyboardsFabrics.createKeyboard(buttons,2, InlineKeyboardMarkup.class);
+    }
+    
     /* 
      * Base checkups for data existing
      */
@@ -86,14 +103,28 @@ public abstract class AbstractCommand implements BotCommand, SettingsDependantNo
         return true;
     }
 
-    protected boolean checkForCartExisting(Long chatId, Long userId) throws TelegramApiException {
+    protected boolean checkForAssignedCartExisting(Long chatId, Long userId) throws TelegramApiException {
         String message;
         if (connection.getUserById(userId).selectedCartId() == null) {
+            message = "У тебя не выбрана ни одна корзина😔 \n/createnewcart чтобы создать новую или /mycarts для выбора существующих";
+            sender.sendMessage(chatId, message, false);
+            return false;
+        }
+        return true;
+    }
+
+    protected boolean checkForAnyAssignedCartsExisting(Long chatId, Long userId) throws TelegramApiException {
+        String message;
+        if (connection.getCartsAssignedToUser(userId).isEmpty()) {
             message = "У тебя нет ни одной корзины😔 \n/createnewcart чтобы создать";
             sender.sendMessage(chatId, message, false);
             return false;
         }
         return true;
+    }
+
+    protected boolean checkForCartExisting(Long cartId) throws TelegramApiException {
+        return connection.getCartById(cartId) != null;
     }
 
     protected boolean checkForCategoryExisting(Long chatId, Integer messageId, Long categoryId) throws TelegramApiException {
@@ -171,7 +202,7 @@ public abstract class AbstractCommand implements BotCommand, SettingsDependantNo
      * Reply Keyboard update methods
      */
     @Override
-    public void updateReplyKeyboardOnDataChanges(Long userId, Long cartId) throws TelegramApiException {
+    public void updateReplyKeyboard(Long userId, Long cartId) throws TelegramApiException {
         Users user = connection.getUserById(userId);
         Long chatId = user != null ? user.chatId() : null;
             
