@@ -2,3 +2,4 @@
 target/
 *.db
 dependency-reduced-pom.xml
+tgbot-shopping-cart-utils/
