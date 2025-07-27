@@ -11,6 +11,7 @@ import com.shavarushka.commands.MessageSender;
 import com.shavarushka.database.SQLiteConnection;
 
 public abstract class AbstractCancelCallback extends AbstractCallbackCommand {
+
     public AbstractCancelCallback(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
         super(sender, userStates, connection);
     }
@@ -29,5 +30,5 @@ public abstract class AbstractCancelCallback extends AbstractCallbackCommand {
 
         userStates.remove(chatId);
         sender.editMessage(chatId, messageId, message, keyboard, false);
-    }
+    }  
 }

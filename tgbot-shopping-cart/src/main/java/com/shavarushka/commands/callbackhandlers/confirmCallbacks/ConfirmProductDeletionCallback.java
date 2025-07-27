@@ -14,6 +14,7 @@ import com.shavarushka.database.entities.Products;
 import com.shavarushka.database.entities.Users;
 
 public class ConfirmProductDeletionCallback extends AbstractCallbackCommand {
+
     public ConfirmProductDeletionCallback(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
         super(sender, userStates, connection);
     }

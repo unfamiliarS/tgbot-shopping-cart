@@ -13,6 +13,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
 public class KeyboardsFabrics {
+
     public static <T extends ReplyKeyboard> T createKeyboard(Map<String, String> buttons, int buttonsPerRow, Class<T> keyboardType) {
         if (keyboardType.equals(InlineKeyboardMarkup.class)) {
             return keyboardType.cast(createInlineKeyboard(buttons, buttonsPerRow));

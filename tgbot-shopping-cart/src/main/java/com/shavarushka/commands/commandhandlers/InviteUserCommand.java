@@ -17,6 +17,7 @@ import com.shavarushka.database.entities.ShoppingCarts;
 import com.shavarushka.database.entities.Users;
 
 public class InviteUserCommand extends AbstractTextCommand {
+
     public InviteUserCommand(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
         super(sender, userStates, connection);
     }
@@ -47,6 +48,7 @@ public class InviteUserCommand extends AbstractTextCommand {
     }
 
     public class UsernameInputHandler extends AbstractTextCommand {
+
         public UsernameInputHandler(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
             super(sender, userStates, connection);
         }

@@ -11,6 +11,7 @@ import com.shavarushka.commands.callbackhandlers.interfaces.AbstractSettingCallb
 import com.shavarushka.database.SQLiteConnection;
 
 public class SettingNotifyAboutInvitingCallback extends AbstractSettingCallback {
+
     public SettingNotifyAboutInvitingCallback(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
         super(sender, userStates, connection);
     }

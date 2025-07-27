@@ -12,6 +12,7 @@ import com.shavarushka.database.SQLiteConnection;
 import com.shavarushka.database.entities.Settings;
 
 public abstract class AbstractSettingCallback extends AbstractCallbackCommand {
+
     public AbstractSettingCallback(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
         super(sender, userStates, connection);
     }

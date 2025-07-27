@@ -53,6 +53,7 @@ CREATE TABLE IF NOT EXISTS settings (
     list_already_purchased BOOLEAN NOT NULL CHECK (list_already_purchased IN (0, 1)), 
     notify_about_products BOOLEAN NOT NULL CHECK (notify_about_products IN (0, 1)),
     notify_about_inviting BOOLEAN NOT NULL CHECK (notify_about_inviting IN (0, 1)),
+    notify_about_price_changing BOOLEAN CHECK (notify_about_inviting IN (0, 1)),
     FOREIGN KEY (setting_id) REFERENCES users(user_id) ON UPDATE CASCADE ON DELETE CASCADE
 );"
 

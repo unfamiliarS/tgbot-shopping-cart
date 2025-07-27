@@ -1,7 +1,6 @@
 package com.shavarushka.database;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,11 +16,12 @@ import com.shavarushka.database.entities.Users;
 import com.shavarushka.database.interfaces.DBConnection;
 
 final public class SQLiteConnection implements DBConnection {
+
     private Connection connection;
 
     public SQLiteConnection(String url) {
         try {
-            connection = DriverManager.getConnection(url);
+            connection = connect(url);
         } catch (SQLException e) {
             e.printStackTrace();
         }

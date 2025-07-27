@@ -10,6 +10,7 @@ import com.shavarushka.commands.interfaces.AbstractCommand;
 import com.shavarushka.database.SQLiteConnection;
 
 public abstract class AbstractCallbackCommand extends AbstractCommand {
+
     public AbstractCallbackCommand(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
         super(sender, userStates, connection);
     }

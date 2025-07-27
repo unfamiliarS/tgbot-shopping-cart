@@ -13,10 +13,12 @@ import com.shavarushka.commands.callbackhandlers.confirmCallbacks.*;
 import com.shavarushka.commands.callbackhandlers.deleteCallbacks.*;
 import com.shavarushka.commands.callbackhandlers.settingCallbacks.*;
 import com.shavarushka.commands.commandhandlers.*;
+
 import com.shavarushka.commands.interfaces.BotCommand;
 import com.shavarushka.database.SQLiteConnection;
 
 public class CommandManager {
+
     private final Map<String, BotCommand> commands = new HashMap<>();
     private final Map<Long, BotState> userStates = new HashMap<>();
     private final Map<Long, String> tempNewNames = new HashMap<>();
@@ -31,14 +33,14 @@ public class CommandManager {
         registerCommand(new StartCommand(sender, userStates, connection));
         var createCartCommand = new CreateCartCommand(sender, userStates, connection, tempNewNames);
         registerCommand(createCartCommand);
-        registerCommand(createCartCommand.new NameInputHandler(sender, userStates, connection));
+        registerCommand(createCartCommand.new CartNameInputHandler(sender, userStates, connection));
         registerCommand(new MyCartsCommand(sender, userStates, connection));
         var inviteUserCommand = new InviteUserCommand(sender, userStates, connection);
         registerCommand(inviteUserCommand);
         registerCommand(inviteUserCommand.new UsernameInputHandler(sender, userStates, connection));
         registerCommand(new AddProductCommand(sender, userStates, connection));
         registerCommand(new ListProductsOfCategoryCommand(sender, userStates, connection));
-        var addCategoryCommand = new AddCategoryCommand(sender, userStates, connection, tempNewNames);
+        var addCategoryCommand = new CreateCategoryCommand(sender, userStates, connection, tempNewNames);
         registerCommand(addCategoryCommand);
         registerCommand(addCategoryCommand.new CategoryNameInputHandler(sender, userStates, connection));
         registerCommand(new ConfirmCategoryCreationCallback(sender, userStates, connection, tempNewNames));
@@ -61,12 +63,10 @@ public class CommandManager {
         registerCommand(new DeleteCategoryCallback(sender, userStates, connection));
         registerCommand(new ConfirmCategoryDeletionCallback(sender, userStates, connection));
         registerCommand(new CancelCategoryDeletionCallback(sender, userStates, connection));
-        var changecategory = new ChangeCategoryCallback(sender, userStates, connection);
-        registerCommand(changecategory);
-        registerCommand(changecategory.new ConfirmCategoryChangingCallback(sender, userStates, connection));
+        registerCommand(new ChangeCategoryCallback(sender, userStates, connection));
+        registerCommand(new ConfirmCategoryChangingCallback(sender, userStates, connection));
         registerCommand(new ChangePurchaseStatusCallback(sender, userStates, connection));
         registerCommand(new CloseCallback(sender, userStates, connection));
-        // settings callbacks
         registerCommand(new SettingListAlreadyPurchasedCallback(sender, userStates, connection));
         registerCommand(new SettingNotifyAboutProductsCallback(sender, userStates, connection));
         registerCommand(new SettingNotifyAboutInvitingCallback(sender, userStates, connection));

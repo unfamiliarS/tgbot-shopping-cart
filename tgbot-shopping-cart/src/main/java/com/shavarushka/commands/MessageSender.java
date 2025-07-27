@@ -10,6 +10,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 public class MessageSender {
+
     private final TelegramClient telegramClient;
     
     public MessageSender(TelegramClient telegramClient) {

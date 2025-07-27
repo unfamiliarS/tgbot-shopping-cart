@@ -16,10 +16,11 @@ import com.shavarushka.database.entities.Categories;
 import com.vdurmont.emoji.EmojiManager;
 import com.vdurmont.emoji.EmojiParser;
 
-public class AddCategoryCommand extends AbstractTextCommand {
+public class CreateCategoryCommand extends AbstractTextCommand {
+
     private final Map<Long, String> categoryNames;
 
-    public AddCategoryCommand(MessageSender sender, Map<Long, BotState> userStates,
+    public CreateCategoryCommand(MessageSender sender, Map<Long, BotState> userStates,
                             SQLiteConnection connection, Map<Long, String> categoryNames) {
         super(sender, userStates, connection);
         this.categoryNames = categoryNames;
@@ -147,5 +148,5 @@ public class AddCategoryCommand extends AbstractTextCommand {
             }
             return false;
         }
-    }
+    } 
 }

@@ -10,6 +10,7 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 import com.shavarushka.commands.CommandManager;
 
 public class Bot implements LongPollingSingleThreadUpdateConsumer {
+
     private CommandManager commandManager;
 
     public Bot(String token) {

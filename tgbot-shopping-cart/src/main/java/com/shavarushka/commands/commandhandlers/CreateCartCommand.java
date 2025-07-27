@@ -27,7 +27,7 @@ public class CreateCartCommand extends AbstractTextCommand {
 
     @Override
     public String getCommand() {
-        return "/createnewcart";
+        return "/createcart";
     }
 
     @Override
@@ -54,8 +54,8 @@ public class CreateCartCommand extends AbstractTextCommand {
         userStates.put(chatId, BotState.WAITING_FOR_CART_NAME);
     }
 
-    public class NameInputHandler extends AbstractTextCommand {
-        public NameInputHandler(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
+    public class CartNameInputHandler extends AbstractTextCommand {
+        public CartNameInputHandler(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
             super(sender, userStates, connection);
         }
 

@@ -23,6 +23,7 @@ import com.shavarushka.database.entities.ShoppingCarts;
 import com.shavarushka.database.entities.Users;
 
 public abstract class AbstractCommand implements BotCommand, SettingsDependantNotifier, ReplyKeyboardUpdater {
+
     protected final MessageSender sender;
     protected final Map<Long, BotState> userStates;
     protected final SQLiteConnection connection;
@@ -106,7 +107,7 @@ public abstract class AbstractCommand implements BotCommand, SettingsDependantNo
     protected boolean checkForAssignedCartExisting(Long chatId, Long userId) throws TelegramApiException {
         String message;
         if (connection.getUserById(userId).selectedCartId() == null) {
-            message = "У тебя не выбрана ни одна корзина😔 \n/createnewcart чтобы создать новую или /mycarts для выбора существующих";
+            message = "У тебя не выбрана ни одна корзина😔 \n/createcart чтобы создать новую или /mycarts для выбора существующих";
             sender.sendMessage(chatId, message, false);
             return false;
         }
@@ -116,7 +117,7 @@ public abstract class AbstractCommand implements BotCommand, SettingsDependantNo
     protected boolean checkForAnyAssignedCartsExisting(Long chatId, Long userId) throws TelegramApiException {
         String message;
         if (connection.getCartsAssignedToUser(userId).isEmpty()) {
-            message = "У тебя нет ни одной корзины😔 \n/createnewcart чтобы создать";
+            message = "У тебя нет ни одной корзины😔 \n/createcart чтобы создать";
             sender.sendMessage(chatId, message, false);
             return false;
         }

@@ -19,6 +19,7 @@ import com.shavarushka.database.entities.Settings;
 import com.shavarushka.database.entities.Users;
 
 public class ListProductsOfCategoryCommand extends AbstractTextCommand {
+
     public ListProductsOfCategoryCommand(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
         super(sender, userStates, connection);
     }
@@ -64,6 +65,7 @@ public class ListProductsOfCategoryCommand extends AbstractTextCommand {
                 return;
             }
         }
+
         sender.sendMessage(chatId, "Категория пуста", true);
     }
 

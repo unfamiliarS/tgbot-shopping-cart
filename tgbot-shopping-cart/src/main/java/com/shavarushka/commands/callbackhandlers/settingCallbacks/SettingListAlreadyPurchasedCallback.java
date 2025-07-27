@@ -11,6 +11,7 @@ import com.shavarushka.commands.callbackhandlers.interfaces.AbstractSettingCallb
 import com.shavarushka.database.SQLiteConnection;
 
 public class SettingListAlreadyPurchasedCallback extends AbstractSettingCallback {
+
     public SettingListAlreadyPurchasedCallback(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
         super(sender, userStates, connection);
     }
@@ -23,5 +24,5 @@ public class SettingListAlreadyPurchasedCallback extends AbstractSettingCallback
     @Override
     public void execute(Update update) throws TelegramApiException {
         processSettingChange(update, this);
-    }
+    } 
 }
