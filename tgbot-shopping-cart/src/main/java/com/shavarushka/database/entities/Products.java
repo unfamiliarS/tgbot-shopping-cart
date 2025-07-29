@@ -9,7 +9,7 @@ public record Products(Long productId, String fullURL, Long assignedCategoryId, 
     }
 
     public String productPurchaseStatusAsString() {
-        return productPurchaseStatus() ? "💚" : "💛";
+        return productPurchaseStatus() ? "💚" : "🤍";
     }
 
 }

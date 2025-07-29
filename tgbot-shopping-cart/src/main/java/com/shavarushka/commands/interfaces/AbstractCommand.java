@@ -67,7 +67,7 @@ public abstract class AbstractCommand implements BotCommand, SettingsDependantNo
         Map<String, String> buttons = new LinkedHashMap<>();
         String mark;
         mark = settings.listAlreadyPurchased().equals(true) ? "✅ " : "";
-        buttons.put("/listalreadypurchased", mark + "Показывать купленные товары 💚 💛");
+        buttons.put("/listalreadypurchased", mark + "Показывать купленные товары 💚 🤍");
         mark = settings.notifyAboutProducts().equals(true) ? "✅ " : "";
         buttons.put("/notifyaboutproducts", mark + "Уведомлять о действиях с товарами 🔔");
         mark = settings.notifyAboutInviting().equals(true) ? "✅ " : "";
