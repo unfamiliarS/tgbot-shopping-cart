@@ -19,7 +19,7 @@ export PATH_TO_DB="path_to_your_db"
 export DB_URL="jdbc:sqlite:$PATH_TO_DB"
 
 # initialize db
-tgbot-shopping-cart/init_db.sh
+tgbot-shopping-cart/utils/init_db.sh
 
 # build and run bot
 mvn clean package && java -jar tgbot-shopping-cart/target/tgbot-shopping-cart.jar

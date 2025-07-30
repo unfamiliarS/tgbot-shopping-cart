@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# past it into crontab -e
+# 0 0 * * 1 /home/semyon/.local/tgbot-shopping-cart/data-base/utils/backup-db
+
+PROJECT_ROOT="$HOME/.local/tgbot-shopping-cart"
+
+BACKUP_DIR="$PROJECT_ROOT/data-base/backups"
+SOURCE_FILE="$PROJECT_ROOT/data-base/release.db"
+DATE=$(date +%Y-%m-%d)
+
+mkdir -p $BACKUP_DIR
+cp "$SOURCE_FILE" "$BACKUP_DIR/backup-$DATE.db"
+
+# remove old backups
+for backup in $(ls -t $BACKUP_DIR/*.db | tail -n +6); do
+    rm -f $backup
+done
