@@ -7,7 +7,7 @@ if [ "$1" = "start" ]; then
     mkdir -p "$PROJECT_ROOT/logs"
     nohup java -jar "$PROJECT_ROOT/tgbot-shopping-cart.jar" > "$PROJECT_ROOT/logs/bot-$DATE.log" 2>&1 &
 elif [ "$1" = "stop" ]; then
-    bot_pid=$(pgrep -f "java -jar tgbot-shopping-cart.jar")
+    bot_pid=$(pgrep -f "java -jar $PROJECT_ROOT/tgbot-shopping-cart.jar")
     [ -n "$1" ] && kill $bot_pid
 else
     echo "Usage: $0 {start|stop}"
