@@ -105,7 +105,7 @@ public class AddProductCommand extends AbstractTextCommand {
     }
 
     private String extractUrlFromMessage(String message) {
-        String urlRegex = "https?://.*";
+        String urlRegex = "https?://\\S+";
         
         Pattern pattern = Pattern.compile(urlRegex);
         Matcher matcher = pattern.matcher(message);

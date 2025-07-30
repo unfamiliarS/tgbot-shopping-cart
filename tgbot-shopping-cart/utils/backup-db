@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # past it into crontab -e
-# 0 0 * * 1 /home/semyon/.local/tgbot-shopping-cart/data-base/utils/backup-db
+# 0 0 * * 1 $HOME/.local/tgbot-shopping-cart/data-base/utils/backup-db
 
 PROJECT_ROOT="$HOME/.local/tgbot-shopping-cart"
 
