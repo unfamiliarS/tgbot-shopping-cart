@@ -62,10 +62,6 @@ public class CreateCategoryCommand extends AbstractTextCommand {
         public String getCommand() {
             return "CategoryNameInputHandler";
         }
-
-        public String getDescription() {
-            return "";
-        }
         
         @Override
         public boolean shouldProcess(Update update) {

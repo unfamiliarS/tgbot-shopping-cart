@@ -23,7 +23,7 @@ public class CancelCategoryDeletionCallback extends AbstractCancelCallback {
 
     @Override
     public boolean shouldProcess(Update update) {
-        return shouldProcessCanceling(this, update, BotState.CONFIRMING_CATEGORY_DELETION);
+        return shouldProcessCanceling(update, BotState.CONFIRMING_CATEGORY_DELETION);
     }
 
     @Override

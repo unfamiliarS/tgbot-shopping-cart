@@ -8,7 +8,6 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.shavarushka.commands.BotState;
 import com.shavarushka.commands.MessageSender;
-import com.shavarushka.commands.interfaces.BotCommand;
 import com.shavarushka.database.SQLiteConnection;
 
 public abstract class AbstractCancelCallback extends AbstractCallbackCommand {
@@ -17,11 +16,11 @@ public abstract class AbstractCancelCallback extends AbstractCallbackCommand {
         super(sender, userStates, connection);
     }
 
-    public boolean shouldProcessCanceling(BotCommand command, Update update, BotState... states) {
+    public boolean shouldProcessCanceling(Update update, BotState... states) {
         if (isThisCallback(update)) {
             Long chatId = update.getCallbackQuery().getMessage().getChatId();
             String message = update.getCallbackQuery().getData();
-            return isUserHaveState(chatId, states) && message.startsWith(command.getCommand().strip());
+            return isUserHaveState(chatId, states) && message.startsWith(getCommand().strip());
         }
         return false;
     }

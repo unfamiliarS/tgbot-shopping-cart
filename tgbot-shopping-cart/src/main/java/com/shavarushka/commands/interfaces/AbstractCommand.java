@@ -38,18 +38,16 @@ public abstract class AbstractCommand implements BotCommand, SettingsDependantNo
     public boolean shouldProcess(Update update) {
         Long chatId;
         String message;
-        if (update.hasMessage() && update.getMessage().hasText()) {
+        if (isThisMessage(update)) {
             chatId = update.getMessage().getChatId();
             message = update.getMessage().getText();
-        } else if (update.hasCallbackQuery()) {
+        } else if (isThisCallback(update)) {
             chatId = update.getCallbackQuery().getMessage().getChatId();
             message = update.getCallbackQuery().getData();
         } else {
             return false;
         }
-
-        return !userStates.containsKey(chatId) &&
-                message.startsWith(getCommand().strip());
+        return !isUserHaveAnyState(chatId) && message.startsWith(getCommand().strip());
     }
 
     protected Categories getDefaultCategory(Long userId, Long assignedCartId) throws TelegramApiException {

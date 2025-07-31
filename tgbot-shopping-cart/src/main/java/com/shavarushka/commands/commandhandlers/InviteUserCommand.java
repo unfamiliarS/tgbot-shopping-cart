@@ -57,11 +57,6 @@ public class InviteUserCommand extends AbstractTextCommand {
         public String getCommand() {
             return "invite_username";
         }
-
-        @Override
-        public String getDescription() {
-            return "";
-        }
         
         @Override
         public boolean shouldProcess(Update update) {

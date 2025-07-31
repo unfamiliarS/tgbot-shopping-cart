@@ -22,8 +22,8 @@ public class CancelCreatingCategoryCallback extends AbstractCancelCallback {
 
     @Override
     public boolean shouldProcess(Update update) {
-        return shouldProcessCanceling(this, update, BotState.CONFIRMING_CATEGORY_CREATION,
-                                                    BotState.WAITING_FOR_CATEGORY_NAME);
+        return shouldProcessCanceling(update, BotState.CONFIRMING_CATEGORY_CREATION,
+                                              BotState.WAITING_FOR_CATEGORY_NAME);
     }
 
     @Override

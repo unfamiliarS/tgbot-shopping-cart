@@ -15,7 +15,9 @@ public abstract class AbstractTextCommand extends AbstractCommand {
         super(sender, userStates, connection);
     }
 
-    abstract public String getDescription();
+    public String getDescription() {
+        return "";
+    }
 
     @Override
     public boolean shouldProcess(Update update) {

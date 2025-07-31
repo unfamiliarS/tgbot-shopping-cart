@@ -22,8 +22,8 @@ public class CancelCreatingCartCallback extends AbstractCancelCallback {
 
     @Override
     public boolean shouldProcess(Update update) {
-        return shouldProcessCanceling(this, update, BotState.CONFIRMING_CART_CREATION,
-                                                    BotState.WAITING_FOR_CART_NAME);
+        return shouldProcessCanceling(update, BotState.CONFIRMING_CART_CREATION,
+                                              BotState.WAITING_FOR_CART_NAME);
     }
 
     @Override

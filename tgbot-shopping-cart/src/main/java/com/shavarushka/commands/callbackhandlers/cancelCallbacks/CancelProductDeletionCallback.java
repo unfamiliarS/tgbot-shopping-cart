@@ -23,7 +23,7 @@ public class CancelProductDeletionCallback extends AbstractCancelCallback {
 
     @Override
     public boolean shouldProcess(Update update) {
-        return shouldProcessCanceling(this, update, BotState.CONFIRMING_PRODUCT_DELETION);
+        return shouldProcessCanceling(update, BotState.CONFIRMING_PRODUCT_DELETION);
     }
 
     @Override

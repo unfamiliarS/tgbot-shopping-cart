@@ -22,7 +22,7 @@ public class CancelInvitingUserCallback extends AbstractCancelCallback {
 
     @Override
     public boolean shouldProcess(Update update) {
-        return shouldProcessCanceling(this, update, BotState.WAITING_FOR_USERNAME_TO_INVITE);
+        return shouldProcessCanceling(update, BotState.WAITING_FOR_USERNAME_TO_INVITE);
     }
 
     @Override

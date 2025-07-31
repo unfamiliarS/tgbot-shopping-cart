@@ -51,8 +51,8 @@ public class AddProductCommand extends AbstractTextCommand {
     public void execute(Update update) throws TelegramApiException {
         Long chatId = update.getMessage().getChatId();
         Long userId = update.getMessage().getFrom().getId();
-        String productURL = parser.extractUrlFromMessage(update.getMessage().getText().strip());
         Users user = connection.getUserById(userId);
+        String productURL = parser.extractUrlFromMessage(update.getMessage().getText().strip());
 
         if (!checkForUserExisting(chatId, userId) || !checkForAssignedCartExisting(chatId, userId))
             return;
@@ -62,12 +62,10 @@ public class AddProductCommand extends AbstractTextCommand {
 
     private void processAddingProduct(Users user, String productURL) throws TelegramApiException {
         if (isProductExists(productURL, user.selectedCartId())) {
-            Products product = connection.getProductByUrlAndCart(productURL, user.selectedCartId());
-            sendMessageThatProductAlreadyExists(user.chatId(), product.assignedCategoryId());
+            sendMessageForAlreadyExistingProduct(user, productURL);
         } else if (addProductInTheDefaultCategory(productURL, user.selectedCartId(), user.userId())) {
             sendMessageThatProductWasAdded(user.chatId(), productURL, user.selectedCartId());
-            
-            processNotification(user.userId(), user.selectedCartId(), productURL);    
+            processUserNotification(user.userId(), user.selectedCartId(), productURL);    
         } else {
             sendErrorMessage(user.chatId());
         }
@@ -83,17 +81,18 @@ public class AddProductCommand extends AbstractTextCommand {
         return connection.addProduct(new Products(productURL, categoryId));
     }
 
-    private void processNotification(Long userNotifierId, Long cartId, String productURL) throws TelegramApiException {
+    private void processUserNotification(Long userNotifierId, Long cartId, String productURL) throws TelegramApiException {
         String message = "добавил(а) новый товар\n" + productURL;
         notifyIfEnabled(userNotifierId, cartId, message, SettingsDependantNotifier.NotificationType.REFUSING_OF_JOINING_THE_CART);
     }
 
-    private void sendMessageThatProductAlreadyExists(Long chatId, Long inThatCategoryProductContains) throws TelegramApiException {
-        Categories category = connection.getCategoryById(inThatCategoryProductContains);
+    private void sendMessageForAlreadyExistingProduct(Users user, String existingProductURL) throws TelegramApiException {
+        Products product = connection.getProductByUrlAndCart(existingProductURL, user.selectedCartId());
+        Categories categoryInThatProductContains = connection.getCategoryById(product.assignedCategoryId());
         String message = "Этот товар уже есть в твоей корзине в категории *"
-                + category.categoryName()
+                + categoryInThatProductContains.categoryName()
                 + "*";
-        sender.sendMessage(chatId, message, true);
+        sender.sendMessage(user.chatId(), message, true);
     }
 
     private void sendMessageThatProductWasAdded(Long chatId, String productURL, Long assignedCartId) throws TelegramApiException {
@@ -110,16 +109,16 @@ public class AddProductCommand extends AbstractTextCommand {
 
     private static class MessageParser {
         
-        private final List<Pattern> possibleURLs;
+        private final List<Pattern> POSSIBLE_URLS;
 
         MessageParser() {
-            possibleURLs = getUrlRegexes("https?://\\S+");
+            POSSIBLE_URLS = getUrlRegexes("https?://\\S+");
         }
 
         private List<Pattern> getUrlRegexes(String ... possibleURLs) {
             List<Pattern> urlRegexes = new ArrayList<>(possibleURLs.length);
-            for (int i = 0; i < possibleURLs.length; i++) {
-                urlRegexes.add(Pattern.compile(possibleURLs[i]));
+            for (int url = 0; url < possibleURLs.length; url++) {
+                urlRegexes.add(Pattern.compile(possibleURLs[url]));
             }
             return urlRegexes;
         }
@@ -129,7 +128,7 @@ public class AddProductCommand extends AbstractTextCommand {
         }
 
         private String extractUrlFromMessage(String message) {
-            for (Pattern url : possibleURLs) {
+            for (Pattern url : POSSIBLE_URLS) {
                 var matcher = url.matcher(message);
                 if (matcher.find()) {
                     return matcher.group();
