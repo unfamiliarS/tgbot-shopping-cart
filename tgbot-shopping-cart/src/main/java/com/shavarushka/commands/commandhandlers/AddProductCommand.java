@@ -66,9 +66,8 @@ public class AddProductCommand extends AbstractTextCommand {
             sendMessageThatProductAlreadyExists(user.chatId(), product.assignedCategoryId());
         } else if (addProductInTheDefaultCategory(productURL, user.selectedCartId(), user.userId())) {
             sendMessageThatProductWasAdded(user.chatId(), productURL, user.selectedCartId());
-                
-            String message = "добавил(а) новый товар\n" + productURL;
-            notifyAllIfEnabled(user.userId(), user.selectedCartId(), SettingsDependantNotifier.NotificationType.PRODUCT_ADDED, message);
+            
+            processNotification(user.userId(), user.selectedCartId(), productURL);    
         } else {
             sendErrorMessage(user.chatId());
         }
@@ -82,6 +81,11 @@ public class AddProductCommand extends AbstractTextCommand {
 
     private Long addProductIntoDataBase(String productURL, Long categoryId) {
         return connection.addProduct(new Products(productURL, categoryId));
+    }
+
+    private void processNotification(Long userNotifierId, Long cartId, String productURL) throws TelegramApiException {
+        String message = "добавил(а) новый товар\n" + productURL;
+        notifyIfEnabled(userNotifierId, cartId, message, SettingsDependantNotifier.NotificationType.REFUSING_OF_JOINING_THE_CART);
     }
 
     private void sendMessageThatProductAlreadyExists(Long chatId, Long inThatCategoryProductContains) throws TelegramApiException {

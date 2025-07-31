@@ -8,12 +8,12 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.shavarushka.commands.BotState;
 import com.shavarushka.commands.MessageSender;
-import com.shavarushka.commands.callbackhandlers.interfaces.AbstractCallbackCommand;
+import com.shavarushka.commands.callbackhandlers.interfaces.AbstractConfirmCallback;
 import com.shavarushka.database.SQLiteConnection;
 import com.shavarushka.database.entities.Categories;
 import com.shavarushka.database.entities.Products;
 
-public class ConfirmCartDeletionCallback extends AbstractCallbackCommand {
+public class ConfirmCartDeletionCallback extends AbstractConfirmCallback {
     public ConfirmCartDeletionCallback(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
         super(sender, userStates, connection);
     }
@@ -25,13 +25,7 @@ public class ConfirmCartDeletionCallback extends AbstractCallbackCommand {
 
     @Override
     public boolean shouldProcess(Update update) {
-        if (!update.hasCallbackQuery())
-            return false;
-
-        Long chatId = update.getCallbackQuery().getMessage().getChatId();
-        return update.getCallbackQuery().getData().startsWith(getCommand().strip()) &&
-               userStates.containsKey(chatId) &&
-               userStates.get(chatId).equals(BotState.CONFIRMING_CART_DELETION);
+        return shouldProcessConfirming(this, update, BotState.CONFIRMING_CART_DELETION);
     }
 
     @Override

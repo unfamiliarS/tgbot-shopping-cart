@@ -19,12 +19,12 @@ public abstract class AbstractTextCommand extends AbstractCommand {
 
     @Override
     public boolean shouldProcess(Update update) {
-        if (!update.hasMessage() || !update.getMessage().hasText())
+        if (isThisMessage(update)) {
+            Long chatId = update.getMessage().getChatId();
+            String message = update.getMessage().getText();
+            return !isUserHaveAnyState(chatId) && message.matches(getCommand().strip());
+        } else {
             return false;
-
-        Long chatId = update.getMessage().getChatId();
-        String message = update.getMessage().getText();
-        return !userStates.containsKey(chatId) &&
-                message.matches(getCommand().strip());
+        }
     }
 }

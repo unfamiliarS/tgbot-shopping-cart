@@ -7,11 +7,11 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import com.shavarushka.commands.BotState;
 import com.shavarushka.commands.MessageSender;
-import com.shavarushka.commands.callbackhandlers.interfaces.AbstractCallbackCommand;
+import com.shavarushka.commands.callbackhandlers.interfaces.AbstractConfirmCallback;
 import com.shavarushka.database.SQLiteConnection;
 import com.shavarushka.database.entities.Products;
 
-public class ConfirmCategoryChangingCallback extends AbstractCallbackCommand {
+public class ConfirmCategoryChangingCallback extends AbstractConfirmCallback {
     
     public ConfirmCategoryChangingCallback(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
         super(sender, userStates, connection);

@@ -18,13 +18,13 @@ public abstract class AbstractCallbackCommand extends AbstractCommand {
     // should override if need to check BotState
     @Override
     public boolean shouldProcess(Update update) {
-        if (!update.hasCallbackQuery())
-            return false;
+        if (isThisCallback(update)) {
+            Long chatId = update.getCallbackQuery().getMessage().getChatId();
+            String callback = update.getCallbackQuery().getData();
+            return !isUserHaveAnyState(chatId) && callback.startsWith(getCommand().strip());
+        }
+        return false;
 
-        Long chatId = update.getCallbackQuery().getMessage().getChatId();
-        String callback = update.getCallbackQuery().getData();
-        return !userStates.containsKey(chatId) &&
-                callback.startsWith(getCommand().strip());
     }
 
     protected Long extractIdFromMessage(String message) {
