@@ -38,7 +38,7 @@ public class AddProductCommand extends AbstractTextCommand {
 
     @Override
     public boolean shouldProcess(Update update) {
-        if (isMessage(update)) {
+        if (isThisMessage(update)) {
             Long chatId = update.getMessage().getChatId();
             String message = update.getMessage().getText();
             return !isUserHaveAnyState(chatId) && parser.isMessageContainsAnyURLs(message);

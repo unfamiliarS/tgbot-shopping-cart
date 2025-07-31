@@ -22,15 +22,7 @@ public class CancelInvitingUserCallback extends AbstractCancelCallback {
 
     @Override
     public boolean shouldProcess(Update update) {
-        if (!update.hasCallbackQuery())
-            return false;
-            
-        Long chatId = update.getCallbackQuery().getMessage().getChatId();
-        String message = update.getCallbackQuery().getData();
-
-        return message.startsWith(getCommand().strip()) &&
-               userStates.containsKey(chatId) &&
-               userStates.get(chatId).equals(BotState.WAITING_FOR_USERNAME_TO_INVITE);
+        return shouldProcessCanceling(this, update, BotState.WAITING_FOR_USERNAME_TO_INVITE);
     }
 
     @Override

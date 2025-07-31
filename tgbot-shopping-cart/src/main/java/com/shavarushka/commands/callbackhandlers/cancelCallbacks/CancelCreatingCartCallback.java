@@ -22,16 +22,8 @@ public class CancelCreatingCartCallback extends AbstractCancelCallback {
 
     @Override
     public boolean shouldProcess(Update update) {
-        if (!update.hasCallbackQuery())
-            return false;
-            
-        Long chatId = update.getCallbackQuery().getMessage().getChatId();
-        String message = update.getCallbackQuery().getData();
-
-        return message.startsWith(getCommand().strip()) &&
-               userStates.containsKey(chatId) &&
-               (userStates.get(chatId).equals(BotState.WAITING_FOR_CART_NAME) ||
-               userStates.get(chatId).equals(BotState.CONFIRMING_CART_CREATION));
+        return shouldProcessCanceling(this, update, BotState.CONFIRMING_CART_CREATION,
+                                                    BotState.WAITING_FOR_CART_NAME);
     }
 
     @Override

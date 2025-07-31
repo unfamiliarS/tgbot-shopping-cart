@@ -63,16 +63,23 @@ public abstract class AbstractCommand implements BotCommand, SettingsDependantNo
     /* 
      * Predicates
      */
-    protected boolean isMessage(Update update) {
+    protected boolean isThisMessage(Update update) {
         return update.hasMessage() && update.getMessage().hasText();
     }
 
-    protected boolean isCallback(Update update) {
+    protected boolean isThisCallback(Update update) {
         return update.hasCallbackQuery();
     }
 
-    protected boolean isUserHaveState(Long chatId, BotState state) {
-        return isUserHaveAnyState(chatId) && userStates.get(chatId).equals(state);
+    protected boolean isUserHaveState(Long chatId, BotState... states) {
+        if (isUserHaveAnyState(chatId)) {
+            for (BotState state : states) {
+                if (userStates.get(chatId).equals(state)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     protected boolean isUserHaveAnyState(Long chatId) {
