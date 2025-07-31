@@ -1,7 +1,8 @@
 package com.shavarushka.commands.commandhandlers;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -18,8 +19,11 @@ import com.shavarushka.database.entities.Users;
 
 public class AddProductCommand extends AbstractTextCommand {
 
+    private MessageParser parser;
+
     public AddProductCommand(MessageSender sender, Map<Long, BotState> userStates, SQLiteConnection connection) {
         super(sender, userStates, connection);
+        parser = new MessageParser();
     }
 
     @Override
@@ -34,86 +38,100 @@ public class AddProductCommand extends AbstractTextCommand {
 
     @Override
     public boolean shouldProcess(Update update) {
-        if (!update.hasMessage() || !update.getMessage().hasText())
+        if (isMessage(update)) {
+            Long chatId = update.getMessage().getChatId();
+            String message = update.getMessage().getText();
+            return !isUserHaveAnyState(chatId) && parser.isMessageContainsAnyURLs(message);
+        } else {
             return false;
-
-        Long chatId = update.getMessage().getChatId();
-        String message = update.getMessage().getText();
-        String regexURL = "(?s).*https?://.*";
-        return !userStates.containsKey(chatId) &&
-                message.matches(regexURL);
+        }
     }
 
     @Override
     public void execute(Update update) throws TelegramApiException {
         Long chatId = update.getMessage().getChatId();
         Long userId = update.getMessage().getFrom().getId();
-        String message;
-    
+        String productURL = parser.extractUrlFromMessage(update.getMessage().getText().strip());
+        Users user = connection.getUserById(userId);
+
         if (!checkForUserExisting(chatId, userId) || !checkForAssignedCartExisting(chatId, userId))
             return;
-
-        String productURL = extractUrlFromMessage(update.getMessage().getText().strip());
-        Users user = connection.getUserById(userId);
-        boolean isNeedToNotifyKeyboardUpdate = false;
         
-        Long cartId = user.selectedCartId();
-        if (productURL.isEmpty()) {
-            System.out.println("don't find url from message");
-            return;
-        }
+        processAddingProduct(user, productURL);
+    }
 
-        Products product = connection.getProductByUrlAndCart(productURL, cartId);
-        
-        // if product already exist
-        if (product != null) {
-            connection.getCategoryById(product.assignedCategoryId());
-            message = "Этот товар уже есть в твоей корзине в категории *"
-                + connection.getCategoryById(product.assignedCategoryId()).categoryName()
-                + "*";
-            sender.sendMessage(chatId, message, true);
-        // if product is new
+    private void processAddingProduct(Users user, String productURL) throws TelegramApiException {
+        if (isProductExists(productURL, user.selectedCartId())) {
+            Products product = connection.getProductByUrlAndCart(productURL, user.selectedCartId());
+            sendMessageThatProductAlreadyExists(user.chatId(), product.assignedCategoryId());
+        } else if (addProductInTheDefaultCategory(productURL, user.selectedCartId(), user.userId())) {
+            sendMessageThatProductWasAdded(user.chatId(), productURL, user.selectedCartId());
+                
+            String message = "добавил(а) новый товар\n" + productURL;
+            notifyAllIfEnabled(user.userId(), user.selectedCartId(), SettingsDependantNotifier.NotificationType.PRODUCT_ADDED, message);
         } else {
-            Categories defaultCategory = connection.getCategoryByAssignedCartIdAndName(cartId, "Прочее");
-            Long defaultCategoryId;
-            // if defaultCategory isn't create yet
-            if (defaultCategory == null) {
-                defaultCategoryId = connection.addCategory(new Categories(cartId, "Прочее"));
-                isNeedToNotifyKeyboardUpdate = true;
-            } else {
-                defaultCategoryId = defaultCategory.categoryId();
-            }
-            
-            product = new Products(productURL, defaultCategoryId);
-            Long productId = connection.addProduct(product);
-
-            if (isNeedToNotifyKeyboardUpdate)
-                updateReplyKeyboard(userId, cartId);
-
-            if (productId != null) {
-                product = connection.getProductById(productId);
-                message = "Товар успешно добавлен в категорию *Прочее* 😎\n" + MessageSender.escapeMarkdownV2(productURL);
-                var keyboard = getProductKeyboard(product);
-                sender.sendMessage(chatId, message, keyboard, true);
-
-                message = "добавил(а) новый товар\n" + productURL;
-                notifyAllIfEnabled(user.userId(), cartId, SettingsDependantNotifier.NotificationType.PRODUCT_ADDED, message);
-            } else {
-                sender.sendMessage(chatId, "Ошибка при добавлении товара", false);
-            }
+            sendErrorMessage(user.chatId());
         }
     }
 
-    private String extractUrlFromMessage(String message) {
-        String urlRegex = "https?://\\S+";
+    private boolean addProductInTheDefaultCategory(String productURL, Long cartId, Long userId) throws TelegramApiException {
+        Categories defaultCategory = getDefaultCategory(userId, cartId);
+        Long newProductId = addProductIntoDataBase(productURL, defaultCategory.categoryId());
+        return newProductId != null;
+    }
+
+    private Long addProductIntoDataBase(String productURL, Long categoryId) {
+        return connection.addProduct(new Products(productURL, categoryId));
+    }
+
+    private void sendMessageThatProductAlreadyExists(Long chatId, Long inThatCategoryProductContains) throws TelegramApiException {
+        Categories category = connection.getCategoryById(inThatCategoryProductContains);
+        String message = "Этот товар уже есть в твоей корзине в категории *"
+                + category.categoryName()
+                + "*";
+        sender.sendMessage(chatId, message, true);
+    }
+
+    private void sendMessageThatProductWasAdded(Long chatId, String productURL, Long assignedCartId) throws TelegramApiException {
+        Products product = connection.getProductByUrlAndCart(productURL, assignedCartId);
+        String message = "Товар успешно добавлен в категорию *" + Categories.DEFAULT_CATEGORY_NAME + "* 😎\n"
+                       + MessageSender.escapeMarkdownV2(product.fullURL());
+        var keyboard = getProductKeyboard(product);
+        sender.sendMessage(chatId, message, keyboard, true);
+    }
+
+    private void sendErrorMessage(Long chatId) throws TelegramApiException {
+        sender.sendMessage(chatId, "❌ Ошибка при добавлении товара", false);
+    }
+
+    private static class MessageParser {
         
-        Pattern pattern = Pattern.compile(urlRegex);
-        Matcher matcher = pattern.matcher(message);
-        
-        if (matcher.find()) {
-            return matcher.group();
+        private final List<Pattern> possibleURLs;
+
+        MessageParser() {
+            possibleURLs = getUrlRegexes("https?://\\S+");
+        }
+
+        private List<Pattern> getUrlRegexes(String ... possibleURLs) {
+            List<Pattern> urlRegexes = new ArrayList<>(possibleURLs.length);
+            for (int i = 0; i < possibleURLs.length; i++) {
+                urlRegexes.add(Pattern.compile(possibleURLs[i]));
+            }
+            return urlRegexes;
         }
         
-        return "";
+        private boolean isMessageContainsAnyURLs(String message) {
+            return !extractUrlFromMessage(message).isEmpty();
+        }
+
+        private String extractUrlFromMessage(String message) {
+            for (Pattern url : possibleURLs) {
+                var matcher = url.matcher(message);
+                if (matcher.find()) {
+                    return matcher.group();
+                }
+            }
+            return "";
+        }
     }
 }

@@ -52,6 +52,49 @@ public abstract class AbstractCommand implements BotCommand, SettingsDependantNo
                 message.startsWith(getCommand().strip());
     }
 
+    protected Categories getDefaultCategory(Long userId, Long assignedCartId) throws TelegramApiException {
+        if (!isDefaultCategoryExists(assignedCartId)) {
+            connection.addCategory(new Categories(assignedCartId, Categories.DEFAULT_CATEGORY_NAME));
+            updateReplyKeyboard(userId, assignedCartId);
+        }
+        return connection.getCategoryByAssignedCartIdAndName(assignedCartId, Categories.DEFAULT_CATEGORY_NAME);
+    }
+
+    /* 
+     * Predicates
+     */
+    protected boolean isMessage(Update update) {
+        return update.hasMessage() && update.getMessage().hasText();
+    }
+
+    protected boolean isCallback(Update update) {
+        return update.hasCallbackQuery();
+    }
+
+    protected boolean isUserHaveState(Long chatId, BotState state) {
+        return isUserHaveAnyState(chatId) && userStates.get(chatId).equals(state);
+    }
+
+    protected boolean isUserHaveAnyState(Long chatId) {
+        return userStates.containsKey(chatId);
+    }
+
+    protected boolean isCategoryExists(String categoryName, Long assignedCartId) {
+        return connection.getCategoryByAssignedCartIdAndName(assignedCartId, categoryName) != null;
+    }
+
+    protected boolean isDefaultCategoryExists(Long assignedCartId) {
+        return connection.getCategoryByAssignedCartIdAndName(assignedCartId, Categories.DEFAULT_CATEGORY_NAME) != null;
+    }
+    
+    protected boolean isProductExists(Long productId) {
+        return connection.getProductById(productId) != null;
+    }
+
+    protected boolean isProductExists(String productURL, Long cartId) {
+        return connection.getProductByUrlAndCart(productURL, cartId) != null;
+    }
+
     /* 
      * Inline keyboards
      */
@@ -137,7 +180,7 @@ public abstract class AbstractCommand implements BotCommand, SettingsDependantNo
     }
 
     protected boolean checkForProductExisting(Long chatId, Integer messageId, Long productId) throws TelegramApiException {
-        if (connection.getProductById(productId) == null) {
+        if (!isProductExists(productId)) {
             sender.deleteMessage(chatId, messageId);
             return false;
         }
@@ -234,7 +277,7 @@ public abstract class AbstractCommand implements BotCommand, SettingsDependantNo
         int cntr = 0;
         Categories defCategory = null;
         for (Categories category : connection.getCategoriesByCartId(cartId)) {
-            if (category.categoryName().equals("Прочее")) {
+            if (category.categoryName().equals(Categories.DEFAULT_CATEGORY_NAME)) {
                 defCategory = category;
                 continue;
             }

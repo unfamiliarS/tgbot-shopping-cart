@@ -181,6 +181,7 @@ final public class SQLiteConnection implements DBConnection {
         return categories;
     }
 
+    // within a cart all categories have unique names
     public Categories getCategoryByAssignedCartIdAndName(Long cartId, String categoryName) {
         String query = "SELECT * FROM categories " +
                     "WHERE assigned_cart_id = ? AND category_name = ?";
@@ -225,7 +226,7 @@ final public class SQLiteConnection implements DBConnection {
         }
     }
 
-    // in cart url only unique
+    // within a cart all URLs are unique
     public Products getProductByUrlAndCart(String url, Long cartId) {
         String query = "SELECT p.* FROM products p " +
                     "JOIN categories c ON p.assigned_category_id = c.category_id " +
