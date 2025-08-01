@@ -35,7 +35,7 @@ public class SetCartCallback extends AbstractCallbackCommand {
         Integer messageId = update.getCallbackQuery().getMessage().getMessageId();
         Long newSelectedCartId = extractIdFromMessage(update.getCallbackQuery().getData());
         
-        if (!checkForCartExisting(newSelectedCartId)) {
+        if (!isCartExists(newSelectedCartId)) {
             // skip
         } else if (isThisCartAlreadySelected(userId, newSelectedCartId)) {
             // skip

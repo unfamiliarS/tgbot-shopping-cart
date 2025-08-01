@@ -32,11 +32,6 @@ public class AddProductCommand extends AbstractTextCommand {
     }
 
     @Override
-    public String getDescription() {
-        return "";
-    }
-
-    @Override
     public boolean shouldProcess(Update update) {
         if (isThisMessage(update)) {
             Long chatId = update.getMessage().getChatId();
@@ -63,7 +58,8 @@ public class AddProductCommand extends AbstractTextCommand {
     private void processAddingProduct(Users user, String productURL) throws TelegramApiException {
         if (isProductExists(productURL, user.selectedCartId())) {
             sendMessageForAlreadyExistingProduct(user, productURL);
-        } else if (addProductInTheDefaultCategory(productURL, user.selectedCartId(), user.userId())) {
+        }
+        if (addProductInTheDefaultCategory(productURL, user.selectedCartId(), user.userId())) {
             sendMessageThatProductWasAdded(user.chatId(), productURL, user.selectedCartId());
             processUserNotification(user.userId(), user.selectedCartId(), productURL);    
         } else {
@@ -73,12 +69,7 @@ public class AddProductCommand extends AbstractTextCommand {
 
     private boolean addProductInTheDefaultCategory(String productURL, Long cartId, Long userId) throws TelegramApiException {
         Categories defaultCategory = getDefaultCategory(userId, cartId);
-        Long newProductId = addProductIntoDataBase(productURL, defaultCategory.categoryId());
-        return newProductId != null;
-    }
-
-    private Long addProductIntoDataBase(String productURL, Long categoryId) {
-        return connection.addProduct(new Products(productURL, categoryId));
+        return connection.addProduct(new Products(productURL, defaultCategory.categoryId())) != null;
     }
 
     private void processUserNotification(Long userNotifierId, Long cartId, String productURL) throws TelegramApiException {

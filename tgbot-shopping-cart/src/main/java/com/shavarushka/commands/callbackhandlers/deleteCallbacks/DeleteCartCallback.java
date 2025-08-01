@@ -39,7 +39,7 @@ public class DeleteCartCallback extends AbstractCallbackCommand {
         ShoppingCarts cart = connection.getCartById(cartForDeletionId);
         Users user = connection.getUserById(update.getCallbackQuery().getFrom().getId());
         
-        if (!checkForCartExisting(cartForDeletionId)) {
+        if (!isCartExists(cartForDeletionId)) {
             // skip if cart doesn't exist
         } else if (!isThisCartAssignedToUser(cartForDeletionId, user.userId())) {
             // skip if this cart isn't assigned to user

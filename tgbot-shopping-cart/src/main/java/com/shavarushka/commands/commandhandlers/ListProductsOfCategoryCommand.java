@@ -33,11 +33,6 @@ public class ListProductsOfCategoryCommand extends AbstractTextCommand {
     }
 
     @Override
-    public String getDescription() {
-        return "";
-    }
-
-    @Override
     public boolean shouldProcess(Update update) {
         if (!update.hasMessage() || !update.getMessage().hasText())
             return false;

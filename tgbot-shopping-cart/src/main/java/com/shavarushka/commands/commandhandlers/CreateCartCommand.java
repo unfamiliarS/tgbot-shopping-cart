@@ -42,12 +42,12 @@ public class CreateCartCommand extends AbstractTextCommand {
         if (!checkForUserExisting(chatId, userId))
             return;
 
-        sendFirstCreatingCartMessage(chatId);
+        sendInitialCreatingCartMessage(chatId);
 
         userStates.put(chatId, BotState.WAITING_FOR_CART_NAME);
     }
 
-    private void sendFirstCreatingCartMessage(Long chatId) throws TelegramApiException {
+    private void sendInitialCreatingCartMessage(Long chatId) throws TelegramApiException {
         String message = getDescription() + "\n\nВведи название корзины:";
         var keyboard = KeyboardsFabrics.createKeyboard(
             Map.of("/cancelcreatingnewcart", "Отменить создание"), 1, InlineKeyboardMarkup.class

@@ -34,22 +34,6 @@ public abstract class AbstractCommand implements BotCommand, SettingsDependantNo
         this.connection = connection;
     }
 
-    @Override
-    public boolean shouldProcess(Update update) {
-        Long chatId;
-        String message;
-        if (isThisMessage(update)) {
-            chatId = update.getMessage().getChatId();
-            message = update.getMessage().getText();
-        } else if (isThisCallback(update)) {
-            chatId = update.getCallbackQuery().getMessage().getChatId();
-            message = update.getCallbackQuery().getData();
-        } else {
-            return false;
-        }
-        return !isUserHaveAnyState(chatId) && message.startsWith(getCommand().strip());
-    }
-
     protected Categories getDefaultCategory(Long userId, Long assignedCartId) throws TelegramApiException {
         if (!isDefaultCategoryExists(assignedCartId)) {
             connection.addCategory(new Categories(assignedCartId, Categories.DEFAULT_CATEGORY_NAME));
@@ -82,6 +66,14 @@ public abstract class AbstractCommand implements BotCommand, SettingsDependantNo
 
     protected boolean isUserHaveAnyState(Long chatId) {
         return userStates.containsKey(chatId);
+    }
+
+    protected boolean isUserExists(Long userId) {
+        return connection.getUserById(userId) != null;
+    }
+
+    protected boolean isCartExists(Long cartId) {
+        return connection.getCartById(cartId) != null;
     }
 
     protected boolean isCategoryExists(String categoryName, Long assignedCartId) {
@@ -144,7 +136,7 @@ public abstract class AbstractCommand implements BotCommand, SettingsDependantNo
      */
     protected boolean checkForUserExisting(Long chatId, Long userId) throws TelegramApiException {
         String message;
-        if (connection.getUserById(userId) == null) {
+        if (!isUserExists(userId)) {
             message = "Не могу найти тебя в своей базе😔 Вероятно мы ещё не знакомы.\n/start чтобы поздороваться";
             sender.sendMessage(chatId, message, false);
             return false;
@@ -170,10 +162,6 @@ public abstract class AbstractCommand implements BotCommand, SettingsDependantNo
             return false;
         }
         return true;
-    }
-
-    protected boolean checkForCartExisting(Long cartId) throws TelegramApiException {
-        return connection.getCartById(cartId) != null;
     }
 
     protected boolean checkForCategoryExisting(Long chatId, Integer messageId, Long categoryId) throws TelegramApiException {
