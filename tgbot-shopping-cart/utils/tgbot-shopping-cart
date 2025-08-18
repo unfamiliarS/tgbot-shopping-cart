@@ -1,15 +1,44 @@
 #!/bin/bash
 
-PROJECT_ROOT="$HOME/.local/tgbot-shopping-cart"
+JAR_NAME=tgbot-shopping-cart
+PROJECT_ROOT="$HOME/.local/$JAR_NAME"
 DATE=$(date +%Y-%m-%d)
 
-if [ "$1" = "start" ]; then
+get_bot_working_info() {
+    ps aux | grep $JAR_NAME.jar
+}
+
+start_bot_in_background() {
+    nohup java -jar "$PROJECT_ROOT/$JAR_NAME.jar" > "$PROJECT_ROOT/logs/bot-$DATE.log" 2>&1 &
+}
+
+execute_start() {
     mkdir -p "$PROJECT_ROOT/logs"
-    nohup java -jar "$PROJECT_ROOT/tgbot-shopping-cart.jar" > "$PROJECT_ROOT/logs/bot-$DATE.log" 2>&1 &
-elif [ "$1" = "stop" ]; then
-    bot_pid=$(pgrep -f "java -jar $PROJECT_ROOT/tgbot-shopping-cart.jar")
+    start_bot_in_background
+}
+
+kill_bot_process() {
+    bot_pid=$(pgrep -f "java -jar $PROJECT_ROOT/$JAR_NAME.jar")
     [ -n "$bot_pid" ] && kill $bot_pid
-else
-    echo "Usage: $0 {start|stop}"
-    exit 0
-fi
+}
+
+execute_stop() {
+    kill_bot_process
+}
+
+command=$1
+case "$command" in
+    "start")
+        execute_start
+    ;;
+    "status")
+        get_bot_working_info
+    ;;
+    "stop")
+        execute_stop
+    ;;
+    *)
+        echo "Usage: $0 {start|status|stop}"
+        exit 0
+    ;;
+esac
