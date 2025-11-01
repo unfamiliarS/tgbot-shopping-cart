@@ -39,6 +39,9 @@ public class CommandManager {
         registerCommand(inviteUserCommand);
         registerCommand(inviteUserCommand.new UsernameInputHandler(sender, userStates, connection));
         registerCommand(new AddProductCommand(sender, userStates, connection));
+        var addNotURLProductCommand = new AddNotURLProductCommand(sender, userStates, connection);
+        registerCommand(addNotURLProductCommand);
+        registerCommand(addNotURLProductCommand.new ProductNameInputHandler(sender, userStates, connection));
         registerCommand(new ListProductsOfCategoryCommand(sender, userStates, connection));
         var addCategoryCommand = new CreateCategoryCommand(sender, userStates, connection, tempNewNames);
         registerCommand(addCategoryCommand);
@@ -49,6 +52,7 @@ public class CommandManager {
         registerCommand(new SettingsCommand(sender, userStates, connection));
 
         // Register callbacks
+        registerCommand(new CancelAddingProductCallback(sender, userStates, connection));
         registerCommand(new CancelCreatingCartCallback(sender, userStates, connection));
         registerCommand(new ConfirmCartCreationCallback(sender, userStates, connection, tempNewNames));
         registerCommand(new SetCartCallback(sender, userStates, connection));
