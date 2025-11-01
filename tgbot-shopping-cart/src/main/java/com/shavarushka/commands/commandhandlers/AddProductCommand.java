@@ -74,7 +74,7 @@ public class AddProductCommand extends AbstractTextCommand {
 
     private void processUserNotification(Long userNotifierId, Long cartId, String productURL) throws TelegramApiException {
         String message = "добавил(а) новый товар\n" + productURL;
-        notifyIfEnabled(userNotifierId, cartId, message, SettingsDependantNotifier.NotificationType.REFUSING_OF_JOINING_THE_CART);
+        notifyAllIfEnabled(userNotifierId, cartId, SettingsDependantNotifier.NotificationType.PRODUCT_ADDED, message);
     }
 
     private void sendMessageForAlreadyExistingProduct(Users user, String existingProductURL) throws TelegramApiException {
