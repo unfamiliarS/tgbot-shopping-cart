@@ -1,0 +1,12 @@
+[Unit]
+Description=tgbot Shared Shopping Cart
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/home/semyon/.local/tgbot-shopping-cart/tgbot-shopping-cart start
+ExecStop=/home/semyon/.local/tgbot-shopping-cart/tgbot-shopping-cart stop
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
