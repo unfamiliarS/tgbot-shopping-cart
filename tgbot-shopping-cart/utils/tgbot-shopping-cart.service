@@ -4,9 +4,13 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=/home/semyon/.local/tgbot-shopping-cart/tgbot-shopping-cart start
-ExecStop=/home/semyon/.local/tgbot-shopping-cart/tgbot-shopping-cart stop
+ExecStart=/usr/bin/java -jar /home/semyon/.local/tgbot-shopping-cart/tgbot-shopping-cart.jar
+SuccessExitStatus=143
 Restart=on-failure
 
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=tgbot-shopping-cart
+
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target

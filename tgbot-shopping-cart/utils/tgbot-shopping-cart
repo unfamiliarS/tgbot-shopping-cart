@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# To manually control the bot process
+
 JAR_NAME=tgbot-shopping-cart
 PROJECT_ROOT="$HOME/.local/$JAR_NAME"
 DATE=$(date +%Y-%m-%d)
